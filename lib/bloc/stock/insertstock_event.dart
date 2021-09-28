@@ -7,7 +7,10 @@ abstract class InsertstockEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class Initiate extends InsertstockEvent {}
+class Initiate extends InsertstockEvent {
+  final bool? success;
+  Initiate({this.success});
+}
 
 class SendtoDB extends InsertstockEvent {
   final List<ItemCards> data;

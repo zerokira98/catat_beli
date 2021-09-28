@@ -152,7 +152,26 @@ class ListOfStockItems extends StatelessWidget {
                   builder: (context, state) {
                 if (state is StockviewLoaded) {
                   if (state.datas.isEmpty) {
-                    return Center(child: Text('Empty!'));
+                    return Column(
+                      children: [
+                        Row(children: [
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              margin: EdgeInsets.only(bottom: 8.0),
+                              color: Colors.grey[700],
+                              child: Text(
+                                state.filter.startDate
+                                    .toString()
+                                    .substring(0, 10),
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          )
+                        ]),
+                        Expanded(child: Center(child: Text('Empty!'))),
+                      ],
+                    );
                   }
                   return Scrollbar(
                     // controller: _scontrol,

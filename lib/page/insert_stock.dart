@@ -24,7 +24,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
             builder: (context) {
               return AlertDialog(
                 title: Text('Are you sure to exit?'),
-                content: Text('Your inputted data would be lost.'),
+                content: Text('Your data on field would be lost.'),
                 actions: [
                   ElevatedButton(
                       onPressed: () {
@@ -35,7 +35,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       onPressed: () {
                         Navigator.pop(context, false);
                       },
-                      child: Text('Close')),
+                      child: Text('Close message')),
                 ],
               );
             });
@@ -102,6 +102,20 @@ class _InsertProductPageState extends State<InsertProductPage> {
           ),
           body: BlocListener<InsertstockBloc, InsertstockState>(
             listener: (context, state) {
+              if (state is Loaded) {
+                if (state.success != null) {
+                  if (state.success!) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      backgroundColor: Colors.green,
+                      content: const Text('Berhasil'),
+                    ));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: const Text('Terjadi kesalahan'),
+                    ));
+                  }
+                }
+              }
               // if (state is Loaded) {
               //   if (state.error != null) {
               //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -473,7 +487,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             onChanged: (v) {
                               BlocProvider.of<InsertstockBloc>(context)
                                   .add(DataChange(widget.data.copywith(
-                                hargaBeli: int.parse(hargaBeli!.text),
+                                hargaBeli: int.tryParse(hargaBeli!.text),
                               )));
                             },
                             controller: hargaBeli,

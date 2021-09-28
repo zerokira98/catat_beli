@@ -46,13 +46,15 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     if (event is InitiateView) {
       yield StockviewLoading();
       var curdate = DateTime.now();
-      var startDate = curdate.subtract(Duration(days: curdate.day + 1));
-      var endDate = curdate.add(Duration(days: 30));
+      var startDate = DateTime(curdate.year, curdate.month, 1);
+      // var startDate = curdate.subtract(Duration(days: curdate.day + 1));
+      // var endDate = curdate.add(Duration(days: 30));
+      var endDate = DateTime(curdate.year, curdate.month + 1, 0);
       int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
 
-      print('maxq = ' + maxQ.toString());
+      // print('maxq = ' + maxQ.toString());
       var a = await db.showStockwithDetails(limit: 20, page: 0);
-      print('passed here');
+      // print('passed here');
       yield StockviewLoaded(
         message: event.message,
         filter: Filter(

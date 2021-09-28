@@ -20,7 +20,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
       List<ItemCards> data = [];
       data.add(ItemCards(
           ditambahkan: DateTime.now(), pcs: 1, cardId: 1, open: false));
-      yield Loaded(data);
+      yield Loaded(data, event.success);
       // await Future.delayed(Duration(milliseconds: 500));
       // yield Loaded(data.map((e) => e.copywith(open: true)).toList());
     }
@@ -39,7 +39,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
 
         List<ItemCards> data = (state as Loaded)
             .data
-            .map((e) => e.copywith(namaBarang: e.namaBarang!.trim()))
+            .map((e) => e.copywith(namaBarang: e.namaBarang?.trim()))
             .toList();
         yield Loaded(data);
         // var state =
@@ -54,7 +54,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
             await db.addItems(data);
             // yield StockInitial();
             // add(StockInitialize(success: true));
-            add(Initiate());
+            add(Initiate(success: true));
           } catch (e) {
             print(e);
             // yield StockLoaded(data, error: {'msg': e.toString()});
