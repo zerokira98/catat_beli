@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:kasir/msc/db_moor.dart';
 import 'package:path_provider/path_provider.dart';
@@ -66,36 +67,33 @@ class _PrintAlertState extends State<PrintAlert> {
               ),
             ],
           ),
-          FutureBuilder(
-              future: getApplicationDocumentsDirectory(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Text(
-                    'file saved at: ${snapshot.data}',
-                    textScaleFactor: 0.7,
-                  );
-                }
-                return Container();
-              }),
+          Platform.isWindows
+              ? FutureBuilder(
+                  future: getApplicationDocumentsDirectory(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                        'file saved at: ${snapshot.data}',
+                        textScaleFactor: 0.7,
+                      );
+                    }
+                    return Container();
+                  })
+              : Container(),
           // CupertinoDatePicker(onDateTimeChanged: (val){},,)
         ],
       ),
       actions: [
+        if (Platform.isWindows)
+          TextButton(
+              onPressed: () async {
+                var uwu = await getApplicationDocumentsDirectory();
+                Process.run("explorer", [uwu.path]);
+              },
+              child: Text('Open Directory')),
         TextButton(
             onPressed: () async {
-              var uwu = await getExternalStorageDirectory();
-              var url = 'file:/' + uwu!.path;
-              print(url);
-              if (await canLaunch(url)) {
-                await launch(url, forceSafariVC: false, forceWebView: false);
-              } else {
-                throw 'Could not launch $url';
-              }
-            },
-            child: Text('Open Directory')),
-        TextButton(
-            onPressed: () async {
-              Directory? a = await getExternalStorageDirectory();
+              Directory a = await getApplicationDocumentsDirectory();
               var curdate = DateTime.now();
               var data = await RepositoryProvider.of<MyDatabase>(context)
                   .showStockwithDetails(
@@ -104,8 +102,8 @@ class _PrintAlertState extends State<PrintAlert> {
                           .subtract(Duration(days: 1)));
               if (data.isNotEmpty) {
                 File theFile =
-                    File(a!.path + '/backup_${dataBulan[multivalue]}.csv');
-                bool isExist = await theFile.exists();
+                    File(a.path + '/backup_${dataBulan[multivalue]}.csv');
+                // bool isExist = await theFile.exists();
                 double totalkeluar = 0.0;
                 List<List> datalist = [
                   // ['...']
@@ -167,51 +165,61 @@ class _PrintAlertState extends State<PrintAlert> {
 
                 ///--------
                 var b = ListToCsvConverter().convert(datalist);
-                bool dialog = true; //true if u want to override or continue
-                if (isExist) {
-                  dialog = await showDialog(
+                // bool dialog = true; //true if u want to override or continue
+                // if (isExist) {
+                //   dialog = await showDialog(
+                //       context: context,
+                //       builder: (context) {
+                //         return AlertDialog(
+                //           title: Text('Alert'),
+                //           content: Text(
+                //               'File with the same name is already exist.Overwrite?'),
+                //           actions: [
+                //             TextButton(
+                //                 onPressed: () {
+                //                   Navigator.pop(context, true);
+                //                 },
+                //                 child: Text('Yes')),
+                //             TextButton(
+                //                 onPressed: () {
+                //                   Navigator.pop(context, false);
+                //                 },
+                //                 child: Text('Cancel')),
+                //           ],
+                //         );
+                //       });
+                // }
+                // if (dialog) {
+                try {
+                  var savedfile =
+                      await theFile.writeAsString(b, mode: FileMode.write);
+                  if (Platform.isAndroid) {
+                    final params =
+                        SaveFileDialogParams(sourceFilePath: savedfile.path);
+                    final filePath =
+                        await FlutterFileDialog.saveFile(params: params);
+                    print(filePath);
+                  }
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Successfully printed'),
+                  ));
+                } catch (e) {
+                  print(e);
+                  showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text('Alert'),
-                          content: Text(
-                              'File with the same name is already exist.Overwrite?'),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                                child: Text('Yes')),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context, false);
-                                },
-                                child: Text('Cancel')),
-                          ],
+                          title: Text('error'),
+                          content: Text(e.toString()),
                         );
                       });
                 }
-                if (dialog) {
-                  try {
-                    await theFile.writeAsString(b, mode: FileMode.write);
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Successfully printed'),
-                    ));
-                  } catch (e) {
-                    print(e);
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text('error'),
-                            content: Text(e.toString()),
-                          );
-                        });
-                  }
-                  print('end');
-                }
-              } else {
+                print('end');
+              }
+              // }
+              else {
                 showDialog(
                     context: context,
                     builder: (context) {
