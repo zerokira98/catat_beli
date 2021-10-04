@@ -98,18 +98,24 @@ class MyDatabase extends _$MyDatabase {
       (select(tempatBelis)..where((tbl) => tbl.id.equals(id))).get();
 
   ///====
-  Future<List<StockWithDetails>> showStockwithDetails(
-      {int? idBarang,
-      int? limit,
-      int? page,
-      DateTime? startDate,
-      DateTime? endDate}) async {
+  Future<List<StockWithDetails>> showStockwithDetails({
+    int? idBarang,
+    int? limit,
+    int? page,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    ///----------Declare default variables
     var timenow = DateTime.now();
     startDate = startDate ?? DateTime(timenow.year, 1, 1);
     endDate = endDate ??
         DateTime(timenow.year, timenow.month + 1, 1)
             .subtract(Duration(days: 1));
+
+    /// Return variable
+    ///
     List<TypedResult> a;
+
     // int max = await ;
     if (idBarang == null) {
       var ab = (select(stocks)
@@ -233,5 +239,19 @@ class MyDatabase extends _$MyDatabase {
 
   Future tempatinsert() async {
     into(tempatBelis).insert(TempatBelisCompanion(nama: Value('TOP')));
+  }
+
+  Future updateItemProp(
+      productId, String nama, int? harga, int? barcode) async {
+    return await (update(stockItems)..where((tbl) => tbl.id.equals(productId)))
+        .write(
+      StockItemsCompanion(
+          nama: Value(nama),
+          barcode: barcode == null
+              ? Value.absent()
+              : Value(
+                  barcode,
+                )),
+    );
   }
 }

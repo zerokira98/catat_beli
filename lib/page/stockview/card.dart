@@ -53,114 +53,124 @@ class _StockviewCardState extends State<StockviewCard> {
           });
         });
       },
-      child: Stack(
-        children: [
-          Container(
-            margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.red,
-            ),
-            child: ListTile(
-              isThreeLine: true,
-              // shape: RoundedRectangleBorder( ),
-              // tileColor: Colors.white,
-              title: Text(''),
-              subtitle: Row(
-                children: [
-                  Text('' + '\n' + '\n'),
-                  Expanded(
-                    child: Container(),
-                  ),
-                  Text(' \n' + '\n')
-                ],
+      child: Container(
+        margin: EdgeInsets.symmetric(
+          horizontal:
+              MediaQuery.of(context).orientation == Orientation.landscape
+                  ? MediaQuery.of(context).size.width * 0.05
+                  : 0,
+          vertical: 3,
+        ),
+        child: Stack(
+          children: [
+            Container(
+              margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
+              // padding: EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.red,
+              ),
+              child: ListTile(
+                isThreeLine: true,
+                // shape: RoundedRectangleBorder( ),
+                // tileColor: Colors.white,
+                title: Text(''),
+                subtitle: Row(
+                  children: [
+                    Text('' + '\n' + '\n'),
+                    Expanded(
+                      child: Container(),
+                    ),
+                    Text(' \n' + '\n')
+                  ],
+                ),
               ),
             ),
-          ),
-          Positioned.fill(
-              child: Container(
-            margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
-            child: Center(
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Are you sure want to delete?',
-                      style: TextStyle(color: Colors.white),
+            Positioned.fill(
+                child: Container(
+              margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
+              child: Center(
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Text(
+                        'Are you sure want to delete?',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Container(),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
+                    Expanded(
+                      child: Container(),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                          onTap: () {
+                            BlocProvider.of<StockviewBloc>(context)
+                                .add(DeleteEntry(
+                              widget.data,
+                            ));
+                          },
+                          child: Text('Yes',
+                              style: TextStyle(color: Colors.white))),
+                    ),
+                    InkWell(
                         onTap: () {
-                          BlocProvider.of<StockviewBloc>(context)
-                              .add(DeleteEntry(
-                            widget.data,
-                          ));
+                          setState(() {
+                            horizontal = 0.0;
+                          });
                         },
-                        child:
-                            Text('Yes', style: TextStyle(color: Colors.white))),
-                  ),
-                  InkWell(
-                      onTap: () {
-                        setState(() {
-                          horizontal = 0.0;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Cancel',
-                            style: TextStyle(color: Colors.white)),
-                      )),
-                ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Text('Cancel',
+                              style: TextStyle(color: Colors.white)),
+                        )),
+                  ],
+                ),
               ),
-            ),
-          )),
-          AnimatedContainer(
-            duration: Duration(milliseconds: 450),
-            transform: Matrix4.identity()..translate(horizontal),
-            margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              // border: Border.all(),
-              boxShadow: [
-                BoxShadow(blurRadius: 8, color: Colors.black26),
-              ],
-              color: Colors.white,
-            ),
-            child: ListTile(
-              isThreeLine: true,
-              // shape: RoundedRectangleBorder( ),
-              // tileColor: Colors.white,
-              title: Text(widget.data.namaBarang.toString()),
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text('Tempat beli: ${widget.data.tempatBeli}' +
-                        '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
-                        '\nJumlah item : ${widget.data.pcs}pcs'),
-                  ),
-                  // Expanded(
-                  //   child: Container(),
-                  // ),
-                  Flexible(
-                    // fit: FlexFit.tight,
-                    child: Text(
-                      'Harga beli : $hargaBeli' + '\nTotal beli : $totalBeli',
-                      // maxLines: 1,
-                      overflow: TextOverflow.fade,
+            )),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 450),
+              transform: Matrix4.identity()..translate(horizontal),
+              margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                // border: Border.all(),
+                boxShadow: [
+                  BoxShadow(blurRadius: 8, color: Colors.black26),
+                ],
+                color: Colors.white,
+              ),
+              child: ListTile(
+                isThreeLine: true,
+                // shape: RoundedRectangleBorder( ),
+                // tileColor: Colors.white,
+                title: Text(widget.data.namaBarang.toString()),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text('Tempat beli: ${widget.data.tempatBeli}' +
+                          '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
+                          '\nJumlah item : ${widget.data.pcs}pcs'),
                     ),
-                  )
-                ],
+                    // Expanded(
+                    //   child: Container(),
+                    // ),
+                    Flexible(
+                      // fit: FlexFit.tight,
+                      child: Text(
+                        'Harga beli : $hargaBeli' + '\nTotal beli : $totalBeli',
+                        // maxLines: 1,
+                        overflow: TextOverflow.fade,
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

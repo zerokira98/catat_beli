@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:kasir/msc/db_moor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PrintAlert extends StatefulWidget {
   @override
@@ -82,35 +83,35 @@ class _PrintAlertState extends State<PrintAlert> {
       actions: [
         TextButton(
             onPressed: () async {
-              Directory a = await getApplicationDocumentsDirectory();
+              var uwu = await getExternalStorageDirectory();
+              var url = 'file:/' + uwu!.path;
+              print(url);
+              if (await canLaunch(url)) {
+                await launch(url, forceSafariVC: false, forceWebView: false);
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+            child: Text('Open Directory')),
+        TextButton(
+            onPressed: () async {
+              Directory? a = await getExternalStorageDirectory();
               var curdate = DateTime.now();
-              // String month = multivalue.toString().length == 1
-              //     ? '0' + (multivalue + 1).toString()
-              //     : (multivalue + 1).toString();
               var data = await RepositoryProvider.of<MyDatabase>(context)
                   .showStockwithDetails(
                       startDate: DateTime(curdate.year, multivalue + 1, 1),
                       endDate: DateTime(curdate.year, multivalue + 2, 1)
                           .subtract(Duration(days: 1)));
-              print(a.path);
-              print(data);
               if (data.isNotEmpty) {
                 File theFile =
-                    File(a.path + '/backup_${dataBulan[multivalue]}.csv');
+                    File(a!.path + '/backup_${dataBulan[multivalue]}.csv');
+                bool isExist = await theFile.exists();
                 double totalkeluar = 0.0;
                 List<List> datalist = [
                   // ['...']
                 ];
-                //  (data['res'] as List)
-                //     .map<List>((e) => [
-                //           e['ADD_DATE'].toString().substring(0, 10),
-                //           e['NAMA'],
-                //           e['PRICE'],
-                //           e['QTY'],
-                //           e['SUPPLIER']
-                //         ])
-                //     .toList();
-                // var e = data['res'];
+
+                ///---- Create Separator for each day
                 for (var i = 0; i < data.length; i++) {
                   if (i == 0) {
                     // var x = DateTime.parse(
@@ -149,9 +150,8 @@ class _PrintAlertState extends State<PrintAlert> {
                     ]
                   });
                 }
-                // datalist.insert(0, [
-                //   data['res'][0]['ADD_DATE'].toString().substring(0, 10),
-                // ]);
+
+                ///-------Menghitung total pengeluaran bulan ini
                 for (var item in datalist) {
                   if (item.length > 2) {
                     totalkeluar += item[2] * item[3];
@@ -161,27 +161,56 @@ class _PrintAlertState extends State<PrintAlert> {
                   ..add('')
                   ..add('')
                   ..add('')
+                  ..add('')
                   ..add('Total bulan ini : ')
                   ..add(totalkeluar);
+
+                ///--------
                 var b = ListToCsvConverter().convert(datalist);
-                try {
-                  await theFile.writeAsString(b, mode: FileMode.write);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Successfully printed'),
-                  ));
-                } catch (e) {
-                  print(e);
-                  showDialog(
+                bool dialog = true; //true if u want to override or continue
+                if (isExist) {
+                  dialog = await showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text('error'),
-                          content: Text(e.toString()),
+                          title: Text('Alert'),
+                          content: Text(
+                              'File with the same name is already exist.Overwrite?'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, true);
+                                },
+                                child: Text('Yes')),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context, false);
+                                },
+                                child: Text('Cancel')),
+                          ],
                         );
                       });
                 }
-                print('end');
+                if (dialog) {
+                  try {
+                    await theFile.writeAsString(b, mode: FileMode.write);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Successfully printed'),
+                    ));
+                  } catch (e) {
+                    print(e);
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('error'),
+                            content: Text(e.toString()),
+                          );
+                        });
+                  }
+                  print('end');
+                }
               } else {
                 showDialog(
                     context: context,

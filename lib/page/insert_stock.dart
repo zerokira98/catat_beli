@@ -116,21 +116,14 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   }
                 }
               }
-              // if (state is Loaded) {
-              //   if (state.error != null) {
-              //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              //       content: Text('Error : ${state.error!['msg']}'),
-              //     ));
-              //   }
-              //   if (state.success != null && state.success!) {
-              //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              //       content: Text('Berhasil'),
-              //     ));
-              //   }
-              // }
             },
             child: Container(
               // padding: EdgeInsets.only(top: 12.0),
+              padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).orientation ==
+                          Orientation.landscape
+                      ? MediaQuery.of(context).size.width * 0.05
+                      : 0),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               // color: Colors.grey[100],
@@ -583,7 +576,9 @@ class _InsertProductCardState extends State<InsertProductCard>
       ),
     );
 
-    return Container(
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 250),
+
       // height: 1,
       child: AnimatedClipRect(
         curve: Curves.ease,
