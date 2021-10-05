@@ -21,14 +21,15 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
         startDate: DateTime.parse(event.filter.startDate),
         endDate: DateTime.parse(event.filter.endDate),
       );
-      print('maxq = ' + maxQ.toString());
+      // print('maxq = ' + maxQ.toString());
       var data = await db.showStockwithDetails(
+        name: event.filter.nama,
         limit: 20,
         page: event.filter.currentPage,
         startDate: DateTime.parse(event.filter.startDate),
         endDate: DateTime.parse(event.filter.endDate),
       );
-      print(data);
+      // print(data);
       yield StockviewLoaded(
           filter: event.filter.copyWith(maxRow: maxQ),
           datas: data

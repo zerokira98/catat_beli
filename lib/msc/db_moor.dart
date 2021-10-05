@@ -104,6 +104,7 @@ class MyDatabase extends _$MyDatabase {
     int? page,
     DateTime? startDate,
     DateTime? endDate,
+    String? name,
   }) async {
     ///----------Declare default variables
     var timenow = DateTime.now();
@@ -136,6 +137,7 @@ class MyDatabase extends _$MyDatabase {
           offset: page! * limit,
         );
       }
+      if (name != null) ab.where(stockItems.nama.contains(name));
       a = await ab.get();
       // ab.where((stocks.dateAdd.isBiggerThan())
     } else {
@@ -154,6 +156,7 @@ class MyDatabase extends _$MyDatabase {
           offset: page! * limit,
         );
       }
+      if (name != null) b.where(stockItems.nama.contains(name));
       a = await b.get();
 
       //  a= (select(stocks)..where((tbl) => tbl.idItem.equals(idBarang))).get();

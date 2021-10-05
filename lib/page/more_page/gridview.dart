@@ -37,9 +37,17 @@ class MorePage extends StatelessWidget {
             ElevatedButton(
               child: Center(
                 // padding: const EdgeInsets.all(18.0),
-                child: Text(
-                  'Print Monthly Stock',
-                  textAlign: TextAlign.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(Icons.print),
+                    Flexible(
+                      child: Text(
+                        'Print Monthly Stock',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               onPressed: () {
@@ -66,9 +74,15 @@ class MorePage extends StatelessWidget {
                   // }
                 },
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Icon(Icons.list),
-                    Flexible(child: Text('List Inserted Item')),
+                    Flexible(
+                        child: Center(
+                            child: Text(
+                      'List Inserted Item',
+                      textAlign: TextAlign.center,
+                    ))),
                   ],
                 )),
           ],
