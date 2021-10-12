@@ -28,6 +28,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
         page: event.filter.currentPage,
         startDate: DateTime.parse(event.filter.startDate),
         endDate: DateTime.parse(event.filter.endDate),
+        boughtPlace: event.filter.tempatBeli,
       );
       // print(data);
       yield StockviewLoaded(

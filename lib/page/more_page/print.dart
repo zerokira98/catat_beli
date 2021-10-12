@@ -78,6 +78,7 @@ class _PrintAlertState extends State<PrintAlert> {
             data[i].item.nama,
             data[i].stock.price,
             data[i].stock.qty,
+            data[i].stock.qty * data[i].stock.price,
             data[i].tempatBeli.nama,
           ]
         });

@@ -10,7 +10,7 @@ part of 'db_moor.dart';
 class Stock extends DataClass implements Insertable<Stock> {
   final int id;
   final int price;
-  final int qty;
+  final double qty;
   final DateTime? dateAdd;
   final int? idItem;
   final int? idSupplier;
@@ -29,7 +29,7 @@ class Stock extends DataClass implements Insertable<Stock> {
           .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
       price: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
-      qty: const IntType()
+      qty: const RealType()
           .mapFromDatabaseResponse(data['${effectivePrefix}qty'])!,
       dateAdd: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}date_add']),
@@ -44,7 +44,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['price'] = Variable<int>(price);
-    map['qty'] = Variable<int>(qty);
+    map['qty'] = Variable<double>(qty);
     if (!nullToAbsent || dateAdd != null) {
       map['date_add'] = Variable<DateTime?>(dateAdd);
     }
@@ -79,7 +79,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return Stock(
       id: serializer.fromJson<int>(json['id']),
       price: serializer.fromJson<int>(json['price']),
-      qty: serializer.fromJson<int>(json['qty']),
+      qty: serializer.fromJson<double>(json['qty']),
       dateAdd: serializer.fromJson<DateTime?>(json['dateAdd']),
       idItem: serializer.fromJson<int?>(json['idItem']),
       idSupplier: serializer.fromJson<int?>(json['idSupplier']),
@@ -91,7 +91,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'price': serializer.toJson<int>(price),
-      'qty': serializer.toJson<int>(qty),
+      'qty': serializer.toJson<double>(qty),
       'dateAdd': serializer.toJson<DateTime?>(dateAdd),
       'idItem': serializer.toJson<int?>(idItem),
       'idSupplier': serializer.toJson<int?>(idSupplier),
@@ -101,7 +101,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   Stock copyWith(
           {int? id,
           int? price,
-          int? qty,
+          double? qty,
           DateTime? dateAdd,
           int? idItem,
           int? idSupplier}) =>
@@ -150,7 +150,7 @@ class Stock extends DataClass implements Insertable<Stock> {
 class StocksCompanion extends UpdateCompanion<Stock> {
   final Value<int> id;
   final Value<int> price;
-  final Value<int> qty;
+  final Value<double> qty;
   final Value<DateTime?> dateAdd;
   final Value<int?> idItem;
   final Value<int?> idSupplier;
@@ -173,7 +173,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   static Insertable<Stock> custom({
     Expression<int>? id,
     Expression<int>? price,
-    Expression<int>? qty,
+    Expression<double>? qty,
     Expression<DateTime?>? dateAdd,
     Expression<int?>? idItem,
     Expression<int?>? idSupplier,
@@ -191,7 +191,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   StocksCompanion copyWith(
       {Value<int>? id,
       Value<int>? price,
-      Value<int>? qty,
+      Value<double>? qty,
       Value<DateTime?>? dateAdd,
       Value<int?>? idItem,
       Value<int?>? idSupplier}) {
@@ -215,7 +215,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
       map['price'] = Variable<int>(price.value);
     }
     if (qty.present) {
-      map['qty'] = Variable<int>(qty.value);
+      map['qty'] = Variable<double>(qty.value);
     }
     if (dateAdd.present) {
       map['date_add'] = Variable<DateTime?>(dateAdd.value);
@@ -260,11 +260,11 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
       requiredDuringInsert: false,
       defaultValue: Constant(0));
   final VerificationMeta _qtyMeta = const VerificationMeta('qty');
-  late final GeneratedColumn<int?> qty = GeneratedColumn<int?>(
+  late final GeneratedColumn<double?> qty = GeneratedColumn<double?>(
       'qty', aliasedName, false,
-      typeName: 'INTEGER',
+      typeName: 'REAL',
       requiredDuringInsert: false,
-      defaultValue: Constant(1));
+      defaultValue: Constant(1.0));
   final VerificationMeta _dateAddMeta = const VerificationMeta('dateAdd');
   late final GeneratedColumn<DateTime?> dateAdd = GeneratedColumn<DateTime?>(
       'date_add', aliasedName, true,

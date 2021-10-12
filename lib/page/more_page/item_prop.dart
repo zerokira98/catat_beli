@@ -104,6 +104,29 @@ class _EditItemPageState extends State<EditItemPage>
     //   qtyc.text = data.pcs?.toString() ?? '';
     // }
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.save),
+            Text(
+              'Save',
+            ),
+          ],
+        ),
+        onPressed: () async {
+          if (_formkey.currentState!.validate()) {
+            print('succ here');
+            int? barcode =
+                barcodeC.text.isEmpty ? null : int.parse(barcodeC.text);
+            print('succ here');
+            await RepositoryProvider.of<MyDatabase>(context)
+                .updateItemProp(
+                    data.id, namec.text, int.tryParse(hargaJual.text), barcode)
+                .then((value) => Navigator.pop(context, 'halo minnasan XD'));
+          }
+        },
+      ),
       appBar: AppBar(title: Text('Edit'), actions: [
         ElevatedButton(
             onPressed: () async {

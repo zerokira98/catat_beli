@@ -10,7 +10,8 @@ import 'package:kasir/bloc/stockview/stockview_bloc.dart';
 import 'package:kasir/page/insert_stock.dart';
 import 'package:kasir/msc/bloc_observer.dart';
 import 'package:kasir/msc/db_moor.dart';
-import 'package:kasir/page/more_page/gridview.dart';
+// import 'package:kasir/page/more_page/gridview.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:sqlite3/sqlite3.dart' as sql;
@@ -25,6 +26,14 @@ main() {
   Bloc.observer = NewBlocObserver();
 
   runApp(App());
+  if (Platform.isWindows) {
+    doWhenWindowReady(() {
+      appWindow.size = Size(800, 600);
+      appWindow.minSize = Size(800, 600);
+      appWindow.maximize();
+      appWindow.show();
+    });
+  }
 }
 
 DynamicLibrary _openOnWindows() {
@@ -56,17 +65,51 @@ class App extends StatelessWidget {
                     ..add(InitiateView())),
         ],
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           home: Scaffold(
-            bottomNavigationBar: Builder(builder: (c) => Bottoms(pc: pageC)),
-            body: PageView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 2,
-                controller: pageC,
-                itemBuilder: (context, i) {
-                  if (i == 0) return InsertProductPage();
-                  if (i == 1) return MorePage();
-                  return CircularProgressIndicator();
-                }),
+            backgroundColor: Colors.transparent,
+            // bottomNavigationBar: Builder(builder: (c) => Bottoms(pc: pageC)),
+            body: Container(
+              // decoration: BoxDecoration(
+              //     borderRadius:
+              //         BorderRadius.only(topLeft: Radius.circular(18.0))),
+              child: Column(
+                children: [
+                  WindowTitleBarBox(
+                      child: Container(
+                    // color: Colors.blue,
+                    decoration: BoxDecoration(
+                      // borderRadius:
+                      //     BorderRadius.only(topLeft: Radius.circular(18.0)),
+                      gradient: LinearGradient(
+                          colors: [
+                            Colors.black,
+                            Colors.grey.shade900,
+                            Colors.grey.shade900,
+                          ],
+                          // stops: [],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter),
+                    ),
+                    child: Row(children: [
+                      Expanded(child: MoveWindow()),
+                      WindowButtons()
+                    ]),
+                  )),
+                  Expanded(
+                    child: PageView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: 1,
+                        controller: pageC,
+                        itemBuilder: (context, i) {
+                          if (i == 0) return InsertProductPage();
+                          // if (i == 1) return MorePage();
+                          return CircularProgressIndicator();
+                        }),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -100,5 +143,31 @@ class _BottomsState extends State<Bottoms> {
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'More'),
         ]);
+  }
+}
+
+class WindowButtons extends StatelessWidget {
+  WindowButtons({Key? key}) : super(key: key);
+  final col =
+      WindowButtonColors(iconNormal: Colors.white, mouseOver: Colors.black54);
+  final colex = WindowButtonColors(
+    iconNormal: Colors.white,
+    mouseOver: Colors.red,
+  );
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        MinimizeWindowButton(
+          colors: col,
+        ),
+        MaximizeWindowButton(
+          colors: col,
+        ),
+        CloseWindowButton(
+          colors: colex,
+        ),
+      ],
+    );
   }
 }

@@ -12,7 +12,7 @@ part 'db_moor.g.dart';
 class Stocks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get price => integer().withDefault(Constant(0))();
-  IntColumn get qty => integer().withDefault(Constant(1))();
+  RealColumn get qty => real().withDefault(Constant(1.0))();
   DateTimeColumn get dateAdd => dateTime().nullable()();
   IntColumn get idItem =>
       integer().nullable().customConstraint('REFERENCES stockitems(id)')();
@@ -105,8 +105,12 @@ class MyDatabase extends _$MyDatabase {
     DateTime? startDate,
     DateTime? endDate,
     String? name,
+    String? boughtPlace,
   }) async {
     ///----------Declare default variables
+    ///
+    boughtPlace = boughtPlace ?? '';
+    name = name ?? '';
     var timenow = DateTime.now();
     startDate = startDate ?? DateTime(timenow.year, 1, 1);
     endDate = endDate ??
@@ -118,8 +122,9 @@ class MyDatabase extends _$MyDatabase {
     List<TypedResult> a;
 
     // int max = await ;
+    var query;
     if (idBarang == null) {
-      var ab = (select(stocks)
+      query = (select(stocks)
             ..orderBy([
               (tbl) =>
                   OrderingTerm(expression: tbl.dateAdd, mode: OrderingMode.asc)
@@ -132,16 +137,17 @@ class MyDatabase extends _$MyDatabase {
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
       ]);
       if (limit != null) {
-        ab.limit(
+        query.limit(
           limit,
           offset: page! * limit,
         );
       }
-      if (name != null) ab.where(stockItems.nama.contains(name));
-      a = await ab.get();
+      // ab.where(stockItems.nama.contains(name));
+      // ab.where(tempatBelis.nama.contains(boughtPlace));
+      // a = await ab.get();
       // ab.where((stocks.dateAdd.isBiggerThan())
     } else {
-      var b = (select(stocks)
+      query = (select(stocks)
             ..where((tbl) =>
                 tbl.dateAdd.isBiggerOrEqualValue(startDate) &
                 stocks.dateAdd.isSmallerOrEqualValue(endDate)))
@@ -149,18 +155,20 @@ class MyDatabase extends _$MyDatabase {
         leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
       ]);
-      b.where(stocks.idItem.equals(idBarang));
+      query.where(stocks.idItem.equals(idBarang));
       if (limit != null) {
-        b.limit(
+        query.limit(
           limit,
           offset: page! * limit,
         );
       }
-      if (name != null) b.where(stockItems.nama.contains(name));
-      a = await b.get();
+      // a = await b.get();
 
       //  a= (select(stocks)..where((tbl) => tbl.idItem.equals(idBarang))).get();
     }
+    query.where(stockItems.nama.contains(name));
+    query.where(tempatBelis.nama.contains(boughtPlace));
+    a = await query.get();
     return a
         .map((e) => StockWithDetails(
               e.readTable(stocks),

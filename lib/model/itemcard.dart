@@ -5,7 +5,7 @@ class ItemCards extends Equatable {
   final String? namaBarang;
   final int? hargaBeli;
   final int? hargaJual;
-  final int? pcs;
+  final double? pcs;
   final GlobalKey<FormState>? formkey;
   final int? productId;
   final int? cardId; //~??????
@@ -30,7 +30,7 @@ class ItemCards extends Equatable {
       {String? namaBarang,
       int? hargaBeli,
       int? hargaJual,
-      int? pcs,
+      double? pcs,
       String? tempatBeli,
       int? productId,
       bool? open,

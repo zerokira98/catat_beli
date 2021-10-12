@@ -152,7 +152,7 @@ class _StockviewCardState extends State<StockviewCard> {
                     Flexible(
                       child: Text('Tempat beli: ${widget.data.tempatBeli}' +
                           '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
-                          '\nJumlah item : ${widget.data.pcs}pcs'),
+                          '\nJumlah item : ${widget.data.pcs}'),
                     ),
                     // Expanded(
                     //   child: Container(),

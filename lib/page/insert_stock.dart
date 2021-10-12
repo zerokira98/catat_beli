@@ -5,8 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 // import 'package:kasir/bloc/insertstock_bloc.dart';
 import 'package:kasir/bloc/stock/insertstock_bloc.dart';
+import 'package:kasir/bloc/stockview/stockview_bloc.dart';
 import 'package:kasir/model/itemcard.dart';
 import 'package:kasir/msc/db_moor.dart';
+import 'package:kasir/page/more_page/item_prop.dart';
+import 'package:kasir/page/more_page/print.dart';
+import 'package:kasir/page/stockview/stockview.dart';
 
 class InsertProductPage extends StatefulWidget {
   @override
@@ -42,7 +46,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
         return dialog;
       },
       child: Scaffold(
+          drawer: SideDrawer(),
           appBar: AppBar(
+            backgroundColor: Colors.black87,
             elevation: 7,
             title: Text('Masuk Barang'),
             actions: [
@@ -65,7 +71,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
 
                         padding: EdgeInsets.only(left: 4.0, right: 12.0),
                         decoration: BoxDecoration(
-                          color: Colors.green[100],
+                          color: Colors.green[200],
                           boxShadow: [BoxShadow(blurRadius: 2.0)],
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -81,9 +87,10 @@ class _InsertProductPageState extends State<InsertProductPage> {
                               },
                             ),
                             Icon(
-                              Icons.subdirectory_arrow_right,
-                              color: Colors.grey,
-                              size: 28,
+                              Icons.upload_file,
+                              // Icons.subdirectory_arrow_right,
+                              color: Colors.black,
+                              size: 24,
                             ),
                             Text(
                               'Submit',
@@ -126,7 +133,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       : 0),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              // color: Colors.grey[100],
+              color: Colors.black87,
               child: SingleChildScrollView(
                 controller: scrollc,
                 child: BlocBuilder<InsertstockBloc, InsertstockState>(
@@ -255,6 +262,8 @@ class _InsertProductCardState extends State<InsertProductCard>
     }
     if (widget.data.pcs?.toString() != qtyc!.text) {
       qtyc!.text = widget.data.pcs?.toString() ?? '';
+      qtyc!.selection = TextSelection.fromPosition(
+          TextPosition(offset: qtyc!.text.indexOf('.')));
     }
     datec!.text = widget.data.ditambahkan.toString().substring(0, 10);
     Widget bottom = Row(
@@ -368,7 +377,7 @@ class _InsertProductCardState extends State<InsertProductCard>
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.00),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8.0),
               boxShadow: [
                 BoxShadow(
@@ -521,8 +530,13 @@ class _InsertProductCardState extends State<InsertProductCard>
                       child: TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (text) {
+                          if (double.tryParse(qtyc!.text.trim()) == 0)
+                            return 'cant be zero';
+                          if (double.tryParse(qtyc!.text.trim()) == null) {
+                            return 'Invalid type';
+                          }
                           if (text!.isNotEmpty &&
-                              !RegExp(r'^[0-9]*$').hasMatch(text)) {
+                              !RegExp(r'^\d+(\.\d+)*$').hasMatch(text)) {
                             return 'must be a number';
                           } else if (text.isEmpty) {
                             return 'tidak boleh kosong';
@@ -531,9 +545,12 @@ class _InsertProductCardState extends State<InsertProductCard>
                         },
                         controller: qtyc,
                         onChanged: (v) {
-                          BlocProvider.of<InsertstockBloc>(context).add(
-                              DataChange(widget.data.copywith(
-                                  pcs: int.parse(qtyc!.text.trim()))));
+                          var doublePcs = double.tryParse(qtyc!.text.trim());
+                          if (doublePcs != null)
+                            BlocProvider.of<InsertstockBloc>(context).add(
+                                DataChange(
+                                    widget.data.copywith(pcs: doublePcs)));
+                          // FocusScope.of(context).
                         },
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(labelText: 'jumlah unit'),
@@ -578,7 +595,7 @@ class _InsertProductCardState extends State<InsertProductCard>
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 250),
-
+      // color: Colors.grey,
       // height: 1,
       child: AnimatedClipRect(
         curve: Curves.ease,
@@ -665,5 +682,52 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
         child: widget.child,
       ),
     );
+  }
+}
+
+class SideDrawer extends StatelessWidget {
+  const SideDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+        child: Column(children: [
+      Container(
+        height: 100,
+        color: Theme.of(context).primaryColor,
+      ),
+      Expanded(
+        child: ListView(children: [
+          ListTile(
+            trailing: Icon(Icons.edit),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ListOfItems()));
+            },
+            title: Text('Ganti deskripsi produk'),
+          ),
+          ListTile(
+            trailing: Icon(Icons.list_alt_rounded),
+            onTap: () {
+              BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ListOfStockItems()));
+            },
+            title: Text('Stock'),
+          ),
+          ListTile(
+            trailing: Icon(Icons.print),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return PrintAlert();
+                  });
+            },
+            title: Text('Print to csv'),
+          ),
+        ]),
+      )
+    ]));
   }
 }
