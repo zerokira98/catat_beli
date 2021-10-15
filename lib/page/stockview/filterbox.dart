@@ -126,37 +126,37 @@ class FilterBox extends StatelessWidget {
                 Row(
                   children: [
                     Text('Sort by:'),
-                    DropdownButton(
-                        value: dropdownValue,
-                        items: [
-                          DropdownMenuItem(
-                            child: Text('Nama A->Z'),
-                            value: 0,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Nama Z->A'),
-                            value: 1,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Tanggal Ascending'),
-                            value: 2,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Tanggal Descending'),
-                            value: 3,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Tempat Beli A->Z'),
-                            value: 4,
-                          ),
-                          DropdownMenuItem(
-                            child: Text('Tempat Beli Z->A'),
-                            value: 5,
-                          ),
-                        ],
-                        onChanged: (dynamic v) {
-                          // dropdownValue = v;
-                        }),
+                    // DropdownButton(
+                    //     value: dropdownValue,
+                    //     items: [
+                    //       DropdownMenuItem(
+                    //         child: Text('Nama A->Z'),
+                    //         value: 0,
+                    //       ),
+                    //       DropdownMenuItem(
+                    //         child: Text('Nama Z->A'),
+                    //         value: 1,
+                    //       ),
+                    //       DropdownMenuItem(
+                    //         child: Text('Tanggal Ascending'),
+                    //         value: 2,
+                    //       ),
+                    //       DropdownMenuItem(
+                    //         child: Text('Tanggal Descending'),
+                    //         value: 3,
+                    //       ),
+                    //       DropdownMenuItem(
+                    //         child: Text('Tempat Beli A->Z'),
+                    //         value: 4,
+                    //       ),
+                    //       DropdownMenuItem(
+                    //         child: Text('Tempat Beli Z->A'),
+                    //         value: 5,
+                    //       ),
+                    //     ],
+                    //     onChanged: (dynamic v) {
+                    //       // dropdownValue = v;
+                    //     }),
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {

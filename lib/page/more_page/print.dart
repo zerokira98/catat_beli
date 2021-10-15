@@ -7,7 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:kasir/msc/db_moor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+
+final numFormat = new NumberFormat("#,##0", "en_US");
 
 class PrintAlert extends StatefulWidget {
   @override
@@ -72,31 +73,32 @@ class _PrintAlertState extends State<PrintAlert> {
             y + ', ' + data[i].stock.dateAdd!.toString().substring(0, 10),
           ]);
         }
+        totalkeluar += data[i].stock.qty * data[i].stock.price;
         datalist.addAll({
           [
             data[i].stock.dateAdd!.toString().substring(0, 10),
             data[i].item.nama,
-            data[i].stock.price,
+            numFormat.format((data[i].stock.price)),
             data[i].stock.qty,
-            data[i].stock.qty * data[i].stock.price,
+            numFormat.format(data[i].stock.qty * data[i].stock.price),
             data[i].tempatBeli.nama,
           ]
         });
       }
 
       ///-------Menghitung total pengeluaran bulan ini
-      for (var item in datalist) {
-        if (item.length > 2) {
-          totalkeluar += item[2] * item[3];
-        }
-      }
+      // for (var item in datalist) {
+      //   if (item.length > 2) {
+      //     totalkeluar += int.parse(item[2]) * int.parse(item[3]);
+      //   }
+      // }
       datalist[0]
         ..add('')
         ..add('')
         ..add('')
         ..add('')
         ..add('Total bulan ini : ')
-        ..add(totalkeluar);
+        ..add(numFormat.format(totalkeluar));
 
       ///--------
       var b = ListToCsvConverter().convert(datalist);

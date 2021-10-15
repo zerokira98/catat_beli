@@ -169,7 +169,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                       print('tambah\'ed');
                                       FocusScope.of(context).unfocus();
                                       Future.delayed(
-                                          Duration(milliseconds: 950), () {
+                                          Duration(milliseconds: 600), () {
                                         scrollc.animateTo(
                                             scrollc.position.maxScrollExtent,
                                             duration:
@@ -225,19 +225,25 @@ class InsertProductCard extends StatefulWidget {
 class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
   SuggestionsBoxController? sbc;
-  TextEditingController? namec = TextEditingController(),
-      hargaBeli,
-      hargaJual = TextEditingController(),
+  TextEditingController hargaBeli = TextEditingController();
+  TextEditingController namec = TextEditingController(),
+      // hargaJual = TextEditingController(),
       datec = TextEditingController(),
-      placec = TextEditingController(),
-      barcodeC = TextEditingController(),
-      qtyc = TextEditingController();
+      placec = TextEditingController(text: ''),
+      barcodeC = TextEditingController();
+  TextEditingController qtyc = TextEditingController();
   final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
+  FocusNode fsn = FocusNode();
   @override
   void initState() {
     sbc = SuggestionsBoxController();
-    hargaBeli = TextEditingController();
+    // hargaBeli = ;
+    fsn.addListener(() {
+      if (fsn.hasFocus)
+        qtyc.selection =
+            TextSelection(baseOffset: 0, extentOffset: qtyc.text.length);
+    });
 
     super.initState();
 
@@ -248,24 +254,24 @@ class _InsertProductCardState extends State<InsertProductCard>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.namaBarang != namec!.text) {
-      namec!.text = widget.data.namaBarang ?? '';
+    if (widget.data.namaBarang != namec.text) {
+      namec.text = widget.data.namaBarang ?? '';
     }
-    if (widget.data.tempatBeli != placec!.text) {
-      placec!.text = widget.data.tempatBeli ?? '';
+    if (widget.data.tempatBeli != placec.text) {
+      placec.text = widget.data.tempatBeli ?? '';
     }
-    if (widget.data.hargaBeli?.toString() != hargaBeli!.text) {
-      hargaBeli!.text = widget.data.hargaBeli?.toString() ?? '';
+    if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
+      hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
     }
-    if (widget.data.hargaJual?.toString() != hargaJual!.text) {
-      hargaJual!.text = widget.data.hargaJual?.toString() ?? '';
+    // if (widget.data.hargaJual?.toString() != hargaJual.text) {
+    //   hargaJual.text = widget.data.hargaJual?.toString() ?? '';
+    // }
+    if (widget.data.pcs?.toString() != qtyc.text) {
+      qtyc.text = widget.data.pcs?.toString() ?? '';
+      qtyc.selection = TextSelection.fromPosition(
+          TextPosition(offset: qtyc.text.indexOf('.')));
     }
-    if (widget.data.pcs?.toString() != qtyc!.text) {
-      qtyc!.text = widget.data.pcs?.toString() ?? '';
-      qtyc!.selection = TextSelection.fromPosition(
-          TextPosition(offset: qtyc!.text.indexOf('.')));
-    }
-    datec!.text = widget.data.ditambahkan.toString().substring(0, 10);
+    datec.text = widget.data.ditambahkan.toString().substring(0, 10);
     Widget bottom = Row(
       children: [
         Expanded(
@@ -283,7 +289,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     firstDate: DateTime(2020),
                     lastDate: DateTime(2101));
                 if (picked != null) {
-                  datec!.text = picked.toString().substring(0, 19);
+                  datec.text = picked.toString().substring(0, 19);
                   print(picked.toString());
                   BlocProvider.of<InsertstockBloc>(context).add(
                       DataChange(widget.data.copywith(ditambahkan: picked)));
@@ -297,7 +303,10 @@ class _InsertProductCardState extends State<InsertProductCard>
                   FocusScope.of(context).unfocus();
                 },
                 keyboardType: TextInputType.datetime,
-                decoration: InputDecoration(labelText: 'Buy date'),
+                decoration: InputDecoration(
+                  labelText: 'Buy date',
+                  fillColor: Colors.white,
+                ),
               ),
             ),
           ),
@@ -321,7 +330,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                     false,
                                     ScanMode.BARCODE);
                             print(barcodeScan);
-                            barcodeC!.text = barcodeScan;
+                            barcodeC.text = barcodeScan;
 
                             BlocProvider.of<InsertstockBloc>(context).add(
                                 DataChange(widget.data.copywith(
@@ -337,7 +346,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 controller: placec,
                 onChanged: (v) {
                   BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                      widget.data.copywith(tempatBeli: placec!.text)));
+                      widget.data.copywith(tempatBeli: placec.text)));
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(labelText: 'Tempat pembelian'),
@@ -377,7 +386,7 @@ class _InsertProductCardState extends State<InsertProductCard>
             margin: EdgeInsets.all(16.0),
             padding: EdgeInsets.all(8.00),
             decoration: BoxDecoration(
-              color: Colors.grey[200],
+              color: Colors.grey[400],
               borderRadius: BorderRadius.circular(8.0),
               boxShadow: [
                 BoxShadow(
@@ -412,7 +421,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               onChanged: (v) {
                                 BlocProvider.of<InsertstockBloc>(context)
                                     .add(DataChange(widget.data.copywith(
-                                  namaBarang: namec!.text,
+                                  namaBarang: namec.text,
                                   productId: null,
                                 )));
                               },
@@ -489,7 +498,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             onChanged: (v) {
                               BlocProvider.of<InsertstockBloc>(context)
                                   .add(DataChange(widget.data.copywith(
-                                hargaBeli: int.tryParse(hargaBeli!.text),
+                                hargaBeli: int.tryParse(hargaBeli.text),
                               )));
                             },
                             controller: hargaBeli,
@@ -518,7 +527,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     //     onChanged: (v) {
                     //       BlocProvider.of<InsertstockBloc>(context).add(
                     //           DataChange(widget.data.copywith(
-                    //               hargaJual: int.parse(hargaJual!.text))));
+                    //               hargaJual: int.parse(hargaJual.text))));
                     //     },
                     //     keyboardType: TextInputType.number,
                     //     decoration: InputDecoration(labelText: 'Harga jual '),
@@ -530,9 +539,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                       child: TextFormField(
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (text) {
-                          if (double.tryParse(qtyc!.text.trim()) == 0)
+                          if (double.tryParse(qtyc.text.trim()) == 0)
                             return 'cant be zero';
-                          if (double.tryParse(qtyc!.text.trim()) == null) {
+                          if (double.tryParse(qtyc.text.trim()) == null) {
                             return 'Invalid type';
                           }
                           if (text!.isNotEmpty &&
@@ -544,8 +553,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                           return null;
                         },
                         controller: qtyc,
+                        focusNode: fsn,
                         onChanged: (v) {
-                          var doublePcs = double.tryParse(qtyc!.text.trim());
+                          var doublePcs = double.tryParse(qtyc.text.trim());
                           if (doublePcs != null)
                             BlocProvider.of<InsertstockBloc>(context).add(
                                 DataChange(
@@ -553,6 +563,17 @@ class _InsertProductCardState extends State<InsertProductCard>
                           // FocusScope.of(context).
                         },
                         keyboardType: TextInputType.number,
+                        onTap: () {
+                          // if (qtyc.selection ==
+                          //     TextSelection(
+                          //         baseOffset: 0,
+                          //         extentOffset: qtyc.text.length)) {
+                          //   print('a');
+                          //   return;
+                          // // }
+                          // qtyc.selection = TextSelection(
+                          //     baseOffset: 0, extentOffset: qtyc.text.length);
+                        },
                         decoration: InputDecoration(labelText: 'jumlah unit'),
                       ),
                     )),

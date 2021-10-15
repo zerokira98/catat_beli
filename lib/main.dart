@@ -28,8 +28,8 @@ main() {
   runApp(App());
   if (Platform.isWindows) {
     doWhenWindowReady(() {
-      appWindow.size = Size(800, 600);
-      appWindow.minSize = Size(800, 600);
+      appWindow.size = Size(480, 720);
+      appWindow.minSize = Size(480, 720);
       appWindow.maximize();
       appWindow.show();
     });
@@ -73,41 +73,16 @@ class App extends StatelessWidget {
               // decoration: BoxDecoration(
               //     borderRadius:
               //         BorderRadius.only(topLeft: Radius.circular(18.0))),
-              child: Column(
-                children: [
-                  WindowTitleBarBox(
-                      child: Container(
-                    // color: Colors.blue,
-                    decoration: BoxDecoration(
-                      // borderRadius:
-                      //     BorderRadius.only(topLeft: Radius.circular(18.0)),
-                      gradient: LinearGradient(
-                          colors: [
-                            Colors.black,
-                            Colors.grey.shade900,
-                            Colors.grey.shade900,
-                          ],
-                          // stops: [],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter),
-                    ),
-                    child: Row(children: [
-                      Expanded(child: MoveWindow()),
-                      WindowButtons()
-                    ]),
-                  )),
-                  Expanded(
-                    child: PageView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: 1,
-                        controller: pageC,
-                        itemBuilder: (context, i) {
-                          if (i == 0) return InsertProductPage();
-                          // if (i == 1) return MorePage();
-                          return CircularProgressIndicator();
-                        }),
-                  ),
-                ],
+              child: CustomWindow(
+                child: PageView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: 1,
+                    controller: pageC,
+                    itemBuilder: (context, i) {
+                      if (i == 0) return InsertProductPage();
+                      // if (i == 1) return MorePage();
+                      return CircularProgressIndicator();
+                    }),
               ),
             ),
           ),
@@ -166,6 +141,41 @@ class WindowButtons extends StatelessWidget {
         ),
         CloseWindowButton(
           colors: colex,
+        ),
+      ],
+    );
+  }
+}
+
+class CustomWindow extends StatelessWidget {
+  final Widget child;
+  const CustomWindow({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        WindowTitleBarBox(
+            child: Container(
+          // color: Colors.blue,
+          decoration: BoxDecoration(
+            // borderRadius:
+            //     BorderRadius.only(topLeft: Radius.circular(18.0)),
+            gradient: LinearGradient(
+                colors: [
+                  Colors.black,
+                  Colors.grey.shade900,
+                  Colors.grey.shade900,
+                ],
+                // stops: [],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter),
+          ),
+          child:
+              Row(children: [Expanded(child: MoveWindow()), WindowButtons()]),
+        )),
+        Expanded(
+          child: child,
         ),
       ],
     );
