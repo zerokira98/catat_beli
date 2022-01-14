@@ -18,10 +18,11 @@ import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:sqlite3/open.dart';
 
 main() {
-  open.overrideFor(OperatingSystem.linux, _openOnWindows);
-
-  final db = sql.sqlite3.openInMemory();
-  db.dispose();
+  if (Platform.isWindows) {
+    open.overrideFor(OperatingSystem.linux, _openOnWindows);
+    final db = sql.sqlite3.openInMemory();
+    db.dispose();
+  }
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = NewBlocObserver();
 
@@ -73,17 +74,19 @@ class App extends StatelessWidget {
               // decoration: BoxDecoration(
               //     borderRadius:
               //         BorderRadius.only(topLeft: Radius.circular(18.0))),
-              child: CustomWindow(
-                child: PageView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: 1,
-                    controller: pageC,
-                    itemBuilder: (context, i) {
-                      if (i == 0) return InsertProductPage();
-                      // if (i == 1) return MorePage();
-                      return CircularProgressIndicator();
-                    }),
-              ),
+              child: (Platform.isWindows)
+                  ? CustomWindow(
+                      child: PageView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: 1,
+                          controller: pageC,
+                          itemBuilder: (context, i) {
+                            if (i == 0) return InsertProductPage();
+                            // if (i == 1) return MorePage();
+                            return CircularProgressIndicator();
+                          }),
+                    )
+                  : InsertProductPage(),
             ),
           ),
         ),

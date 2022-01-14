@@ -59,7 +59,7 @@ class _StockviewCardState extends State<StockviewCard> {
               MediaQuery.of(context).orientation == Orientation.landscape
                   ? MediaQuery.of(context).size.width * 0.05
                   : 0,
-          vertical: 3,
+          vertical: 0,
         ),
         child: Stack(
           children: [
@@ -71,17 +71,17 @@ class _StockviewCardState extends State<StockviewCard> {
                 color: Colors.red,
               ),
               child: ListTile(
-                isThreeLine: true,
+                // isThreeLine: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Text(''),
                 subtitle: Row(
                   children: [
-                    Text('' + '\n' + '\n'),
+                    Text('' + ''),
                     Expanded(
                       child: Container(),
                     ),
-                    Text(' \n' + '\n')
+                    Text(' ' + '')
                   ],
                 ),
               ),
@@ -132,7 +132,7 @@ class _StockviewCardState extends State<StockviewCard> {
             AnimatedContainer(
               duration: Duration(milliseconds: 450),
               transform: Matrix4.identity()..translate(horizontal),
-              margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
+              margin: EdgeInsets.only(bottom: 0, left: 8, right: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 // border: Border.all(),
@@ -142,25 +142,47 @@ class _StockviewCardState extends State<StockviewCard> {
                 color: Colors.white,
               ),
               child: ListTile(
-                isThreeLine: true,
+                // isThreeLine: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
-                title: Text(widget.data.namaBarang.toString()),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                title: Row(
                   children: [
-                    Flexible(
-                      child: Text('Tempat beli: ${widget.data.tempatBeli}' +
-                          '\nTanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}' +
-                          '\nJumlah item : ${widget.data.pcs}'),
+                    Text(widget.data.namaBarang.toString()),
+                    Expanded(child: Container()),
+                    Text('Jumlah item : ${widget.data.pcs}'),
+                  ],
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                          child:
+                              Text('Tempat beli: ${widget.data.tempatBeli}')),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                          'Tanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}'),
                     ),
                     // Expanded(
                     //   child: Container(),
                     // ),
-                    Flexible(
+                    Expanded(
+                      flex: 1,
                       // fit: FlexFit.tight,
                       child: Text(
-                        'Harga beli : $hargaBeli' + '\nTotal beli : $totalBeli',
+                        'Harga beli : $hargaBeli',
+                        // maxLines: 1,
+                        overflow: TextOverflow.fade,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      // fit: FlexFit.tight,
+                      child: Text(
+                        'Total beli : $totalBeli',
                         // maxLines: 1,
                         overflow: TextOverflow.fade,
                       ),

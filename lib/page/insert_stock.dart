@@ -322,6 +322,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                       if (snapshot.hasData && snapshot.data!.isEmpty)
                         return Container();
                       return InkWell(
+                          canRequestFocus: false,
                           onTap: () async {
                             String barcodeScan =
                                 await FlutterBarcodeScanner.scanBarcode(
@@ -591,6 +592,7 @@ class _InsertProductCardState extends State<InsertProductCard>
             right: 8,
             top: 8,
             child: InkWell(
+              canRequestFocus: false,
               onTap: () {
                 FocusScope.of(context).unfocus();
                 BlocProvider.of<InsertstockBloc>(context)
@@ -716,6 +718,19 @@ class SideDrawer extends StatelessWidget {
       Container(
         height: 100,
         color: Theme.of(context).primaryColor,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                  child: Text(
+                'Pencatatan Pembelian',
+                textScaleFactor: 1.3,
+                style: TextStyle(color: Colors.white),
+              )),
+            ],
+          ),
+        ),
       ),
       Expanded(
         child: ListView(children: [

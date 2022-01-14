@@ -46,7 +46,7 @@ class _PrintAlertState extends State<PrintAlert> {
             endDate: DateTime(curdate.year, multivalue + 2, 1)
                 .subtract(Duration(days: 1)));
     if (data.isNotEmpty) {
-      File theFile = File(a.path + '/backup_${dataBulan[multivalue]}.csv');
+      File theFile = File(a.path + '/Backup_${dataBulan[multivalue]}.csv');
       double totalkeluar = 0.0;
       List<List> datalist = [
         // ['...']
@@ -196,12 +196,12 @@ class _PrintAlertState extends State<PrintAlert> {
             ],
           ),
           Platform.isWindows
-              ? FutureBuilder(
+              ? FutureBuilder<Directory>(
                   future: getApplicationDocumentsDirectory(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return Text(
-                        'file saved at: ${snapshot.data}',
+                        'file saved at: ${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}.csv',
                         textScaleFactor: 0.7,
                       );
                     }
@@ -216,7 +216,8 @@ class _PrintAlertState extends State<PrintAlert> {
           TextButton(
               onPressed: () async {
                 var uwu = await getApplicationDocumentsDirectory();
-                Process.run("explorer", [uwu.path]);
+                await Process.run("explorer", [uwu.path]);
+                // print(a);
               },
               child: Text('Open Directory')),
         TextButton(
