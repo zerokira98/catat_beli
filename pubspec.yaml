@@ -44,6 +44,7 @@ dependencies:
   url_launcher: ^6.0.12
   flutter_file_dialog: ^2.1.1
   bitsdojo_window: ^0.1.1+1
+  file_picker: ^4.3.1
   # flutter_launcher_icons: ^0.9.2
 
 dev_dependencies:

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kasir/bloc/stock/insertstock_bloc.dart';
 import 'package:kasir/bloc/stockview/stockview_bloc.dart';
-import 'package:kasir/page/insert_stock.dart';
+import 'package:kasir/page/insert_stock/insert_stock.dart';
 import 'package:kasir/msc/bloc_observer.dart';
 import 'package:kasir/msc/db_moor.dart';
 // import 'package:kasir/page/more_page/gridview.dart';

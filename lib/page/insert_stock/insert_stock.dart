@@ -3,14 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-// import 'package:kasir/bloc/insertstock_bloc.dart';
 import 'package:kasir/bloc/stock/insertstock_bloc.dart';
-import 'package:kasir/bloc/stockview/stockview_bloc.dart';
 import 'package:kasir/model/itemcard.dart';
 import 'package:kasir/msc/db_moor.dart';
-import 'package:kasir/page/more_page/item_prop.dart';
-import 'package:kasir/page/more_page/print.dart';
-import 'package:kasir/page/stockview/stockview.dart';
+import 'package:kasir/page/sidebar/sidebar.dart';
 
 class InsertProductPage extends StatefulWidget {
   @override
@@ -705,65 +701,5 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
         child: widget.child,
       ),
     );
-  }
-}
-
-class SideDrawer extends StatelessWidget {
-  const SideDrawer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-        child: Column(children: [
-      Container(
-        height: 100,
-        color: Theme.of(context).primaryColor,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                  child: Text(
-                'Pencatatan Pembelian',
-                textScaleFactor: 1.3,
-                style: TextStyle(color: Colors.white),
-              )),
-            ],
-          ),
-        ),
-      ),
-      Expanded(
-        child: ListView(children: [
-          ListTile(
-            trailing: Icon(Icons.edit),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListOfItems()));
-            },
-            title: Text('Ganti deskripsi produk'),
-          ),
-          ListTile(
-            trailing: Icon(Icons.list_alt_rounded),
-            onTap: () {
-              BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListOfStockItems()));
-            },
-            title: Text('Stock'),
-          ),
-          ListTile(
-            trailing: Icon(Icons.print),
-            onTap: () {
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return PrintAlert();
-                  });
-            },
-            title: Text('Print to csv'),
-          ),
-        ]),
-      )
-    ]));
   }
 }
