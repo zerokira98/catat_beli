@@ -6,7 +6,7 @@ part of 'db_moor.dart';
 // MoorGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
+// ignore_for_file: type=lint
 class Stock extends DataClass implements Insertable<Stock> {
   final int id;
   final int price;
@@ -127,14 +127,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(
-      id.hashCode,
-      $mrjc(
-          price.hashCode,
-          $mrjc(
-              qty.hashCode,
-              $mrjc(dateAdd.hashCode,
-                  $mrjc(idItem.hashCode, idSupplier.hashCode))))));
+  int get hashCode => Object.hash(id, price, qty, dateAdd, idItem, idSupplier);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -244,41 +237,48 @@ class StocksCompanion extends UpdateCompanion<Stock> {
 }
 
 class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $StocksTable(this._db, [this._alias]);
+  $StocksTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
   late final GeneratedColumn<int?> price = GeneratedColumn<int?>(
       'price', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultValue: Constant(0));
   final VerificationMeta _qtyMeta = const VerificationMeta('qty');
+  @override
   late final GeneratedColumn<double?> qty = GeneratedColumn<double?>(
       'qty', aliasedName, false,
-      typeName: 'REAL',
+      type: const RealType(),
       requiredDuringInsert: false,
       defaultValue: Constant(1.0));
   final VerificationMeta _dateAddMeta = const VerificationMeta('dateAdd');
+  @override
   late final GeneratedColumn<DateTime?> dateAdd = GeneratedColumn<DateTime?>(
       'date_add', aliasedName, true,
-      typeName: 'INTEGER', requiredDuringInsert: false);
+      type: const IntType(), requiredDuringInsert: false);
   final VerificationMeta _idItemMeta = const VerificationMeta('idItem');
+  @override
   late final GeneratedColumn<int?> idItem = GeneratedColumn<int?>(
       'id_item', aliasedName, true,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       $customConstraints: 'REFERENCES stockitems(id)');
   final VerificationMeta _idSupplierMeta = const VerificationMeta('idSupplier');
+  @override
   late final GeneratedColumn<int?> idSupplier = GeneratedColumn<int?>(
       'id_supplier', aliasedName, true,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       $customConstraints: 'REFERENCES tempatbelis(id)');
   @override
@@ -325,13 +325,13 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Stock map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Stock.fromData(data, _db,
+    return Stock.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $StocksTable createAlias(String alias) {
-    return $StocksTable(_db, alias);
+    return $StocksTable(attachedDatabase, alias);
   }
 }
 
@@ -408,8 +408,7 @@ class StockItem extends DataClass implements Insertable<StockItem> {
   }
 
   @override
-  int get hashCode =>
-      $mrjf($mrjc(id.hashCode, $mrjc(barcode.hashCode, nama.hashCode)));
+  int get hashCode => Object.hash(id, barcode, nama);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -482,26 +481,30 @@ class StockItemsCompanion extends UpdateCompanion<StockItem> {
 
 class $StockItemsTable extends StockItems
     with TableInfo<$StockItemsTable, StockItem> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $StockItemsTable(this._db, [this._alias]);
+  $StockItemsTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _barcodeMeta = const VerificationMeta('barcode');
+  @override
   late final GeneratedColumn<int?> barcode = GeneratedColumn<int?>(
       'barcode', aliasedName, true,
-      typeName: 'INTEGER', requiredDuringInsert: false);
+      type: const IntType(), requiredDuringInsert: false);
   final VerificationMeta _namaMeta = const VerificationMeta('nama');
+  @override
   late final GeneratedColumn<String?> nama =
       GeneratedColumn<String?>('nama', aliasedName, false,
           additionalChecks: GeneratedColumn.checkTextLength(
             minTextLength: 3,
           ),
-          typeName: 'TEXT',
+          type: const StringType(),
           requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, barcode, nama];
@@ -534,13 +537,13 @@ class $StockItemsTable extends StockItems
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   StockItem map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return StockItem.fromData(data, _db,
+    return StockItem.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $StockItemsTable createAlias(String alias) {
-    return $StockItemsTable(_db, alias);
+    return $StockItemsTable(attachedDatabase, alias);
   }
 }
 
@@ -604,7 +607,7 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
   }
 
   @override
-  int get hashCode => $mrjf($mrjc(id.hashCode, nama.hashCode));
+  int get hashCode => Object.hash(id, nama);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -663,19 +666,22 @@ class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
 
 class $TempatBelisTable extends TempatBelis
     with TableInfo<$TempatBelisTable, TempatBeli> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $TempatBelisTable(this._db, [this._alias]);
+  $TempatBelisTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
       'id', aliasedName, false,
-      typeName: 'INTEGER',
+      type: const IntType(),
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _namaMeta = const VerificationMeta('nama');
+  @override
   late final GeneratedColumn<String?> nama = GeneratedColumn<String?>(
       'nama', aliasedName, false,
-      typeName: 'TEXT', requiredDuringInsert: true);
+      type: const StringType(), requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, nama];
   @override
@@ -703,13 +709,13 @@ class $TempatBelisTable extends TempatBelis
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TempatBeli map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return TempatBeli.fromData(data, _db,
+    return TempatBeli.fromData(data, attachedDatabase,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
   @override
   $TempatBelisTable createAlias(String alias) {
-    return $TempatBelisTable(_db, alias);
+    return $TempatBelisTable(attachedDatabase, alias);
   }
 }
 

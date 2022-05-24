@@ -3,7 +3,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 // import 'package:kasir/model/itemcard.dart';
-import 'package:kasir/msc/db_moor.dart';
+import 'package:catatbeli/msc/db_moor.dart';
 import 'package:intl/intl.dart';
 
 final numFormat = new NumberFormat("#,##0.00", "en_US");
@@ -14,6 +14,25 @@ class ListOfItems extends StatefulWidget {
 }
 
 class _ListOfItemsState extends State<ListOfItems> {
+  int optionVal = 0;
+  var options = [
+    DropdownMenuItem(
+      child: Text('Date Asc'),
+      value: 0,
+    ),
+    DropdownMenuItem(
+      child: Text('Date Dsc'),
+      value: 1,
+    ),
+    DropdownMenuItem(
+      child: Text('Name Asc'),
+      value: 2,
+    ),
+    DropdownMenuItem(
+      child: Text('Name Dsc'),
+      value: 3,
+    ),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,19 +47,48 @@ class _ListOfItemsState extends State<ListOfItems> {
         ],
       ),
       body: FutureBuilder<List<StockItem>>(
-          future: RepositoryProvider.of<MyDatabase>(context).showInsideItems(),
+          future: RepositoryProvider.of<MyDatabase>(context)
+              .showInsideItems(null, optionVal),
           builder: (context, snapshot) {
             if (snapshot.data != null && snapshot.hasData) {
               print(snapshot.data);
               return ListView.builder(
                 itemBuilder: (context, i) {
+                  if (i == 0)
+                    return Card(
+                      elevation: 12,
+                      margin: EdgeInsets.fromLTRB(8, 8, 8, 24),
+                      child: Container(
+                          margin: EdgeInsets.all(12),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Filter',
+                                textScaleFactor: 1.8,
+                              ),
+                              Row(
+                                children: [
+                                  Text('Sort by : '),
+                                  DropdownButton<int>(
+                                      items: options,
+                                      onChanged: (val) {
+                                        setState(() {
+                                          optionVal = val!;
+                                        });
+                                      },
+                                      value: optionVal),
+                                ],
+                              ),
+                            ],
+                          )),
+                    );
                   return ListTile(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditItemPage(
-                            data: snapshot.data![i],
+                            data: snapshot.data![i - 1],
                           ),
                         ),
                       ).then((value) {
@@ -48,12 +96,10 @@ class _ListOfItemsState extends State<ListOfItems> {
                         setState(() {});
                       });
                     },
-                    title: Text(snapshot.data![i].nama),
-                    // subtitle:
-                    //     Text('Harga : ${snapshot.data![i].}'),
+                    title: Text(snapshot.data![i - 1].nama),
                   );
                 },
-                itemCount: snapshot.data!.length,
+                itemCount: snapshot.data!.length + 1,
               );
             }
             return CircularProgressIndicator();
@@ -80,7 +126,7 @@ class _EditItemPageState extends State<EditItemPage>
       qtyc = TextEditingController();
   late StockItem data;
   final _formkey = GlobalKey<FormState>();
-
+  // int optionVal = 0;
   DateTime selectedDate = DateTime.now();
   @override
   void initState() {
@@ -94,15 +140,9 @@ class _EditItemPageState extends State<EditItemPage>
     if (data.nama != namec.text) {
       namec.text = data.nama;
     }
-    // if (data.hargaJual?.toString() != hargaJual.text) {
-    //   hargaJual.text = data.hargaJual?.toString() ?? '';
-    // }
     if (data.barcode.toString() != barcodeC.text) {
       barcodeC.text = data.barcode?.toString() ?? '';
     }
-    // if (data.pcs?.toString() != qtyc.text) {
-    //   qtyc.text = data.pcs?.toString() ?? '';
-    // }
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         child: Column(
@@ -161,7 +201,9 @@ class _EditItemPageState extends State<EditItemPage>
                       margin: EdgeInsets.all(16.0),
                       padding: EdgeInsets.all(8.00),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.white,
                         borderRadius: BorderRadius.circular(8.0),
                         boxShadow: [
                           BoxShadow(
@@ -254,23 +296,27 @@ class _EditItemPageState extends State<EditItemPage>
                               //   ),
                               // )),
                               Expanded(
-                                child: TextFormField(
-                                  controller: barcodeC,
-                                  decoration: InputDecoration(
-                                      labelText: 'barcode',
-                                      suffixIcon: InkWell(
-                                          onTap: () async {
-                                            String barcodeScan =
-                                                await FlutterBarcodeScanner
-                                                    .scanBarcode(
-                                                        '#ffffff',
-                                                        'Cancel',
-                                                        false,
-                                                        ScanMode.BARCODE);
-                                            print(barcodeScan);
-                                            barcodeC.text = barcodeScan;
-                                          },
-                                          child: Icon(Icons.qr_code))),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: barcodeC,
+                                    decoration: InputDecoration(
+                                        labelText: 'barcode',
+                                        suffixIcon: InkWell(
+                                            onTap: () async {
+                                              String barcodeScan =
+                                                  await FlutterBarcodeScanner
+                                                      .scanBarcode(
+                                                          '#ffffff',
+                                                          'Cancel',
+                                                          false,
+                                                          ScanMode.BARCODE);
+                                              print(barcodeScan);
+                                              if (barcodeScan == -1) return;
+                                              barcodeC.text = barcodeScan;
+                                            },
+                                            child: Icon(Icons.qr_code))),
+                                  ),
                                 ),
                               ),
                               // Expanded(

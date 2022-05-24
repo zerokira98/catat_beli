@@ -14,6 +14,7 @@ class StockviewCard extends StatefulWidget {
 
 class _StockviewCardState extends State<StockviewCard> {
   double horizontal = 0.0;
+  double opacityval = 1.0;
   @override
   Widget build(BuildContext context) {
     var hargaBeli = numFormat.format(widget.data.hargaBeli);
@@ -23,6 +24,11 @@ class _StockviewCardState extends State<StockviewCard> {
     // print('tempat:' + (widget.data.tempatBeli ?? ''));
     // return Container();
     return GestureDetector(
+      onHorizontalDragStart: (details) {
+        setState(() {
+          opacityval = 0.0;
+        });
+      },
       onHorizontalDragUpdate: (details) {
         // print(details.delta);
         setState(() {
@@ -32,24 +38,31 @@ class _StockviewCardState extends State<StockviewCard> {
       onHorizontalDragEnd: (details) {
         var width = MediaQuery.of(context).size.width;
         print(details.primaryVelocity);
+        // print();
         if (horizontal >= width * 0.5 ||
             (details.primaryVelocity ?? 0.0) >= 100.0) {
           setState(() {
             horizontal = width;
+            opacityval = 0.0;
           });
         } else if (horizontal <= width * -0.5 ||
             (details.primaryVelocity ?? 0.0) <= -100.0) {
           setState(() {
+            opacityval = 0.0;
             horizontal = -width;
           });
         } else {
+          // print('kesini/');
           setState(() {
             horizontal = 0.0;
+            opacityval = 1.0;
           });
         }
         Future.delayed(Duration(seconds: 4), () {
+          // if (horizontal != 0.0)
           setState(() {
             horizontal = 0.0;
+            opacityval = 1.0;
           });
         });
       },
@@ -114,14 +127,17 @@ class _StockviewCardState extends State<StockviewCard> {
                           child: Text('Yes',
                               style: TextStyle(color: Colors.white))),
                     ),
+                    Padding(padding: EdgeInsets.all(12)),
                     InkWell(
                         onTap: () {
+                          print('tapped');
                           setState(() {
                             horizontal = 0.0;
+                            opacityval = 1.0;
                           });
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(14.0),
+                          padding: const EdgeInsets.all(18.0),
                           child: Text('Cancel',
                               style: TextStyle(color: Colors.white)),
                         )),
@@ -129,17 +145,91 @@ class _StockviewCardState extends State<StockviewCard> {
                 ),
               ),
             )),
+            Positioned.fill(
+                child: AnimatedOpacity(
+              duration: Duration(milliseconds: 200),
+              opacity: opacityval,
+              child: Container(
+                padding: EdgeInsets.all(2.0),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  gradient: LinearGradient(
+                      colors: [
+                        Colors.green,
+                        Colors.green,
+                        Colors.green,
+                        Colors.green,
+                        Colors.red,
+                        Colors.red,
+                        Colors.red,
+                        Colors.red,
+                      ],
+                      // stops: [],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                margin: EdgeInsets.only(bottom: 8, left: 8, right: 180),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(18.0),
+                                      child: Text(
+                                        'Future Feature!',
+                                        textScaleFactor: 2.0,
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            var width = MediaQuery.of(context).size.width;
+                            print(horizontal);
+                            setState(() {
+                              horizontal = width;
+                              opacityval = 0.0;
+                            });
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            )),
             AnimatedContainer(
               duration: Duration(milliseconds: 450),
               transform: Matrix4.identity()..translate(horizontal),
-              margin: EdgeInsets.only(bottom: 0, left: 8, right: 8),
+              margin: EdgeInsets.only(bottom: 0, left: 34, right: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 // border: Border.all(),
                 boxShadow: [
                   BoxShadow(blurRadius: 8, color: Colors.black26),
                 ],
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[700]
+                    : Colors.white,
               ),
               child: ListTile(
                 // isThreeLine: true,
@@ -153,13 +243,11 @@ class _StockviewCardState extends State<StockviewCard> {
                   ],
                 ),
                 subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Expanded(
                       flex: 1,
-                      child: Container(
-                          child:
-                              Text('Tempat beli: ${widget.data.tempatBeli}')),
+                      child: Text('Tempat beli: ${widget.data.tempatBeli}'),
                     ),
                     Expanded(
                       flex: 1,

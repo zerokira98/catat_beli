@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:kasir/bloc/stockview/stockview_bloc.dart';
-import 'package:kasir/main.dart';
-import 'package:kasir/model/itemcard.dart';
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
+import 'package:catatbeli/main.dart';
+import 'package:catatbeli/model/itemcard.dart';
 
 part 'card.dart';
 part 'filterbox.dart';
@@ -14,109 +14,156 @@ final numFormat = new NumberFormat("#,##0", "id");
 
 class ListOfStockItems extends StatelessWidget {
   final ScrollController _scontrol = ScrollController();
+  final format = DateFormat('d MMMM y');
+
   @override
   Widget build(BuildContext context) {
-    Widget a = Scaffold(
+    Widget body = Scaffold(
       bottomNavigationBar: Container(
-        color: Colors.grey[700],
+        padding: EdgeInsets.only(top: 4, bottom: 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.elliptical(28, 8),
+              topRight: Radius.elliptical(28, 8)),
+          color: Colors.grey[700],
+        ),
         // color: Theme.of(context).primaryColor,
-        child: BlocBuilder<StockviewBloc, StockviewState>(
-          builder: (context, state) {
-            ///---------- Pagination
-            if (state is StockviewLoaded) {
-              return Row(
-                children: [
-                  Expanded(child: Container()),
-                  InkWell(
-                    onTap: () {
-                      if ((state.filter.maxRow / 20).floor() !=
-                              state.filter.currentPage - 1 &&
-                          state.filter.currentPage != 0) {
-                        BlocProvider.of<StockviewBloc>(context).add(
-                            FilterChange(state.filter.copyWith(
-                                currentPage: state.filter.currentPage - 1)));
-                      }
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 6),
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.lightGreen[100],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.arrow_left,
-                        color: ((state.filter.maxRow / 20).floor() !=
-                                    state.filter.currentPage - 1 &&
-                                state.filter.currentPage != 0)
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 50,
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    color: Colors.grey[350],
-                    child: Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text(
-                            (state.filter.currentPage + 1).toString(),
-                            textScaleFactor: 1.4,
-                          ),
-                          Text(
-                            '/',
-                            textScaleFactor: 1.4,
-                          ),
-                          Text(
-                            ((state.filter.maxRow / 20).floor() + 1).toString(),
-                            textScaleFactor: 1.4,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      print(state.filter.currentPage);
-                      print((state.filter.maxRow / 20).floor());
-                      if ((state.filter.maxRow / 20).floor() + 1 !=
-                          (state.filter.currentPage + 1)) {
-                        BlocProvider.of<StockviewBloc>(context).add(
-                            FilterChange(state.filter.copyWith(
-                                currentPage: state.filter.currentPage + 1)));
-                      }
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 6),
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.lightGreen[100],
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Icon(
-                        Icons.arrow_right,
-                        color: ((state.filter.maxRow / 20).floor() + 1 !=
-                                (state.filter.currentPage + 1))
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                    ),
-                  ),
-                  Expanded(child: Container()),
-                ],
-              );
-            }
-            return Container();
+        child: BlocListener<StockviewBloc, StockviewState>(
+          listener: (context, state) {
+            if (state is StockviewLoaded && state.message != null)
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.message!)));
           },
+          child: BlocBuilder<StockviewBloc, StockviewState>(
+            builder: (context, state) {
+              ///---------- Pagination
+              if (state is StockviewLoaded) {
+                return Row(
+                  children: [
+                    Expanded(child: Container()),
+                    InkWell(
+                      onTap: () {
+                        if ((state.filter.maxRow / 20).floor() !=
+                                state.filter.currentPage - 1 &&
+                            state.filter.currentPage != 0) {
+                          BlocProvider.of<StockviewBloc>(context).add(
+                              FilterChange(state.filter.copyWith(
+                                  currentPage: state.filter.currentPage - 1)));
+                        }
+                      },
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 6),
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.lightGreen[100],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.arrow_left,
+                          color: ((state.filter.maxRow / 20).floor() !=
+                                      state.filter.currentPage - 1 &&
+                                  state.filter.currentPage != 0)
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 50,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.all(Radius.elliptical(18.0, 4.0)),
+                        color: Theme.of(context).backgroundColor,
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              (state.filter.currentPage + 1).toString(),
+                              textScaleFactor: 1.4,
+                            ),
+                            Text(
+                              '/',
+                              textScaleFactor: 1.4,
+                            ),
+                            Text(
+                              ((state.filter.maxRow / 20).floor() + 1)
+                                  .toString(),
+                              textScaleFactor: 1.4,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        // print(state.filter.currentPage);
+                        // print((state.filter.maxRow / 20).floor());
+                        if ((state.filter.maxRow / 20).floor() + 1 !=
+                            (state.filter.currentPage + 1)) {
+                          BlocProvider.of<StockviewBloc>(context).add(
+                              FilterChange(state.filter.copyWith(
+                                  currentPage: state.filter.currentPage + 1)));
+                        }
+                      },
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 6),
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.lightGreen[100],
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          Icons.arrow_right,
+                          color: ((state.filter.maxRow / 20).floor() + 1 !=
+                                  (state.filter.currentPage + 1))
+                              ? Colors.black
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Container()),
+                  ],
+                );
+              }
+              return Container();
+            },
+          ),
         ),
         height: 42,
       ),
       appBar: AppBar(
         backgroundColor: Colors.grey[800],
-        title: Text('Histori tambah stock'),
+        title: BlocBuilder<StockviewBloc, StockviewState>(
+            builder: (context, state) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Riwayat stock'),
+              Text(
+                format
+                        .format(DateTime.parse(
+                            (BlocProvider.of<StockviewBloc>(context).state
+                                    as StockviewLoaded)
+                                .filter
+                                .startDate))
+                        .toString() +
+                    // .substring(0, 10) +
+                    ' - ' +
+                    format
+                        .format(DateTime.parse(
+                            (BlocProvider.of<StockviewBloc>(context).state
+                                    as StockviewLoaded)
+                                .filter
+                                .endDate))
+                        .toString(),
+                textScaleFactor: 0.7,
+              )
+            ],
+          );
+        }),
         actions: [
           IconButton(
               icon: Icon(Icons.refresh),
@@ -129,26 +176,28 @@ class ListOfStockItems extends StatelessWidget {
                 onPressed: () {
                   // BlocProvider.of<StockviewBloc>(context).add(Initializeview());
                   Scaffold.of(context).showBottomSheet(
-                      (context) => Column(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child:
-                                        Container(color: Colors.transparent)),
-                              ),
-                              FilterBox(),
-                            ],
-                          ),
-                      backgroundColor: Colors.black26);
+                    (context) => Column(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(color: Colors.transparent)),
+                        ),
+                        FilterBox(),
+                      ],
+                    ),
+                    backgroundColor: Colors.black26,
+                  );
                 }),
           )
         ],
       ),
       body: Container(
-        color: Colors.grey[100],
+        color: Theme.of(context).brightness == Brightness.dark
+            ? Theme.of(context).scaffoldBackgroundColor
+            : Colors.grey[100],
         child: Column(
           children: [
             // FilterBox(),
@@ -158,75 +207,65 @@ class ListOfStockItems extends StatelessWidget {
                 if (state is StockviewLoaded) {
                   var widget;
                   if (state.datas.isEmpty) {
+                    print('length = ' + state.datas.length.toString());
                     widget = Column(
                       children: [
-                        Row(children: [
-                          Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(8.0),
-                              margin: EdgeInsets.only(bottom: 8.0),
-                              color: Colors.grey[700],
-                              child: Text(
-                                state.filter.startDate
-                                    .toString()
-                                    .substring(0, 10),
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          )
-                        ]),
                         Expanded(child: Center(child: Text('Empty!'))),
                       ],
                     );
-                  }
-                  widget = ListView.builder(
-                    key: UniqueKey(),
-                    controller: _scontrol,
-                    padding: EdgeInsets.only(bottom: 12),
-                    itemBuilder: (context, i) {
-                      ItemCards data = state.datas[i];
-                      // print(data.ditambahkan);
-                      // return Container();
-                      return Column(
-                        children: [
-                          ///---- date seperator
-                          if ((i >= 1 &&
-                                  data.ditambahkan
-                                          .toString()
-                                          .substring(0, 10) !=
-                                      state.datas[i - 1].ditambahkan
-                                          .toString()
-                                          .substring(0, 10)) ||
-                              i == 0)
-                            Row(children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.all(8.0),
-                                  margin: EdgeInsets.only(bottom: 8.0),
-                                  color: Colors.grey[700],
-                                  child: Text(
+                  } else {
+                    widget = ListView.builder(
+                      key: UniqueKey(),
+                      controller: _scontrol,
+                      padding: EdgeInsets.only(bottom: 12),
+                      itemBuilder: (context, i) {
+                        ItemCards data = state.datas[i];
+                        // print(data.ditambahkan);
+                        // return Container();
+                        return Column(
+                          children: [
+                            ///---- date seperator
+                            if ((i >= 1 &&
                                     data.ditambahkan
-                                        .toString()
-                                        .substring(0, 10),
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              )
-                            ]),
+                                            .toString()
+                                            .substring(0, 10) !=
+                                        state.datas[i - 1].ditambahkan
+                                            .toString()
+                                            .substring(0, 10)) ||
+                                i == 0)
+                              Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        margin: EdgeInsets.only(bottom: 8.0),
+                                        color: Colors.grey[700],
+                                        child: Text(
+                                          data.ditambahkan
+                                              .toString()
+                                              .substring(0, 10),
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    )
+                                  ]),
 
-                          ///------
-                          StockviewCard(data, Key(data.cardId.toString())),
-                        ],
-                      );
-                    },
-                    itemCount: state.datas.length,
-                  );
+                            ///------end of date seperator
+                            StockviewCard(data, Key(data.cardId.toString())),
+                          ],
+                        );
+                      },
+                      itemCount: state.datas.length,
+                    );
+                  }
                   return AnimatedSwitcher(
                     duration: Duration(milliseconds: 450),
                     child: widget,
                   );
                 }
-                return CircularProgressIndicator();
+                return Center(child: CircularProgressIndicator());
               }),
             ),
           ],
@@ -235,8 +274,8 @@ class ListOfStockItems extends StatelessWidget {
     );
     return (Platform.isWindows)
         ? CustomWindow(
-            child: a,
+            child: body,
           )
-        : a;
+        : body;
   }
 }

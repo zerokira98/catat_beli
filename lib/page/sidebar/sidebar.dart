@@ -1,12 +1,14 @@
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
-import 'package:kasir/bloc/stockview/stockview_bloc.dart';
-import 'package:kasir/page/more_page/item_prop.dart';
-import 'package:kasir/page/more_page/print.dart';
-import 'package:kasir/page/stockview/stockview.dart';
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
+import 'package:catatbeli/page/more_page/item_prop.dart';
+import 'package:catatbeli/page/more_page/print.dart';
+import 'package:catatbeli/page/more_page/tempat.dart';
+import 'package:catatbeli/page/stockview/stockview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -18,19 +20,21 @@ class SideDrawer extends StatelessWidget {
     return Drawer(
         child: Column(children: [
       Container(
-        height: 100,
+        height: 180,
         color: Theme.of(context).primaryColor,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Expanded(
-                  child: Text(
-                'Pencatatan Pembelian',
-                textScaleFactor: 1.3,
-                style: TextStyle(color: Colors.white),
-              )),
-            ],
+          child: SafeArea(
+            child: Row(
+              children: [
+                Expanded(
+                    child: Text(
+                  'Pencatatan Pembelian',
+                  textScaleFactor: 1.3,
+                  style: TextStyle(color: Colors.white),
+                )),
+              ],
+            ),
           ),
         ),
       ),
@@ -51,7 +55,15 @@ class SideDrawer extends StatelessWidget {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => ListOfStockItems()));
             },
-            title: Text('Stock'),
+            title: Text('Riwayat Stock'),
+          ),
+          ListTile(
+            trailing: Icon(Icons.edit),
+            onTap: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (context) => TempatEdit()));
+            },
+            title: Text('Tempat edit'),
           ),
           ListTile(
             trailing: Icon(Icons.print),

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:kasir/model/itemcard.dart';
+import 'package:catatbeli/model/itemcard.dart';
 import 'package:moor/ffi.dart';
 import 'package:moor/moor.dart';
 import 'package:path_provider/path_provider.dart';
@@ -77,6 +77,11 @@ class MyDatabase extends _$MyDatabase {
   Future<List<StockItem>> get dataItem => select(stockItems).get();
   Future<List<Stock>> get dataStock => select(stocks).get();
 
+  ///================
+  Future deleteStock(int cardId) async {
+    return (delete(stocks)..where((tbl) => tbl.id.equals(cardId))).go();
+  }
+
   ///============
   Future<int> maxdataStock(
       {required DateTime startDate, required DateTime endDate}) {
@@ -100,6 +105,7 @@ class MyDatabase extends _$MyDatabase {
   ///====
   Future<List<StockWithDetails>> showStockwithDetails({
     int? idBarang,
+    int? barcode,
     int? limit,
     int? page,
     DateTime? startDate,
@@ -108,7 +114,6 @@ class MyDatabase extends _$MyDatabase {
     String? boughtPlace,
   }) async {
     ///----------Declare default variables
-    ///
     boughtPlace = boughtPlace ?? '';
     name = name ?? '';
     var timenow = DateTime.now();
@@ -142,10 +147,6 @@ class MyDatabase extends _$MyDatabase {
           offset: page! * limit,
         );
       }
-      // ab.where(stockItems.nama.contains(name));
-      // ab.where(tempatBelis.nama.contains(boughtPlace));
-      // a = await ab.get();
-      // ab.where((stocks.dateAdd.isBiggerThan())
     } else {
       query = (select(stocks)
             ..where((tbl) =>
@@ -168,6 +169,7 @@ class MyDatabase extends _$MyDatabase {
     }
     query.where(stockItems.nama.contains(name));
     query.where(tempatBelis.nama.contains(boughtPlace));
+    barcode ?? query.where(stockItems.barcode.equals(barcode));
     a = await query.get();
     return a
         .map((e) => StockWithDetails(
@@ -189,9 +191,20 @@ class MyDatabase extends _$MyDatabase {
       : (select(tempatBelis)..where((tbl) => tbl.nama.contains(query))).get();
 
   ///========
-  Future<List<StockItem>> showInsideItems([String? nama]) => nama == null
-      ? select(stockItems).get()
-      : (select(stockItems)..where((tbl) => tbl.nama.contains(nama))).get();
+  Future<List<StockItem>> showInsideItems([String? nama, int? sort]) {
+    var a = select(stockItems);
+    sort = sort ?? 0;
+    List sortIndex = [
+      (u) => OrderingTerm.asc(u.id),
+      (u) => OrderingTerm.desc(u.id),
+      (u) => OrderingTerm.asc(u.nama),
+      (u) => OrderingTerm.desc(u.nama),
+    ];
+    a.orderBy([sortIndex[sort]]);
+    return nama == null
+        ? a.get()
+        : (a..where((tbl) => tbl.nama.contains(nama))).get();
+  }
 
   ///========
   Future addItems(List<ItemCards> datas) async {
@@ -200,14 +213,13 @@ class MyDatabase extends _$MyDatabase {
       int? itemId = data.productId;
 
       if (data.productId == null) {
-        var a = await (select(stockItems)
+        List<StockItem> a = await (select(stockItems)
               ..where((tbl) => tbl.nama.equals(data.namaBarang!)))
             .get();
         if (a.isEmpty) {
           itemId = await into(stockItems).insert(StockItemsCompanion(
             nama: Value(data.namaBarang!),
-            barcode:
-                data.barcode == null ? Value.absent() : Value(data.barcode),
+            barcode: Value(data.barcode),
           ));
         } else {
           itemId = a.single.id;
@@ -248,21 +260,21 @@ class MyDatabase extends _$MyDatabase {
     // into(stocks).insert(StocksCompanion())
   }
 
-  Future tempatinsert() async {
-    into(tempatBelis).insert(TempatBelisCompanion(nama: Value('TOP')));
+  // Future tempatinsert() async {
+  //   return into(tempatBelis).insert(TempatBelisCompanion(nama: Value('TOP')));
+  // }
+
+  Future updateNamaTempat(int id, String nama) async {
+    return (update(tempatBelis)..where((tbl) => tbl.id.equals(id)))
+        .write(TempatBelisCompanion(nama: Value(nama)));
   }
 
   Future updateItemProp(
       productId, String nama, int? harga, int? barcode) async {
+    print(barcode);
     return await (update(stockItems)..where((tbl) => tbl.id.equals(productId)))
         .write(
-      StockItemsCompanion(
-          nama: Value(nama),
-          barcode: barcode == null
-              ? Value.absent()
-              : Value(
-                  barcode,
-                )),
+      StockItemsCompanion(nama: Value(nama), barcode: Value(barcode)),
     );
   }
 }

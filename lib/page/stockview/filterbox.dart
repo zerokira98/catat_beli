@@ -1,17 +1,11 @@
 part of 'stockview.dart';
 
 class FilterBox extends StatelessWidget {
-  final dateFrom = TextEditingController(
-      // text: DateTime.now()
-      //     .subtract(Duration(days: 1365))
-      //     .toString()
-      //     .substring(0, 10),
-      );
-  final dateTo = TextEditingController(
-      // text: DateTime.now().add(Duration(days: 1)).toString().substring(0, 10),
-      );
+  final dateFrom = TextEditingController();
+  final dateTo = TextEditingController();
   final namaBarang = TextEditingController();
   final tempatBeliController = TextEditingController();
+  final barcodeController = TextEditingController();
   final int dropdownValue = 0;
   @override
   Widget build(BuildContext context) {
@@ -22,10 +16,13 @@ class FilterBox extends StatelessWidget {
           tempatBeliController.text = state.filter.tempatBeli ?? '';
           dateFrom.text = state.filter.startDate.substring(0, 10);
           dateTo.text = state.filter.endDate.substring(0, 10);
+          barcodeController.text = state.filter.barcode?.toString() ?? '';
           return Container(
             padding: EdgeInsets.all(12.0),
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : Theme.of(context).backgroundColor,
                 border: Border.all(color: Colors.grey[50]!),
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(24.0))),
@@ -61,6 +58,18 @@ class FilterBox extends StatelessWidget {
                       flex: 2,
                       child: TextField(
                         controller: tempatBeliController,
+                        onEditingComplete: () {
+                          BlocProvider.of<StockviewBloc>(context)
+                              .add(FilterChange(state.filter.copyWith(
+                            barcode: int.tryParse(barcodeController.text),
+                            nama: namaBarang.text,
+                            currentPage: 0,
+                            tempatBeli: tempatBeliController.text,
+                            startDate: dateFrom.text,
+                            endDate: dateTo.text,
+                          )));
+                          // FocusScope.of(context).unfocus();
+                        },
                         decoration: InputDecoration(
                           labelText: 'Tempat beli',
                         ),
@@ -125,7 +134,40 @@ class FilterBox extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    Text('Sort by:'),
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        controller: barcodeController,
+                        onEditingComplete: () {
+                          BlocProvider.of<StockviewBloc>(context)
+                              .add(FilterChange(state.filter.copyWith(
+                            barcode: int.tryParse(barcodeController.text),
+                            nama: namaBarang.text,
+                            currentPage: 0,
+                            tempatBeli: tempatBeliController.text,
+                            startDate: dateFrom.text,
+                            endDate: dateTo.text,
+                          )));
+                          // FocusScope.of(context).unfocus();
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Barcode',
+                          suffixIcon: InkWell(
+                              onTap: () {
+                                barcodeController.text = '';
+                                // BlocProvider.of<StockviewBloc>(context)
+                                //     .add(FilterChange(state.filter.copyWith(
+                                //   barcode: null,
+                                // )));
+                              },
+                              child: Icon(Icons.close_rounded)),
+                          // floatingLabelBehavior: FloatingLabelBehavior.always,
+                          labelStyle: TextStyle(overflow: TextOverflow.clip),
+                        ),
+                      ),
+                    ),
+                    Padding(padding: EdgeInsets.all(12)),
+                    // Text('Sort by:'),
                     // DropdownButton(
                     //     value: dropdownValue,
                     //     items: [
@@ -158,22 +200,29 @@ class FilterBox extends StatelessWidget {
                     //       // dropdownValue = v;
                     //     }),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          print(dateTo.text);
-                          // print(namaBarang.text + dateFromFull + dateToFull);
-                          BlocProvider.of<StockviewBloc>(context)
-                              .add(FilterChange(state.filter.copyWith(
-                            nama: namaBarang.text,
-                            currentPage: 0,
-                            tempatBeli: tempatBeliController.text,
-                            startDate: dateFrom.text,
-                            endDate: dateTo.text,
-                          )));
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 18.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // print(dateTo.text);
+                            // print(namaBarang.text + dateFromFull + dateToFull);
+                            BlocProvider.of<StockviewBloc>(context)
+                                .add(FilterChange(state.filter.copyWith(
+                              barcode: int.tryParse(barcodeController.text),
+                              nama: namaBarang.text,
+                              currentPage: 0,
+                              tempatBeli: tempatBeliController.text,
+                              startDate: dateFrom.text,
+                              endDate: dateTo.text,
+                            )));
 
-                          Navigator.pop(context);
-                        },
-                        child: Text('Go'),
+                            // Navigator.pop(context);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('Go'),
+                          ),
+                        ),
                       ),
                     ),
                   ],
