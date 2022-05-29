@@ -78,6 +78,7 @@ class FormTempatEdit extends StatelessWidget {
                           if (value.length < 2) {
                             return "At least 3 char";
                           }
+                          return null;
                         },
                         controller: namaController,
                         decoration: InputDecoration(label: Text('Nama Tempat')),

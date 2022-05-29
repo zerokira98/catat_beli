@@ -33,6 +33,14 @@ class _ListOfItemsState extends State<ListOfItems> {
       value: 3,
     ),
   ];
+  late Future<List<StockItem>> getData;
+  @override
+  void initState() {
+    getData = RepositoryProvider.of<MyDatabase>(context)
+        .showInsideItems(null, optionVal);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

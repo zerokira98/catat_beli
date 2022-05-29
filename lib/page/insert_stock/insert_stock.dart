@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -7,6 +8,7 @@ import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
 
 class InsertProductPage extends StatefulWidget {
@@ -49,6 +51,13 @@ class _InsertProductPageState extends State<InsertProductPage> {
             elevation: 7,
             title: Text('Masuk Barang'),
             actions: [
+              // IconButton(
+              //     onPressed: () async {
+              //       var a = await SharedPreferences.getInstance();
+              //       bool b = a.getBool('darkmode') ?? false;
+              //       a.setBool('darkmode', !b);
+              //     },
+              //     icon: Icon(Icons.nightlight)),
               Container(
                 padding: EdgeInsets.all(8.0),
                 child: MouseRegion(

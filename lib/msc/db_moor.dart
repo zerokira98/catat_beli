@@ -169,7 +169,7 @@ class MyDatabase extends _$MyDatabase {
     }
     query.where(stockItems.nama.contains(name));
     query.where(tempatBelis.nama.contains(boughtPlace));
-    barcode ?? query.where(stockItems.barcode.equals(barcode));
+    if (barcode != null) query.where(stockItems.barcode.equals(barcode));
     a = await query.get();
     return a
         .map((e) => StockWithDetails(

@@ -11,6 +11,7 @@ import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:sqlite3/open.dart';
+part 'windows_window.dart';
 
 main() {
   if (Platform.isWindows) {
@@ -67,6 +68,7 @@ class App extends StatelessWidget {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
+
           // themeMode: ThemeMode.dark,
           darkTheme: ThemeData.dark(),
           theme: ThemeData(fontFamily: 'OpenSans'),
@@ -117,96 +119,6 @@ class App extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class Bottoms extends StatefulWidget {
-  final PageController pc;
-  const Bottoms({Key? key, required this.pc}) : super(key: key);
-
-  @override
-  _BottomsState createState() => _BottomsState();
-}
-
-class _BottomsState extends State<Bottoms> {
-  int navIndex = 0;
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        onTap: (i) {
-          setState(() {
-            navIndex = i;
-          });
-          widget.pc.animateToPage(i,
-              duration: Duration(milliseconds: 500), curve: Curves.ease);
-        },
-        currentIndex: navIndex,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add New'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'More'),
-        ]);
-  }
-}
-
-class WindowButtons extends StatelessWidget {
-  WindowButtons({Key? key}) : super(key: key);
-  final col =
-      WindowButtonColors(iconNormal: Colors.white, mouseOver: Colors.black54);
-  final colex = WindowButtonColors(
-    iconNormal: Colors.white,
-    mouseOver: Colors.red,
-  );
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        MinimizeWindowButton(
-          colors: col,
-        ),
-        MaximizeWindowButton(
-          colors: col,
-        ),
-        CloseWindowButton(
-          colors: colex,
-        ),
-      ],
-    );
-  }
-}
-
-class CustomWindow extends StatelessWidget {
-  final Widget child;
-  const CustomWindow({Key? key, required this.child}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        WindowTitleBarBox(
-            child: Container(
-          // color: Colors.blue,
-          decoration: BoxDecoration(
-            // borderRadius:
-            //     BorderRadius.only(topLeft: Radius.circular(18.0)),
-            gradient: LinearGradient(
-                colors: [
-                  Colors.black,
-                  Colors.grey.shade900,
-                  Colors.grey.shade900,
-                ],
-                // stops: [],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter),
-          ),
-          child:
-              Row(children: [Expanded(child: MoveWindow()), WindowButtons()]),
-        )),
-        Expanded(
-          child: child,
-        ),
-      ],
     );
   }
 }

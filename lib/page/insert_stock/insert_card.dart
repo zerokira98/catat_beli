@@ -89,8 +89,13 @@ class _InsertProductCardState extends State<InsertProductCard>
               },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  labelText: 'jumlah unit'),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                label: AutoSizeText(
+                  'jumlah unit',
+                  maxLines: 1,
+                ),
+                // labelText: 'jumlah unit',
+              ),
             ),
           ),
         ),
@@ -138,18 +143,18 @@ class _InsertProductCardState extends State<InsertProductCard>
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                    suffixIcon: InkWell(
-                        onTap: () {
-                          BlocProvider.of<InsertstockBloc>(context)
-                              .add(DataChange(widget.data.copywith(
-                            tempatBeli: '',
-                          )));
-                        },
-                        child: Icon(Icons.close_rounded)),
-                    // floatingLabelBehavior: FloatingLabelBehavior.always,
-                    labelStyle: TextStyle(overflow: TextOverflow.clip),
-                    // err
-                    labelText: 'Tempat Beli'),
+                  suffixIcon: InkWell(
+                      onTap: () {
+                        BlocProvider.of<InsertstockBloc>(context)
+                            .add(DataChange(widget.data.copywith(
+                          tempatBeli: '',
+                        )));
+                      },
+                      child: Icon(Icons.close_rounded)),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  labelStyle: TextStyle(overflow: TextOverflow.clip),
+                  labelText: 'Tempat Beli',
+                ),
               ),
               onSuggestionSelected: (TempatBeli val) {
                 BlocProvider.of<InsertstockBloc>(context).add(

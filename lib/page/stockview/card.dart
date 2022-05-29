@@ -84,17 +84,30 @@ class _StockviewCardState extends State<StockviewCard> {
                 color: Colors.red,
               ),
               child: ListTile(
-                // isThreeLine: true,
+                isThreeLine: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Text(''),
-                subtitle: Row(
+                subtitle: Column(
                   children: [
-                    Text('' + ''),
-                    Expanded(
-                      child: Container(),
+                    Row(
+                      children: [
+                        Text('' + ''),
+                        Expanded(
+                          child: Container(),
+                        ),
+                        Text(' ' + '')
+                      ],
                     ),
-                    Text(' ' + '')
+                    Row(
+                      children: [
+                        Text('' + ''),
+                        Expanded(
+                          child: Container(),
+                        ),
+                        Text(' ' + '')
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -127,7 +140,7 @@ class _StockviewCardState extends State<StockviewCard> {
                           child: Text('Yes',
                               style: TextStyle(color: Colors.white))),
                     ),
-                    Padding(padding: EdgeInsets.all(12)),
+                    Padding(padding: EdgeInsets.all(4)),
                     InkWell(
                         onTap: () {
                           print('tapped');
@@ -137,7 +150,7 @@ class _StockviewCardState extends State<StockviewCard> {
                           });
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(18.0),
+                          padding: const EdgeInsets.all(12.0),
                           child: Text('Cancel',
                               style: TextStyle(color: Colors.white)),
                         )),
@@ -232,48 +245,65 @@ class _StockviewCardState extends State<StockviewCard> {
                     : Colors.white,
               ),
               child: ListTile(
-                // isThreeLine: true,
+                isThreeLine: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(widget.data.namaBarang.toString()),
-                    Expanded(child: Container()),
-                    Text('Jumlah item : ${widget.data.pcs}'),
+                    Expanded(
+                        child: AutoSizeText(
+                      widget.data.namaBarang.toString(),
+                      minFontSize: 12,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    )),
+                    // Expanded(child: Container()),
+                    Text('Total : ${widget.data.pcs}'),
                   ],
                 ),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                subtitle: Column(
+                  // mainAxisAlignment: MainAxisAlignment.end,
+                  // mainAxisSize: MainAxisSize.max,
                   children: [
-                    Expanded(
-                      flex: 1,
-                      child: Text('Tempat beli: ${widget.data.tempatBeli}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text('Tempat beli: ${widget.data.tempatBeli}'),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                              'Tgl : ${widget.data.ditambahkan.toString().substring(0, 10)}'),
+                        ),
+                        // Expanded(
+                        //   child: Container(),
+                        // ),
+                      ],
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                          'Tanggal beli : ${widget.data.ditambahkan.toString().substring(0, 10)}'),
-                    ),
-                    // Expanded(
-                    //   child: Container(),
-                    // ),
-                    Expanded(
-                      flex: 1,
-                      // fit: FlexFit.tight,
-                      child: Text(
-                        'Harga beli : $hargaBeli',
-                        // maxLines: 1,
-                        overflow: TextOverflow.fade,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      // fit: FlexFit.tight,
-                      child: Text(
-                        'Total beli : $totalBeli',
-                        // maxLines: 1,
-                        overflow: TextOverflow.fade,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          // fit: FlexFit.tight,
+                          child: Text(
+                            'Harga beli : $hargaBeli',
+                            // maxLines: 1,
+                            overflow: TextOverflow.fade,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          // fit: FlexFit.tight,
+                          child: Text(
+                            'Total beli : $totalBeli',
+                            // maxLines: 1,
+                            overflow: TextOverflow.fade,
+                          ),
+                        )
+                      ],
                     )
                   ],
                 ),

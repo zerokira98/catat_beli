@@ -47,6 +47,7 @@ dependencies:
   file_picker: ^4.3.1
   msix: ^3.6.2
   shared_preferences: ^2.0.15
+  auto_size_text: ^3.0.0
   # flutter_launcher_icons: ^0.9.2
 
 dev_dependencies:

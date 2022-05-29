@@ -180,6 +180,7 @@ class _PrintAlertState extends State<PrintAlert> {
               Padding(padding: EdgeInsets.all(12.0)),
               Expanded(
                 child: DropdownButton<int>(
+                  isExpanded: true,
                   onChanged: (val) {
                     setState(() {
                       multivalue = val!;
