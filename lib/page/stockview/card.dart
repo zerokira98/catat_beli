@@ -14,6 +14,7 @@ class StockviewCard extends StatefulWidget {
 
 class _StockviewCardState extends State<StockviewCard> {
   double horizontal = 0.0;
+  var df = DateFormat('d/M/y');
   double opacityval = 1.0;
   @override
   Widget build(BuildContext context) {
@@ -190,20 +191,27 @@ class _StockviewCardState extends State<StockviewCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         InkWell(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(18.0),
-                                      child: Text(
-                                        'Future Feature!',
-                                        textScaleFactor: 2.0,
-                                      ),
-                                    ),
-                                  );
-                                });
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => StockEdit(widget.data),
+                                ));
+                            BlocProvider.of<StockviewBloc>(context)
+                                .add(InitiateView());
+                            // showDialog(
+                            //     context: context,
+                            //     builder: (context) {
+                            //       return Dialog(
+                            //         child: Padding(
+                            //           padding: const EdgeInsets.all(18.0),
+                            //           child: Text(
+                            //             'Future Feature!',
+                            //             textScaleFactor: 2.0,
+                            //           ),
+                            //         ),
+                            //       );
+                            //     });
                           },
                           child: Icon(
                             Icons.edit,
@@ -246,6 +254,7 @@ class _StockviewCardState extends State<StockviewCard> {
               ),
               child: ListTile(
                 isThreeLine: true,
+                // dense: false,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Row(
@@ -263,8 +272,8 @@ class _StockviewCardState extends State<StockviewCard> {
                   ],
                 ),
                 subtitle: Column(
-                  // mainAxisAlignment: MainAxisAlignment.end,
-                  // mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -276,7 +285,7 @@ class _StockviewCardState extends State<StockviewCard> {
                         Expanded(
                           flex: 1,
                           child: Text(
-                              'Tgl : ${widget.data.ditambahkan.toString().substring(0, 10)}'),
+                              'Tgl : ${df.format(widget.data.ditambahkan!)}'),
                         ),
                         // Expanded(
                         //   child: Container(),

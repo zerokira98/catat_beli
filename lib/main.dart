@@ -6,14 +6,16 @@ import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:catatbeli/msc/bloc_observer.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ffi' as ffi;
 import 'dart:io';
 import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:sqlite3/open.dart';
+// import 'package:intl/intl.dart';
 part 'windows_window.dart';
 
-main() {
+main() async {
   if (Platform.isWindows) {
     open.overrideFor(OperatingSystem.linux, _openOnWindows);
     final db = sql.sqlite3.openInMemory();
@@ -21,10 +23,11 @@ main() {
   }
   WidgetsFlutterBinding.ensureInitialized();
   // Bloc = NewBlocObserver();
-  BlocOverrides.runZoned(
-    () => runApp(App()),
-    blocObserver: NewBlocObserver(),
-  );
+  await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
+  // BlocOverrides.runZoned(
+  //   () => runApp(App()),
+  //   blocObserver: NewBlocObserver(),
+  // );
   // runApp(App());
   if (Platform.isWindows) {
     doWhenWindowReady(() {
@@ -68,7 +71,6 @@ class App extends StatelessWidget {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-
           // themeMode: ThemeMode.dark,
           darkTheme: ThemeData.dark(),
           theme: ThemeData(fontFamily: 'OpenSans'),
@@ -87,9 +89,10 @@ class App extends StatelessWidget {
                             builder: (context) {
                               return Dialog(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(18.0),
+                                  padding: const EdgeInsets.all(24.0),
                                   child: Text(
-                                      'It\'s my first app. Lots of bugs is expected. :)'),
+                                      'It\'s my first published app. Lots of bugs is expected. :)\n' +
+                                          'No tutorial, use your instinct.'),
                                 ),
                               );
                             });

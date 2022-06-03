@@ -13,35 +13,35 @@ class TempatEdit extends StatefulWidget {
 class _TempatEditState extends State<TempatEdit> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(),
-      child: Material(
-        child: FutureBuilder<List<TempatBeli>>(
-            future: RepositoryProvider.of<MyDatabase>(context).datatempat(),
-            builder: (context, snap) {
-              if (snap.hasData && snap.data != null) {
-                return ListView.builder(
-                  itemBuilder: (context, i) {
-                    return i != 0
-                        ? ListTile(
-                            onTap: () async {
-                              await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          FormTempatEdit(snap.data![i])));
-                              setState(() {});
-                            },
-                            title: Text('${snap.data![i].nama}'),
-                          )
-                        : Container();
-                  },
-                  itemCount: snap.data!.length,
-                );
-              }
-              return Container();
-            }),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Edit Tempat'),
       ),
+      body: FutureBuilder<List<TempatBeli>>(
+          future: RepositoryProvider.of<MyDatabase>(context).datatempat(),
+          builder: (context, snap) {
+            if (snap.hasData && snap.data != null) {
+              return ListView.builder(
+                itemBuilder: (context, i) {
+                  return i != 0
+                      ? ListTile(
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        FormTempatEdit(snap.data![i])));
+                            setState(() {});
+                          },
+                          title: Text('${snap.data![i].nama}'),
+                        )
+                      : Container();
+                },
+                itemCount: snap.data!.length,
+              );
+            }
+            return Container();
+          }),
     );
   }
 }

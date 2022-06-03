@@ -39,7 +39,10 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
       SendtoDB event, Emitter<InsertstockState> emit) async {
     List<ItemCards> data = (state as Loaded)
         .data
-        .map((e) => e.copywith(namaBarang: e.namaBarang?.trim()))
+        .map((e) => e.copywith(
+              namaBarang: e.namaBarang?.trim(),
+              tempatBeli: e.tempatBeli?.trim(),
+            ))
         .toList();
     emit(Loaded(data));
     // var state =

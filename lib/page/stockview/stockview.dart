@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:catatbeli/page/stockview/edit_stock/edit_stock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -11,11 +12,11 @@ import 'package:catatbeli/model/itemcard.dart';
 part 'card.dart';
 part 'filterbox.dart';
 
-final numFormat = new NumberFormat("#,##0", "id");
+final numFormat = new NumberFormat("#,##0", 'id_ID');
 
 class ListOfStockItems extends StatelessWidget {
   final ScrollController _scontrol = ScrollController();
-  final format = DateFormat('d MMMM y');
+  final format = DateFormat('d MMMM y', 'id_ID');
 
   @override
   Widget build(BuildContext context) {
@@ -145,20 +146,18 @@ class ListOfStockItems extends StatelessWidget {
               Text('Riwayat stock'),
               Text(
                 format
-                        .format(DateTime.parse(
-                            (BlocProvider.of<StockviewBloc>(context).state
-                                    as StockviewLoaded)
-                                .filter
-                                .startDate))
+                        .format(((BlocProvider.of<StockviewBloc>(context).state
+                                as StockviewLoaded)
+                            .filter
+                            .startDate))
                         .toString() +
                     // .substring(0, 10) +
                     ' - ' +
                     format
-                        .format(DateTime.parse(
-                            (BlocProvider.of<StockviewBloc>(context).state
-                                    as StockviewLoaded)
-                                .filter
-                                .endDate))
+                        .format(((BlocProvider.of<StockviewBloc>(context).state
+                                as StockviewLoaded)
+                            .filter
+                            .endDate))
                         .toString(),
                 textScaleFactor: 0.7,
               )
@@ -221,7 +220,7 @@ class ListOfStockItems extends StatelessWidget {
                       padding: EdgeInsets.only(bottom: 12),
                       itemBuilder: (context, i) {
                         ItemCards data = state.datas[i];
-                        // print(data.ditambahkan);
+                        // print(data.ditambahkan.weekday);
                         // return Container();
                         return Column(
                           children: [
@@ -244,9 +243,9 @@ class ListOfStockItems extends StatelessWidget {
                                         margin: EdgeInsets.only(bottom: 8.0),
                                         color: Colors.grey[700],
                                         child: Text(
-                                          data.ditambahkan
-                                              .toString()
-                                              .substring(0, 10),
+                                          DateFormat('EEEE, d MMMM y', 'id_ID')
+                                              .format(data.ditambahkan!)
+                                              .toString(),
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ),

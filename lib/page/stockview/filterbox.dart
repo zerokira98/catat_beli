@@ -1,6 +1,7 @@
 part of 'stockview.dart';
 
 class FilterBox extends StatelessWidget {
+  final format = DateFormat('d/M/y');
   final dateFrom = TextEditingController();
   final dateTo = TextEditingController();
   final namaBarang = TextEditingController();
@@ -14,8 +15,10 @@ class FilterBox extends StatelessWidget {
         if (state is StockviewLoaded) {
           namaBarang.text = state.filter.nama ?? '';
           tempatBeliController.text = state.filter.tempatBeli ?? '';
-          dateFrom.text = state.filter.startDate.substring(0, 10);
-          dateTo.text = state.filter.endDate.substring(0, 10);
+          dateFrom.text = format.format((state.filter.startDate));
+          dateTo.text = format.format((state.filter.endDate));
+          // state.filter.startDate.substring(0, 10);
+          // dateTo.text = state.filter.endDate.substring(0, 10);
           barcodeController.text = state.filter.barcode?.toString() ?? '';
           return Container(
             padding: EdgeInsets.all(12.0),
@@ -65,8 +68,6 @@ class FilterBox extends StatelessWidget {
                             nama: namaBarang.text,
                             currentPage: 0,
                             tempatBeli: tempatBeliController.text,
-                            startDate: dateFrom.text,
-                            endDate: dateTo.text,
                           )));
                           // FocusScope.of(context).unfocus();
                         },
@@ -88,14 +89,21 @@ class FilterBox extends StatelessWidget {
                         onTap: () async {
                           var selectedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate:
+                                  (BlocProvider.of<StockviewBloc>(context).state
+                                          as StockviewLoaded)
+                                      .filter
+                                      .startDate,
                               firstDate:
                                   DateTime.now().subtract(Duration(days: 365)),
                               lastDate:
                                   DateTime.now().add(Duration(days: 365)));
                           if (selectedDate != null) {
-                            dateFrom.text =
-                                selectedDate.toString().substring(0, 10);
+                            // dateFrom.text =
+                            //     selectedDate.toString().substring(0, 10);
+                            BlocProvider.of<StockviewBloc>(context).add(
+                                FilterChange(state.filter
+                                    .copyWith(startDate: selectedDate)));
                           }
                           // dateFromFull = selectedDate.toString();
                         },
@@ -112,14 +120,21 @@ class FilterBox extends StatelessWidget {
                         onTap: () async {
                           var selectedDate = await showDatePicker(
                               context: context,
-                              initialDate: DateTime.now(),
+                              initialDate:
+                                  (BlocProvider.of<StockviewBloc>(context).state
+                                          as StockviewLoaded)
+                                      .filter
+                                      .endDate,
                               firstDate:
                                   DateTime.now().subtract(Duration(days: 365)),
                               lastDate:
                                   DateTime.now().add(Duration(days: 365)));
                           if (selectedDate != null) {
-                            dateTo.text =
-                                selectedDate.toString().substring(0, 10);
+                            // dateTo.text =
+                            //     selectedDate.toString().substring(0, 10);
+                            BlocProvider.of<StockviewBloc>(context).add(
+                                FilterChange(state.filter
+                                    .copyWith(endDate: selectedDate)));
                           }
                           // dateToFull = selectedDate.toString();
                         },
@@ -145,8 +160,8 @@ class FilterBox extends StatelessWidget {
                             nama: namaBarang.text,
                             currentPage: 0,
                             tempatBeli: tempatBeliController.text,
-                            startDate: dateFrom.text,
-                            endDate: dateTo.text,
+                            // startDate: dateFrom.text,
+                            // endDate: dateTo.text,
                           )));
                           // FocusScope.of(context).unfocus();
                         },
@@ -212,8 +227,8 @@ class FilterBox extends StatelessWidget {
                               nama: namaBarang.text,
                               currentPage: 0,
                               tempatBeli: tempatBeliController.text,
-                              startDate: dateFrom.text,
-                              endDate: dateTo.text,
+                              // startDate: dateFrom.text,
+                              // endDate: dateTo.text,
                             )));
 
                             // Navigator.pop(context);

@@ -69,7 +69,20 @@ class ItemCards extends Equatable {
 
   @override
   String toString() {
-    return 'open : $open';
+    return [
+      namaBarang,
+      hargaBeli,
+      hargaJual,
+      pcs,
+      tempatBeli,
+      cardId,
+      open,
+      barcode,
+      productId,
+      ditambahkan,
+      formkey
+    ].toString();
+    // return 'open : $open';
     // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
     // $pcs, $tempatBeli, $id, $expdate, $barcode,$productId}''';
   }

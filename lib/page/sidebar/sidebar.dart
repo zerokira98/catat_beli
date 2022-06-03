@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:catatbeli/msc/db_moor.dart';
+// import 'package:catatbeli/msc/db_moor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,21 +42,23 @@ class SideDrawer extends StatelessWidget {
       Expanded(
         child: ListView(children: [
           ListTile(
-            trailing: Icon(Icons.edit),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListOfItems()));
-            },
-            title: Text('Ganti deskripsi produk'),
-          ),
-          ListTile(
-            trailing: Icon(Icons.list_alt_rounded),
+            trailing: Icon(Icons.history),
+            subtitle: Text('Data input stock'),
             onTap: () {
               BlocProvider.of<StockviewBloc>(context).add(InitiateView());
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ListOfStockItems()));
+                  CupertinoPageRoute(builder: (context) => ListOfStockItems()));
             },
             title: Text('Riwayat Stock'),
+          ),
+          ListTile(
+            trailing: Icon(Icons.edit),
+            subtitle: Text('Nama & barcode'),
+            onTap: () {
+              Navigator.push(context,
+                  CupertinoPageRoute(builder: (context) => ListOfItems()));
+            },
+            title: Text('Ganti deskripsi produk'),
           ),
           ListTile(
             trailing: Icon(Icons.edit),
@@ -64,7 +66,7 @@ class SideDrawer extends StatelessWidget {
               Navigator.push(context,
                   CupertinoPageRoute(builder: (context) => TempatEdit()));
             },
-            title: Text('Tempat edit'),
+            title: Text('Ganti Nama Tempat'),
           ),
           ListTile(
             trailing: Icon(Icons.print),
@@ -75,7 +77,7 @@ class SideDrawer extends StatelessWidget {
                     return PrintAlert();
                   });
             },
-            title: Text('Print to csv'),
+            title: Text('Print to Excel'),
           ),
           ListTile(
             trailing: Icon(Icons.ac_unit),

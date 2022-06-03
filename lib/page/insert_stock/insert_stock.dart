@@ -8,7 +8,7 @@ import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
 
 class InsertProductPage extends StatefulWidget {
@@ -77,7 +77,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
 
                         padding: EdgeInsets.only(left: 4.0, right: 12.0),
                         decoration: BoxDecoration(
-                          color: Colors.green[200],
+                          color: Colors.green[300],
                           boxShadow: [BoxShadow(blurRadius: 2.0)],
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -100,7 +100,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                             ),
                             Text(
                               'Submit',
-                              textScaleFactor: 1.25,
+                              textScaleFactor: 1.2,
                               style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.w500),

@@ -302,7 +302,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                             decoration: InputDecoration(
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
-                                labelText: 'Harga beli ',
+                                // labelText: 'Harga beli ',
+                                label: AutoSizeText('Harga Beli'),
                                 suffixIcon: InkWell(
                                     onTap: () {
                                       BlocProvider.of<InsertstockBloc>(context)
@@ -345,7 +346,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                             decoration: InputDecoration(
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
-                              labelText: 'Buy date',
+
+                              label: AutoSizeText('Tanggal Beli'),
+                              // labelText: 'Buy date',
                               fillColor: Colors.white,
                             ),
                           ),

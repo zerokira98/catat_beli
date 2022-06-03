@@ -24,8 +24,12 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       barcode: event.filter.barcode,
       name: event.filter.nama,
       page: event.filter.currentPage,
-      startDate: DateTime.parse(event.filter.startDate),
-      endDate: DateTime.parse(event.filter.endDate),
+      startDate: (event.filter.startDate),
+      endDate: (event.filter.endDate).add(Duration(
+        hours: 23,
+        minutes: 59,
+        seconds: 59,
+      )),
       boughtPlace: event.filter.tempatBeli,
     );
     int maxQ = all.length;
@@ -35,8 +39,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       name: event.filter.nama,
       limit: 20,
       page: event.filter.currentPage,
-      startDate: DateTime.parse(event.filter.startDate),
-      endDate: DateTime.parse(event.filter.endDate),
+      startDate: (event.filter.startDate),
+      endDate: (event.filter.endDate),
       boughtPlace: event.filter.tempatBeli,
     );
     // print(data);
@@ -62,7 +66,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     var startDate = DateTime(curdate.year, curdate.month, 1);
     // var startDate = curdate.subtract(Duration(days: curdate.day + 1));
     // var endDate = curdate.add(Duration(days: 30));
-    var endDate = DateTime(curdate.year, curdate.month + 1, 0);
+    var endDate = DateTime(curdate.year, curdate.month + 1, 0)
+        .add(Duration(hours: 23, minutes: 59));
     int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
 
     print('maxq = ' + maxQ.toString());
@@ -72,10 +77,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     emit(StockviewLoaded(
       message: event.message,
       filter: Filter(
-          currentPage: 0,
-          maxRow: maxQ,
-          startDate: startDate.toString(),
-          endDate: endDate.toString()),
+          currentPage: 0, maxRow: maxQ, startDate: startDate, endDate: endDate),
       datas: a
           .map((e) => ItemCards(
                 ditambahkan: e.stock.dateAdd,

@@ -45,7 +45,7 @@ class _ListOfItemsState extends State<ListOfItems> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('List Registered Items'),
+        title: Text('Daftar Barang'),
         actions: [
           IconButton(
               icon: Icon(Icons.refresh),

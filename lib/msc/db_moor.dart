@@ -118,9 +118,7 @@ class MyDatabase extends _$MyDatabase {
     name = name ?? '';
     var timenow = DateTime.now();
     startDate = startDate ?? DateTime(timenow.year, 1, 1);
-    endDate = endDate ??
-        DateTime(timenow.year, timenow.month + 1, 1)
-            .subtract(Duration(days: 1));
+    endDate = endDate ?? DateTime(timenow.year, timenow.month + 1, 0);
 
     /// Return variable
     ///
@@ -276,5 +274,13 @@ class MyDatabase extends _$MyDatabase {
         .write(
       StockItemsCompanion(nama: Value(nama), barcode: Value(barcode)),
     );
+  }
+
+  Future updateStock(ItemCards a) async {
+    return await (update(stocks)..where((tbl) => tbl.id.equals(a.cardId)))
+        .write(StocksCompanion(
+            dateAdd: Value(a.ditambahkan),
+            price: Value(a.hargaBeli!),
+            qty: Value(a.pcs!)));
   }
 }

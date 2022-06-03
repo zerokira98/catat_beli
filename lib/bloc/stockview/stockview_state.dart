@@ -28,8 +28,8 @@ class Filter extends Equatable {
   final int? barcode;
   final int currentPage;
   final int maxRow;
-  final String startDate;
-  final String endDate;
+  final DateTime startDate;
+  final DateTime endDate;
   Filter(
       {this.nama,
       this.tempatBeli,
@@ -43,8 +43,8 @@ class Filter extends Equatable {
     String? tempatBeli,
     int? currentPage,
     int? maxRow,
-    String? startDate,
-    String? endDate,
+    DateTime? startDate,
+    DateTime? endDate,
     int? barcode,
   }) {
     return Filter(
