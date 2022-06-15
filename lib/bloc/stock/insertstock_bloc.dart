@@ -21,13 +21,13 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
     List<ItemCards> data = [];
     data.add(ItemCards(
         ditambahkan: DateTime.now(), pcs: 1.0, cardId: 1, open: false));
-    emit(Loaded(data, event.success));
+    emit(Loaded(data: data, success: event.success));
   }
 
   void _dataChange(DataChange event, Emitter<InsertstockState> emit) async {
     if (state is Loaded) {
       emit(Loaded(
-        (state as Loaded)
+        data: (state as Loaded)
             .data
             .map((e) => e.cardId == event.data.cardId ? event.data : e)
             .toList(),
@@ -44,7 +44,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
               tempatBeli: e.tempatBeli?.trim(),
             ))
         .toList();
-    emit(Loaded(data));
+    emit(Loaded(data: data));
     // var state =
     //             (BlocProvider.of<StockBloc>(context).state as StockLoaded);
     bool valids = data.isNotEmpty
@@ -59,10 +59,10 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
         // add(StockInitialize(success: true));
         add(Initiate(success: true));
       } catch (e) {
-        print(e);
-        // yield StockLoaded(data, error: {'msg': e.toString()});
-        // await Future.delayed(Duration(seconds: 1));
-        // yield (state as StockLoaded).clearMsg();
+        // print(e);
+        emit(Loaded(data: data, success: false, msg: e.toString()));
+        await Future.delayed(Duration(seconds: 25));
+        emit((state as Loaded).clearMsg());
       }
     }
   }
@@ -72,7 +72,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
     var tambahDate =
         prev.isNotEmpty ? prev.last.ditambahkan : DateTime.now().toUtc();
     emit(Loaded(
-      prev +
+      data: prev +
           [
             ItemCards(
                 cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
@@ -86,16 +86,17 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
   FutureOr<void> _removeCard(
       RemoveCard event, Emitter<InsertstockState> emit) async {
     emit(Loaded(
-      (state as Loaded)
+      data: (state as Loaded)
           .data
           .map((e) => e.cardId == event.cardId ? e.copywith(open: false) : e)
           .toList(),
     ));
-    await Future.delayed(Duration(milliseconds: 500));
-    emit(Loaded((state as Loaded)
-        .data
-        .where((e) => e.cardId != event.cardId)
-        .toList()));
+    await Future.delayed(Duration(milliseconds: 410));
+    emit(Loaded(
+        data: (state as Loaded)
+            .data
+            .where((e) => e.cardId != event.cardId)
+            .toList()));
 
     if ((state as Loaded).data.isEmpty) {
       // yield InsertstockInitial();

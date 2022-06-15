@@ -23,6 +23,18 @@ class _InsertProductCardState extends State<InsertProductCard>
   DateTime selectedDate = DateTime.now();
   FocusNode fsn = FocusNode();
   @override
+  void dispose() {
+    // sbc.close();
+    namec.dispose();
+    datec.dispose();
+    placec.dispose();
+    barcodeC.dispose();
+    qtyc.dispose();
+    hargaBeli.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     sbc = SuggestionsBoxController();
     // hargaBeli = ;
@@ -49,6 +61,9 @@ class _InsertProductCardState extends State<InsertProductCard>
     }
     if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
       hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+    }
+    if (widget.data.barcode?.toString() != barcodeC.text) {
+      barcodeC.text = widget.data.barcode?.toString() ?? '';
     }
     if (widget.data.pcs?.toString() != qtyc.text) {
       qtyc.text = widget.data.pcs?.toString() ?? '';
@@ -81,7 +96,10 @@ class _InsertProductCardState extends State<InsertProductCard>
               controller: qtyc,
               focusNode: fsn,
               onChanged: (v) {
+                print(v);
+                print('aaa');
                 var doublePcs = double.tryParse(qtyc.text.trim());
+                print(doublePcs);
                 if (doublePcs != null)
                   BlocProvider.of<InsertstockBloc>(context)
                       .add(DataChange(widget.data.copywith(pcs: doublePcs)));
@@ -103,6 +121,20 @@ class _InsertProductCardState extends State<InsertProductCard>
           flex: 2,
           child: TextFormField(
             controller: barcodeC,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (a) {
+              if (a != null && a.isNotEmpty) {
+                if (int.tryParse(a) == null) {
+                  print('hey');
+                  return 'invalid barcode';
+                }
+              }
+              return null;
+            },
+            onChanged: (a) {
+              BlocProvider.of<InsertstockBloc>(context).add(
+                  DataChange(widget.data.copywith(barcode: int.tryParse(a))));
+            },
             decoration: InputDecoration(
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 labelText: 'barcode',
@@ -116,16 +148,14 @@ class _InsertProductCardState extends State<InsertProductCard>
                           onTap: () async {
                             String barcodeScan =
                                 await FlutterBarcodeScanner.scanBarcode(
-                                    '#ffffff',
-                                    'Cancel',
-                                    false,
-                                    ScanMode.BARCODE);
-                            print(barcodeScan);
+                                    '#ffffff', 'Batal', true, ScanMode.BARCODE);
+                            // print(barcodeScan);
                             if (barcodeScan != '-1') {
-                              barcodeC.text = barcodeScan;
-                              BlocProvider.of<InsertstockBloc>(context).add(
-                                  DataChange(widget.data.copywith(
-                                      barcode: int.parse(barcodeScan))));
+                              barcodeC.text = barcodeScan.trim();
+                              BlocProvider.of<InsertstockBloc>(context)
+                                  .add(DataChange(widget.data.copywith(
+                                barcode: int.tryParse(barcodeScan.trim()),
+                              )));
                             }
                           },
                           child: Icon(Icons.qr_code));
@@ -240,9 +270,13 @@ class _InsertProductCardState extends State<InsertProductCard>
                                       context)
                                   .showInsideItems(pattern);
                             }
+                            // print('hello');
+                            // print(a);
                             return a;
                           },
                           itemBuilder: (context, StockItem suggestion) {
+                            if (suggestion.nama == '[deleted]')
+                              return Container();
                             return ListTile(
                               leading: Icon(Icons.shopping_cart),
                               title: Text(suggestion.nama),
@@ -252,6 +286,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             var res1 =
                                 await RepositoryProvider.of<MyDatabase>(context)
                                     .showInsideStock(idBarang: (suggestion.id));
+                            // print('heres');
                             var tempat =
                                 await RepositoryProvider.of<MyDatabase>(context)
                                     .tempatwithid(res1.last.idSupplier!);
@@ -398,7 +433,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       child: AnimatedClipRect(
         curve: Curves.ease,
         reverseCurve: Curves.ease,
-        duration: Duration(milliseconds: 450),
+        duration: Duration(milliseconds: 400),
         horizontalAnimation: false,
         open: widget.data.open,
         child: theForm,

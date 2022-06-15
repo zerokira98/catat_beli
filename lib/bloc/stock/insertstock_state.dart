@@ -14,7 +14,12 @@ class Loading extends InsertstockState {}
 class Loaded extends InsertstockState {
   final List<ItemCards> data;
   final bool? success;
-  Loaded(this.data, [this.success]);
+  final String? msg;
+  Loaded({required this.data, this.msg, this.success});
+  Loaded clearMsg() {
+    return Loaded(data: this.data, msg: null, success: null);
+  }
+
   @override
   List<Object> get props => [data];
 }

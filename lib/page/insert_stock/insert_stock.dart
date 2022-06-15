@@ -123,6 +123,14 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       content: const Text('Berhasil'),
                     ));
                   } else {
+                    if (state.msg != null && state.msg!.isNotEmpty)
+                      showGeneralDialog(
+                          context: context,
+                          pageBuilder: (context, a1, a2) {
+                            return Dialog(
+                              child: Text(state.msg!),
+                            );
+                          });
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: const Text('Terjadi kesalahan'),
                     ));

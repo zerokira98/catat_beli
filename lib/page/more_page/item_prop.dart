@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,7 +52,7 @@ class _ListOfItemsState extends State<ListOfItems> {
               icon: Icon(Icons.refresh),
               onPressed: () {
                 setState(() {});
-              })
+              }),
         ],
       ),
       body: FutureBuilder<List<StockItem>>(
@@ -90,6 +91,9 @@ class _ListOfItemsState extends State<ListOfItems> {
                             ],
                           )),
                     );
+
+                  if (snapshot.data![i - 1].nama == '[deleted]')
+                    return Container();
                   return ListTile(
                     onTap: () {
                       Navigator.push(
@@ -153,25 +157,53 @@ class _EditItemPageState extends State<EditItemPage>
     }
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.red,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.save),
-            Text(
-              'Save',
+            Icon(
+              Icons.delete_forever,
+            ),
+            AutoSizeText(
+              'Remove Item',
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              maxFontSize: 12,
+              // minFontSize: 8,
             ),
           ],
         ),
         onPressed: () async {
-          if (_formkey.currentState!.validate()) {
-            print('succ here');
+          bool a = await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('Caution'),
+                  content: Text('deskripsi menghapus'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, true);
+                      },
+                      child: Text(
+                        'Sure',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: Text('Cancel')),
+                  ],
+                );
+              });
+          if (a) {
             int? barcode =
                 barcodeC.text.isEmpty ? null : int.parse(barcodeC.text);
-            print('succ here');
             await RepositoryProvider.of<MyDatabase>(context)
-                .updateItemProp(
-                    data.id, namec.text, int.tryParse(hargaJual.text), barcode)
-                .then((value) => Navigator.pop(context, 'halo minnasan XD'));
+                .updateItemProp(data.id, '[deleted]', null, barcode)
+                .then((value) => Navigator.pop(context));
           }
         },
       ),
@@ -179,10 +211,10 @@ class _EditItemPageState extends State<EditItemPage>
         ElevatedButton(
             onPressed: () async {
               if (_formkey.currentState!.validate()) {
-                print('succ here');
+                // print('succ here');
                 int? barcode =
                     barcodeC.text.isEmpty ? null : int.parse(barcodeC.text);
-                print('succ here');
+                // print('succ here');
                 await RepositoryProvider.of<MyDatabase>(context)
                     .updateItemProp(data.id, namec.text,
                         int.tryParse(hargaJual.text), barcode)

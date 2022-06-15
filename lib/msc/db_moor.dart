@@ -206,8 +206,9 @@ class MyDatabase extends _$MyDatabase {
 
   ///========
   Future addItems(List<ItemCards> datas) async {
+    // transaction(() => null)
     for (var data in datas) {
-      int tempatId;
+      int tempatId = 0;
       int? itemId = data.productId;
 
       if (data.productId == null) {
@@ -217,7 +218,8 @@ class MyDatabase extends _$MyDatabase {
         if (a.isEmpty) {
           itemId = await into(stockItems).insert(StockItemsCompanion(
             nama: Value(data.namaBarang!),
-            barcode: Value(data.barcode),
+            barcode:
+                data.barcode != null ? Value(data.barcode) : Value.absent(),
           ));
         } else {
           itemId = a.single.id;

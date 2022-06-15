@@ -21,6 +21,7 @@ class _TempatEditState extends State<TempatEdit> {
           future: RepositoryProvider.of<MyDatabase>(context).datatempat(),
           builder: (context, snap) {
             if (snap.hasData && snap.data != null) {
+              print(snap.data);
               return ListView.builder(
                 itemBuilder: (context, i) {
                   return i != 0

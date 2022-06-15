@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/msc/db_moor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +25,7 @@ class SideDrawer extends StatelessWidget {
         height: 180,
         color: Theme.of(context).primaryColor,
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(18.0),
           child: SafeArea(
             child: Row(
               children: [
@@ -41,9 +42,22 @@ class SideDrawer extends StatelessWidget {
       ),
       Expanded(
         child: ListView(children: [
+          // ListTile(
+          //   trailing: Icon(Icons.history),
+          //   subtitle: Text('Dev deug'),
+          //   onTap: () async {
+          //     var a = await RepositoryProvider.of<MyDatabase>(context)
+          //         .showInsideStock(idBarang: 91);
+          //     print(a);
+          //     // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+          //     // Navigator.push(context,
+          //     //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
+          //   },
+          //   title: Text('dev debug '),
+          // ),
           ListTile(
             trailing: Icon(Icons.history),
-            subtitle: Text('Data input stock'),
+            subtitle: Text('Data Masuk Barang'),
             onTap: () {
               BlocProvider.of<StockviewBloc>(context).add(InitiateView());
               Navigator.push(context,
