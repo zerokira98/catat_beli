@@ -18,6 +18,8 @@ class _StockviewCardState extends State<StockviewCard> {
   double opacityval = 1.0;
   @override
   Widget build(BuildContext context) {
+    var telo = widget.data.note;
+    print('note:$telo');
     var hargaBeli = numFormat.format(widget.data.hargaBeli);
     // var hargaJual = numFormat.format(widget.data.hargaJual);
     // print(widget.data.pcs);
@@ -25,6 +27,20 @@ class _StockviewCardState extends State<StockviewCard> {
     // print('tempat:' + (widget.data.tempatBeli ?? ''));
     // return Container();
     return GestureDetector(
+      onTap: () {
+        if (widget.data.note != null) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Text(widget.data.note!),
+                  ),
+                );
+              });
+        }
+      },
       onHorizontalDragStart: (details) {
         setState(() {
           opacityval = 0.0;
@@ -77,6 +93,7 @@ class _StockviewCardState extends State<StockviewCard> {
         ),
         child: Stack(
           children: [
+            //BackGround
             Container(
               margin: EdgeInsets.only(bottom: 8, left: 8, right: 8),
               // padding: EdgeInsets.symmetric(horizontal: 8),
@@ -86,6 +103,7 @@ class _StockviewCardState extends State<StockviewCard> {
               ),
               child: ListTile(
                 isThreeLine: true,
+                dense: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Text(''),
@@ -254,7 +272,7 @@ class _StockviewCardState extends State<StockviewCard> {
               ),
               child: ListTile(
                 isThreeLine: true,
-                // dense: false,
+                dense: true,
                 // shape: RoundedRectangleBorder( ),
                 // tileColor: Colors.white,
                 title: Row(
@@ -267,6 +285,12 @@ class _StockviewCardState extends State<StockviewCard> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     )),
+                    Container(
+                      child: Text(
+                        widget.data.note == null ? '' : '*',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                     // Expanded(child: Container()),
                     Text('Total : ${widget.data.pcs}'),
                   ],
@@ -279,11 +303,14 @@ class _StockviewCardState extends State<StockviewCard> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Expanded(
-                          flex: 1,
-                          child: Text('Tempat beli: ${widget.data.tempatBeli}'),
+                          flex: 3,
+                          child: AutoSizeText(
+                            '${widget.data.tempatBeli}',
+                            maxLines: 1,
+                          ),
                         ),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Text(
                               'Tgl : ${df.format(widget.data.ditambahkan!)}'),
                         ),
@@ -295,19 +322,19 @@ class _StockviewCardState extends State<StockviewCard> {
                     Row(
                       children: [
                         Expanded(
-                          flex: 1,
+                          flex: 3,
                           // fit: FlexFit.tight,
                           child: Text(
-                            'Harga beli : $hargaBeli',
+                            'Harga beli : Rp$hargaBeli',
                             // maxLines: 1,
                             overflow: TextOverflow.fade,
                           ),
                         ),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           // fit: FlexFit.tight,
                           child: Text(
-                            'Total beli : $totalBeli',
+                            'Total: Rp$totalBeli',
                             // maxLines: 1,
                             overflow: TextOverflow.fade,
                           ),

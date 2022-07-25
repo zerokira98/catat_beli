@@ -9,6 +9,7 @@ class ItemCards extends Equatable {
   final GlobalKey<FormState>? formkey;
   final int? productId;
   final int? cardId; //~??????
+  final String? note;
   final String? tempatBeli;
   final int? barcode;
   final bool? open;
@@ -20,6 +21,7 @@ class ItemCards extends Equatable {
       this.productId,
       this.hargaJual,
       this.pcs,
+      this.note,
       this.formkey,
       this.barcode,
       this.tempatBeli,
@@ -32,8 +34,9 @@ class ItemCards extends Equatable {
       int? hargaJual,
       double? pcs,
       String? tempatBeli,
-      int? productId,
+      int? Function()? productId,
       bool? open,
+      String? note,
       GlobalKey<FormState>? formkey,
       int? barcode,
       DateTime? ditambahkan,
@@ -43,9 +46,10 @@ class ItemCards extends Equatable {
         open: open ?? this.open,
         namaBarang: namaBarang ?? this.namaBarang,
         formkey: formkey ?? this.formkey,
-        productId: productId ?? this.productId,
+        productId: productId!=null?productId():this.productId,
         ditambahkan: ditambahkan ?? this.ditambahkan,
         hargaBeli: hargaBeli ?? this.hargaBeli,
+        note: note ?? this.note,
         hargaJual: hargaJual ?? this.hargaJual,
         pcs: pcs ?? this.pcs,
         tempatBeli: tempatBeli ?? this.tempatBeli,
@@ -60,6 +64,7 @@ class ItemCards extends Equatable {
         pcs,
         tempatBeli,
         cardId,
+        note,
         open,
         barcode,
         productId,
@@ -73,6 +78,7 @@ class ItemCards extends Equatable {
       namaBarang,
       hargaBeli,
       hargaJual,
+      note,
       pcs,
       tempatBeli,
       cardId,

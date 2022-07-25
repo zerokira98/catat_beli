@@ -34,13 +34,22 @@ class FilterBox extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          'Filter',
-                          textScaleFactor: 1.75,
-                          textAlign: TextAlign.left,
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              'Filter',
+                              textScaleFactor: 1.75,
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          // IconButton(
+
+                          //     onPressed: () => Navigator.pop(context),
+                          //     icon: Icon(Icons.close,)),
+                        ],
                       ),
                     ),
                   ],
@@ -231,7 +240,7 @@ class FilterBox extends StatelessWidget {
                               // endDate: dateTo.text,
                             )));
 
-                            // Navigator.pop(context);
+                            Navigator.pop(context);
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),

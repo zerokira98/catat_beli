@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:csv/csv.dart';
+// import 'package:csv/csv.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
@@ -42,7 +42,7 @@ class _PrintAlertState extends State<PrintAlert> {
 
   convert(BuildContext context) async {
     Directory a = await getApplicationDocumentsDirectory();
-    var curdate = DateTime.now();
+    // var curdate = DateTime.now();
     // print(DateTime(curdate.year, multivalue + 2, 0));
     var data = await RepositoryProvider.of<MyDatabase>(context)
         .showStockwithDetails(
@@ -56,6 +56,7 @@ class _PrintAlertState extends State<PrintAlert> {
     var sheet = excel['${dataBulan[multivalue]}' + ' ' + '${selectedDateYear}'];
     excel.delete('Sheet1');
     num total = 0;
+    num totalHarian = 0;
     for (var i = 0; i < data.length; i++) {
       //Date Separator
       if (i == 0) {
@@ -75,6 +76,13 @@ class _PrintAlertState extends State<PrintAlert> {
       } else if (data[i].stock.dateAdd!.toString().substring(0, 10) !=
           data[i - 1].stock.dateAdd!.toString().substring(0, 10)) {
         var y = DateFormat('EEEE, d/M/y').format(data[i].stock.dateAdd!);
+        sheet.appendRow(
+            ['', '', '', 'total hari ini :', numFormat.format(totalHarian)]);
+        sheet
+            .cell(CellIndex.indexByColumnRow(
+                columnIndex: 4, rowIndex: sheet.maxRows - 1))
+            .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
+        totalHarian = 0;
         sheet.appendRow([y]);
         sheet.merge(
             CellIndex.indexByColumnRow(
@@ -96,6 +104,7 @@ class _PrintAlertState extends State<PrintAlert> {
         data[i].tempatBeli.nama,
       ]);
       total += (data[i].stock.qty * data[i].stock.price);
+      totalHarian += (data[i].stock.qty * data[i].stock.price);
       sheet
           .cell(CellIndex.indexByColumnRow(
               columnIndex: 2, rowIndex: sheet.maxRows - 1))
@@ -104,6 +113,14 @@ class _PrintAlertState extends State<PrintAlert> {
           .cell(CellIndex.indexByColumnRow(
               columnIndex: 4, rowIndex: sheet.maxRows - 1))
           .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
+      if(i==data.length-1){
+        sheet.appendRow(
+            ['', '', '', 'total hari ini :', numFormat.format(totalHarian)]);
+        sheet
+            .cell(CellIndex.indexByColumnRow(
+            columnIndex: 4, rowIndex: sheet.maxRows - 1))
+            .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
+      }
     }
     sheet.cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: 0))
       ..value = 'Total bulan ini'

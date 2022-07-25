@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:catatbeli/model/itemcard.dart';
-import 'package:moor/ffi.dart';
-import 'package:moor/moor.dart';
+import 'package:drift/native.dart';
+import 'package:drift/drift.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:path/path.dart' as p;
@@ -14,6 +14,7 @@ class Stocks extends Table {
   IntColumn get price => integer().withDefault(Constant(0))();
   RealColumn get qty => real().withDefault(Constant(1.0))();
   DateTimeColumn get dateAdd => dateTime().nullable()();
+  TextColumn get note => text().nullable()();
   IntColumn get idItem =>
       integer().nullable().customConstraint('REFERENCES stockitems(id)')();
   IntColumn get idSupplier =>
@@ -51,19 +52,24 @@ LazyDatabase _openConnection() {
     final dbFolder = await getApplicationDocumentsDirectory();
 
     final file = File(p.join(dbFolder.path, 'db.sqlite'));
-    return VmDatabase(file);
+    return NativeDatabase(file);
   });
 }
 
-@UseMoor(tables: [Stocks, StockItems, TempatBelis])
+@DriftDatabase(tables: [Stocks, StockItems, TempatBelis])
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
           return m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(stocks, stocks.note);
+          }
         },
         beforeOpen: (d) async {
           //aa
@@ -167,6 +173,11 @@ class MyDatabase extends _$MyDatabase {
     }
     query.where(stockItems.nama.contains(name));
     query.where(tempatBelis.nama.contains(boughtPlace));
+    // query.orderBy([
+    //   ($StocksTable tbl) => OrderingTerm.asc(tbl.dateAdd),
+    //   ($StockItemsTable tbl) => OrderingTerm.asc(tbl.nama),
+    //   ($TempatBelisTable tbl) => OrderingTerm.asc(tbl.nama)
+    // ]);
     if (barcode != null) query.where(stockItems.barcode.equals(barcode));
     a = await query.get();
     return a
@@ -185,8 +196,12 @@ class MyDatabase extends _$MyDatabase {
 
   ///========
   Future<List<TempatBeli>> datatempat([String? query]) => query == null
-      ? select(tempatBelis).get()
-      : (select(tempatBelis)..where((tbl) => tbl.nama.contains(query))).get();
+      ? (select(tempatBelis)..orderBy([(tbl) => OrderingTerm.asc(tbl.nama)]))
+          .get()
+      : (select(tempatBelis)
+            ..where((tbl) => tbl.nama.contains(query))
+            ..orderBy([(tbl) => OrderingTerm.asc(tbl.nama)]))
+          .get();
 
   ///========
   Future<List<StockItem>> showInsideItems([String? nama, int? sort]) {
@@ -206,43 +221,45 @@ class MyDatabase extends _$MyDatabase {
 
   ///========
   Future addItems(List<ItemCards> datas) async {
-    // transaction(() => null)
-    for (var data in datas) {
-      int tempatId = 0;
-      int? itemId = data.productId;
+    await transaction(() async {
+      for (var data in datas) {
+        int tempatId = 0;
+        int? itemId = data.productId;
 
-      if (data.productId == null) {
-        List<StockItem> a = await (select(stockItems)
-              ..where((tbl) => tbl.nama.equals(data.namaBarang!)))
-            .get();
-        if (a.isEmpty) {
-          itemId = await into(stockItems).insert(StockItemsCompanion(
-            nama: Value(data.namaBarang!),
-            barcode:
-                data.barcode != null ? Value(data.barcode) : Value.absent(),
-          ));
-        } else {
-          itemId = a.single.id;
+        if (data.productId == null) {
+          List<StockItem> a = await (select(stockItems)
+                ..where((tbl) => tbl.nama.equals(data.namaBarang!)))
+              .get();
+          if (a.isEmpty) {
+            itemId = await into(stockItems).insert(StockItemsCompanion(
+              nama: Value(data.namaBarang!),
+              barcode:
+                  data.barcode != null ? Value(data.barcode) : Value.absent(),
+            ));
+          } else {
+            itemId = a.single.id;
+          }
         }
+        //---------get tempat id
+        var aa = await (select(tempatBelis)
+              ..where((tbl) => tbl.nama.equals(data.tempatBeli ?? '')))
+            .get();
+        if (aa.isEmpty) {
+          tempatId = await into(tempatBelis)
+              .insert(TempatBelisCompanion(nama: Value(data.tempatBeli!)));
+        } else {
+          tempatId = aa.single.id;
+        }
+        await into(stocks).insert(StocksCompanion(
+          idItem: Value(itemId),
+          note: Value(data.note),
+          idSupplier: Value(tempatId),
+          price: Value(data.hargaBeli!),
+          qty: Value(data.pcs!),
+          dateAdd: Value(data.ditambahkan),
+        ));
       }
-      //---------get tempat id
-      var aa = await (select(tempatBelis)
-            ..where((tbl) => tbl.nama.equals(data.tempatBeli)))
-          .get();
-      if (aa.isEmpty) {
-        tempatId = await into(tempatBelis)
-            .insert(TempatBelisCompanion(nama: Value(data.tempatBeli!)));
-      } else {
-        tempatId = aa.single.id;
-      }
-      await into(stocks).insert(StocksCompanion(
-        idItem: Value(itemId),
-        idSupplier: Value(tempatId),
-        price: Value(data.hargaBeli!),
-        qty: Value(data.pcs!),
-        dateAdd: Value(data.ditambahkan),
-      ));
-    }
+    });
 
     // var namaitem = 'Rokok Surya 12';
     // int? barcode;

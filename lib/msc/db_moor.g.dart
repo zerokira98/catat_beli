@@ -12,6 +12,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   final int price;
   final double qty;
   final DateTime? dateAdd;
+  final String? note;
   final int? idItem;
   final int? idSupplier;
   Stock(
@@ -19,10 +20,10 @@ class Stock extends DataClass implements Insertable<Stock> {
       required this.price,
       required this.qty,
       this.dateAdd,
+      this.note,
       this.idItem,
       this.idSupplier});
-  factory Stock.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
+  factory Stock.fromData(Map<String, dynamic> data, {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return Stock(
       id: const IntType()
@@ -33,6 +34,8 @@ class Stock extends DataClass implements Insertable<Stock> {
           .mapFromDatabaseResponse(data['${effectivePrefix}qty'])!,
       dateAdd: const DateTimeType()
           .mapFromDatabaseResponse(data['${effectivePrefix}date_add']),
+      note: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}note']),
       idItem: const IntType()
           .mapFromDatabaseResponse(data['${effectivePrefix}id_item']),
       idSupplier: const IntType()
@@ -47,6 +50,9 @@ class Stock extends DataClass implements Insertable<Stock> {
     map['qty'] = Variable<double>(qty);
     if (!nullToAbsent || dateAdd != null) {
       map['date_add'] = Variable<DateTime?>(dateAdd);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String?>(note);
     }
     if (!nullToAbsent || idItem != null) {
       map['id_item'] = Variable<int?>(idItem);
@@ -65,6 +71,7 @@ class Stock extends DataClass implements Insertable<Stock> {
       dateAdd: dateAdd == null && nullToAbsent
           ? const Value.absent()
           : Value(dateAdd),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       idItem:
           idItem == null && nullToAbsent ? const Value.absent() : Value(idItem),
       idSupplier: idSupplier == null && nullToAbsent
@@ -75,24 +82,26 @@ class Stock extends DataClass implements Insertable<Stock> {
 
   factory Stock.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return Stock(
       id: serializer.fromJson<int>(json['id']),
       price: serializer.fromJson<int>(json['price']),
       qty: serializer.fromJson<double>(json['qty']),
       dateAdd: serializer.fromJson<DateTime?>(json['dateAdd']),
+      note: serializer.fromJson<String?>(json['note']),
       idItem: serializer.fromJson<int?>(json['idItem']),
       idSupplier: serializer.fromJson<int?>(json['idSupplier']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'price': serializer.toJson<int>(price),
       'qty': serializer.toJson<double>(qty),
       'dateAdd': serializer.toJson<DateTime?>(dateAdd),
+      'note': serializer.toJson<String?>(note),
       'idItem': serializer.toJson<int?>(idItem),
       'idSupplier': serializer.toJson<int?>(idSupplier),
     };
@@ -103,6 +112,7 @@ class Stock extends DataClass implements Insertable<Stock> {
           int? price,
           double? qty,
           DateTime? dateAdd,
+          String? note,
           int? idItem,
           int? idSupplier}) =>
       Stock(
@@ -110,6 +120,7 @@ class Stock extends DataClass implements Insertable<Stock> {
         price: price ?? this.price,
         qty: qty ?? this.qty,
         dateAdd: dateAdd ?? this.dateAdd,
+        note: note ?? this.note,
         idItem: idItem ?? this.idItem,
         idSupplier: idSupplier ?? this.idSupplier,
       );
@@ -120,6 +131,7 @@ class Stock extends DataClass implements Insertable<Stock> {
           ..write('price: $price, ')
           ..write('qty: $qty, ')
           ..write('dateAdd: $dateAdd, ')
+          ..write('note: $note, ')
           ..write('idItem: $idItem, ')
           ..write('idSupplier: $idSupplier')
           ..write(')'))
@@ -127,7 +139,8 @@ class Stock extends DataClass implements Insertable<Stock> {
   }
 
   @override
-  int get hashCode => Object.hash(id, price, qty, dateAdd, idItem, idSupplier);
+  int get hashCode =>
+      Object.hash(id, price, qty, dateAdd, note, idItem, idSupplier);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -136,6 +149,7 @@ class Stock extends DataClass implements Insertable<Stock> {
           other.price == this.price &&
           other.qty == this.qty &&
           other.dateAdd == this.dateAdd &&
+          other.note == this.note &&
           other.idItem == this.idItem &&
           other.idSupplier == this.idSupplier);
 }
@@ -145,6 +159,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   final Value<int> price;
   final Value<double> qty;
   final Value<DateTime?> dateAdd;
+  final Value<String?> note;
   final Value<int?> idItem;
   final Value<int?> idSupplier;
   const StocksCompanion({
@@ -152,6 +167,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     this.price = const Value.absent(),
     this.qty = const Value.absent(),
     this.dateAdd = const Value.absent(),
+    this.note = const Value.absent(),
     this.idItem = const Value.absent(),
     this.idSupplier = const Value.absent(),
   });
@@ -160,6 +176,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     this.price = const Value.absent(),
     this.qty = const Value.absent(),
     this.dateAdd = const Value.absent(),
+    this.note = const Value.absent(),
     this.idItem = const Value.absent(),
     this.idSupplier = const Value.absent(),
   });
@@ -168,6 +185,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     Expression<int>? price,
     Expression<double>? qty,
     Expression<DateTime?>? dateAdd,
+    Expression<String?>? note,
     Expression<int?>? idItem,
     Expression<int?>? idSupplier,
   }) {
@@ -176,6 +194,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
       if (price != null) 'price': price,
       if (qty != null) 'qty': qty,
       if (dateAdd != null) 'date_add': dateAdd,
+      if (note != null) 'note': note,
       if (idItem != null) 'id_item': idItem,
       if (idSupplier != null) 'id_supplier': idSupplier,
     });
@@ -186,6 +205,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
       Value<int>? price,
       Value<double>? qty,
       Value<DateTime?>? dateAdd,
+      Value<String?>? note,
       Value<int?>? idItem,
       Value<int?>? idSupplier}) {
     return StocksCompanion(
@@ -193,6 +213,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
       price: price ?? this.price,
       qty: qty ?? this.qty,
       dateAdd: dateAdd ?? this.dateAdd,
+      note: note ?? this.note,
       idItem: idItem ?? this.idItem,
       idSupplier: idSupplier ?? this.idSupplier,
     );
@@ -213,6 +234,9 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     if (dateAdd.present) {
       map['date_add'] = Variable<DateTime?>(dateAdd.value);
     }
+    if (note.present) {
+      map['note'] = Variable<String?>(note.value);
+    }
     if (idItem.present) {
       map['id_item'] = Variable<int?>(idItem.value);
     }
@@ -229,6 +253,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
           ..write('price: $price, ')
           ..write('qty: $qty, ')
           ..write('dateAdd: $dateAdd, ')
+          ..write('note: $note, ')
           ..write('idItem: $idItem, ')
           ..write('idSupplier: $idSupplier')
           ..write(')'))
@@ -267,6 +292,11 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   late final GeneratedColumn<DateTime?> dateAdd = GeneratedColumn<DateTime?>(
       'date_add', aliasedName, true,
       type: const IntType(), requiredDuringInsert: false);
+  final VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String?> note = GeneratedColumn<String?>(
+      'note', aliasedName, true,
+      type: const StringType(), requiredDuringInsert: false);
   final VerificationMeta _idItemMeta = const VerificationMeta('idItem');
   @override
   late final GeneratedColumn<int?> idItem = GeneratedColumn<int?>(
@@ -283,7 +313,7 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
       $customConstraints: 'REFERENCES tempatbelis(id)');
   @override
   List<GeneratedColumn> get $columns =>
-      [id, price, qty, dateAdd, idItem, idSupplier];
+      [id, price, qty, dateAdd, note, idItem, idSupplier];
   @override
   String get aliasedName => _alias ?? 'stocks';
   @override
@@ -308,6 +338,10 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
       context.handle(_dateAddMeta,
           dateAdd.isAcceptableOrUnknown(data['date_add']!, _dateAddMeta));
     }
+    if (data.containsKey('note')) {
+      context.handle(
+          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
     if (data.containsKey('id_item')) {
       context.handle(_idItemMeta,
           idItem.isAcceptableOrUnknown(data['id_item']!, _idItemMeta));
@@ -325,7 +359,7 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Stock map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Stock.fromData(data, attachedDatabase,
+    return Stock.fromData(data,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
@@ -340,8 +374,7 @@ class StockItem extends DataClass implements Insertable<StockItem> {
   final int? barcode;
   final String nama;
   StockItem({required this.id, this.barcode, required this.nama});
-  factory StockItem.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
+  factory StockItem.fromData(Map<String, dynamic> data, {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return StockItem(
       id: const IntType()
@@ -375,7 +408,7 @@ class StockItem extends DataClass implements Insertable<StockItem> {
 
   factory StockItem.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return StockItem(
       id: serializer.fromJson<int>(json['id']),
       barcode: serializer.fromJson<int?>(json['barcode']),
@@ -384,7 +417,7 @@ class StockItem extends DataClass implements Insertable<StockItem> {
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'barcode': serializer.toJson<int?>(barcode),
@@ -537,7 +570,7 @@ class $StockItemsTable extends StockItems
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   StockItem map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return StockItem.fromData(data, attachedDatabase,
+    return StockItem.fromData(data,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 
@@ -551,8 +584,7 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
   final int id;
   final String nama;
   TempatBeli({required this.id, required this.nama});
-  factory TempatBeli.fromData(Map<String, dynamic> data, GeneratedDatabase db,
-      {String? prefix}) {
+  factory TempatBeli.fromData(Map<String, dynamic> data, {String? prefix}) {
     final effectivePrefix = prefix ?? '';
     return TempatBeli(
       id: const IntType()
@@ -578,7 +610,7 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
 
   factory TempatBeli.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return TempatBeli(
       id: serializer.fromJson<int>(json['id']),
       nama: serializer.fromJson<String>(json['nama']),
@@ -586,7 +618,7 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= moorRuntimeOptions.defaultSerializer;
+    serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'nama': serializer.toJson<String>(nama),
@@ -709,7 +741,7 @@ class $TempatBelisTable extends TempatBelis
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TempatBeli map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return TempatBeli.fromData(data, attachedDatabase,
+    return TempatBeli.fromData(data,
         prefix: tablePrefix != null ? '$tablePrefix.' : null);
   }
 

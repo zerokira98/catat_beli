@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/page/insert_stock/insert_stock.dart';
-import 'package:catatbeli/msc/bloc_observer.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -101,21 +100,8 @@ class App extends StatelessWidget {
                     }
                   }
                   return Container(
-                    // decoration: BoxDecoration(
-                    //     borderRadius:
-                    //         BorderRadius.only(topLeft: Radius.circular(18.0))),
                     child: (Platform.isWindows)
-                        ? CustomWindow(
-                            child: PageView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: 1,
-                                controller: pageC,
-                                itemBuilder: (context, i) {
-                                  if (i == 0) return InsertProductPage();
-                                  // if (i == 1) return MorePage();
-                                  return CircularProgressIndicator();
-                                }),
-                          )
+                        ? CustomWindow(child: InsertProductPage())
                         : InsertProductPage(),
                   );
                 }),

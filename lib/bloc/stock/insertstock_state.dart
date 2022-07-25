@@ -4,7 +4,7 @@ abstract class InsertstockState extends Equatable {
   const InsertstockState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class InsertstockInitial extends InsertstockState {}
@@ -21,5 +21,5 @@ class Loaded extends InsertstockState {
   }
 
   @override
-  List<Object> get props => [data];
+  List<Object?> get props => [data, success, msg];
 }

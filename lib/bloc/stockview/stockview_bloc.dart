@@ -43,20 +43,22 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       endDate: (event.filter.endDate),
       boughtPlace: event.filter.tempatBeli,
     );
-    // print(data);
+    print(data);
     emit(StockviewLoaded(
         filter: event.filter.copyWith(maxRow: maxQ),
-        datas: data
-            .map((e) => ItemCards(
-                  ditambahkan: e.stock.dateAdd,
-                  namaBarang: e.item.nama,
-                  cardId: e.stock.id,
-                  pcs: e.stock.qty,
-                  productId: e.item.id,
-                  tempatBeli: e.tempatBeli.nama,
-                  hargaBeli: e.stock.price,
-                ))
-            .toList()));
+        datas: data.map((e) {
+          print('e${e.stock.note}');
+          return ItemCards(
+            note: e.stock.note,
+            ditambahkan: e.stock.dateAdd,
+            namaBarang: e.item.nama,
+            cardId: e.stock.id,
+            pcs: e.stock.qty,
+            productId: e.item.id,
+            tempatBeli: e.tempatBeli.nama,
+            hargaBeli: e.stock.price,
+          );
+        }).toList()));
   }
 
   FutureOr<void> _initiateView(
@@ -80,6 +82,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           currentPage: 0, maxRow: maxQ, startDate: startDate, endDate: endDate),
       datas: a
           .map((e) => ItemCards(
+                note: e.stock.note,
                 ditambahkan: e.stock.dateAdd,
                 namaBarang: e.item.nama,
                 cardId: e.stock.id,
@@ -100,7 +103,8 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     if (a != 0) {
       print(a);
       // yield StockviewInitial();
-      add(InitiateView(message: 'Deleted Sucsessfully'));
+      add(InitiateView(
+          message: '[${event.data.namaBarang}] Deleted Sucsessfully'));
     }
   }
 

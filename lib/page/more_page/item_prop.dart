@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -15,7 +16,9 @@ class ListOfItems extends StatefulWidget {
 }
 
 class _ListOfItemsState extends State<ListOfItems> {
-  int optionVal = 0;
+  ScrollController sc = ScrollController();
+  List changes = [];
+  int optionVal = 2;
   var options = [
     DropdownMenuItem(
       child: Text('Date Asc'),
@@ -40,6 +43,39 @@ class _ListOfItemsState extends State<ListOfItems> {
     getData = RepositoryProvider.of<MyDatabase>(context)
         .showInsideItems(null, optionVal);
     super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   if (mounted) {
+    //     sc.addListener(scListener);
+    //     // namebefore = '';
+    //   }
+    // });
+  }
+
+  double opacity = 0.0;
+  String currentTitleBar = '';
+  setTitleBar(String v) {
+    if (currentTitleBar != v) {
+      setState(() {
+        currentTitleBar = v;
+      });
+    }
+  }
+
+  void scListener() {
+    var a = sc.offset;
+    if (a < 132) {
+      if (opacity != 0) {
+        setState(() {
+          opacity = 0;
+          // namebefore = '';
+        });
+      }
+      print(a);
+    } else if (opacity == 0) {
+      setState(() {
+        opacity = 1;
+      });
+    }
   }
 
   @override
@@ -55,67 +91,191 @@ class _ListOfItemsState extends State<ListOfItems> {
               }),
         ],
       ),
-      body: FutureBuilder<List<StockItem>>(
-          future: RepositoryProvider.of<MyDatabase>(context)
-              .showInsideItems(null, optionVal),
-          builder: (context, snapshot) {
-            if (snapshot.data != null && snapshot.hasData) {
-              print(snapshot.data);
-              return ListView.builder(
-                itemBuilder: (context, i) {
-                  if (i == 0)
-                    return Card(
-                      elevation: 12,
-                      margin: EdgeInsets.fromLTRB(8, 8, 8, 24),
-                      child: Container(
-                          margin: EdgeInsets.all(12),
-                          child: Column(
-                            children: [
-                              Text(
-                                'Filter',
-                                textScaleFactor: 1.8,
-                              ),
-                              Row(
-                                children: [
-                                  Text('Sort by : '),
-                                  DropdownButton<int>(
-                                      items: options,
-                                      onChanged: (val) {
-                                        setState(() {
-                                          optionVal = val!;
-                                        });
-                                      },
-                                      value: optionVal),
-                                ],
-                              ),
-                            ],
-                          )),
-                    );
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: FutureBuilder<List<StockItem>>(
+                future: RepositoryProvider.of<MyDatabase>(context)
+                    .showInsideItems(null, optionVal),
+                builder: (context, snapshot) {
+                  if (snapshot.data != null && snapshot.hasData) {
+                    if (optionVal == 2) {
+                      changes = [];
+                      int count = 0;
+                      int wordCount = 0;
+                      // List<Key> telobgst = [];
+                      List<Map> wordCountList = [];
+                      // String namebefore = ' ';
+                      for (int a = 0; a < snapshot.data!.length; a++) {
+                        if (a == 0) {
+                          changes.add(snapshot.data![a].nama[0]);
+                          // telobgst.add(Key(snapshot.data![a].nama[0]));
+                        } else if (snapshot.data![a].nama[0] !=
+                            snapshot.data![a - 1].nama[0]) {
+                          wordCountList.add({
+                            'word': snapshot.data![a - 1].nama[0],
+                            'count': wordCount
+                          });
+                          changes.add(snapshot.data![a].nama[0]);
+                          // telobgst.add(Key(snapshot.data![a].nama[0]));
+                          wordCount = 0;
+                        } else if (snapshot.data![a] == snapshot.data!.last) {
+                          wordCountList.add({
+                            'word': snapshot.data![a].nama[0],
+                            'count': wordCount
+                          });
+                          wordCount = 0;
+                        }
+                        changes.add(snapshot.data![a]);
+                        wordCount += 1;
+                      }
+                      // print(telobgst);
+                      return ListView.builder(
+                        controller: sc,
+                        itemCount: changes.length + 1,
+                        itemBuilder: (context, i) {
+                          if (i == 0) {
+                            return Card(
+                              elevation: 12,
+                              margin: EdgeInsets.fromLTRB(8, 8, 8, 24),
+                              child: Container(
+                                  margin: EdgeInsets.all(12),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        'Filter',
+                                        textScaleFactor: 1.8,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text('Sort by : '),
+                                          DropdownButton<int>(
+                                              items: options,
+                                              onChanged: (val) {
+                                                setState(() {
+                                                  optionVal = val!;
+                                                });
+                                              },
+                                              value: optionVal),
+                                        ],
+                                      ),
+                                    ],
+                                  )),
+                            );
+                          }
+                          if ((changes[i - 1] is StockItem)) {
+                            if (changes[i - 1].nama == '[deleted]') {
+                              return Container();
+                            }
+                            return ListTile(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditItemPage(
+                                      data: changes[i - 1],
+                                    ),
+                                  ),
+                                ).then((value) {
+                                  print(value);
+                                  setState(() {});
+                                });
+                              },
+                              title: Text(changes[i - 1].nama),
+                            );
+                          }
+                          if (changes[i - 1] is! StockItem) {
+                            count++;
+                            // print('nsb$i' + changes[i - 1]);
+                            // print(telobgst[count - 1]);
+                            // if (namebefore == ' ') {
+                            //   namebefore = changes[i - 1];
+                            // }
+                            return Separator(
+                              // key: telobgst[count - 1],
+                              sc: sc,
+                              fun: setTitleBar,
+                              name: changes[i - 1],
+                            );
+                            // namebefore = changes[i - 1];
+                            // return fak;
+                          }
+                          return Container();
+                        },
+                      );
+                    }
+                    // print(snapshot.data);
+                    return ListView.builder(
+                      itemBuilder: (context, i) {
+                        if (i == 0)
+                          return Card(
+                            elevation: 12,
+                            margin: EdgeInsets.fromLTRB(8, 8, 8, 24),
+                            child: Container(
+                                margin: EdgeInsets.all(12),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'Filter',
+                                      textScaleFactor: 1.8,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text('Sort by : '),
+                                        DropdownButton<int>(
+                                            items: options,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                optionVal = val!;
+                                              });
+                                            },
+                                            value: optionVal),
+                                      ],
+                                    ),
+                                  ],
+                                )),
+                          );
 
-                  if (snapshot.data![i - 1].nama == '[deleted]')
-                    return Container();
-                  return ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditItemPage(
-                            data: snapshot.data![i - 1],
-                          ),
-                        ),
-                      ).then((value) {
-                        print(value);
-                        setState(() {});
-                      });
-                    },
-                    title: Text(snapshot.data![i - 1].nama),
-                  );
-                },
-                itemCount: snapshot.data!.length + 1,
-              );
-            }
-            return CircularProgressIndicator();
-          }),
+                        if (snapshot.data![i - 1].nama == '[deleted]')
+                          return Container();
+                        return ListTile(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditItemPage(
+                                  data: snapshot.data![i - 1],
+                                ),
+                              ),
+                            ).then((value) {
+                              print(value);
+                              setState(() {});
+                            });
+                          },
+                          title: Text(snapshot.data![i - 1].nama),
+                        );
+                      },
+                      itemCount: snapshot.data!.length + 1,
+                    );
+                  }
+                  return CircularProgressIndicator();
+                }),
+          ),
+          Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Opacity(
+                opacity: 0,
+                child: Container(
+                  padding: EdgeInsets.all(8.0),
+                  color: Colors.grey,
+                  width: MediaQuery.of(context).size.width,
+                  child: Text(currentTitleBar),
+                ),
+              )),
+        ],
+      ),
     );
   }
 }
@@ -269,6 +429,8 @@ class _EditItemPageState extends State<EditItemPage>
                                 },
                                 suggestionsBoxController: sbc,
                                 textFieldConfiguration: TextFieldConfiguration(
+                                    maxLines: 2,
+                                    minLines: 1,
                                     controller: namec,
                                     onChanged: (v) {
                                       // dO Something
@@ -478,6 +640,71 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
         },
         child: widget.child,
       ),
+    );
+  }
+}
+
+class Separator extends StatefulWidget {
+  final ScrollController sc;
+  final String name;
+  final Function(String v) fun;
+  const Separator(
+      {Key? key, required this.name, required this.sc, required this.fun})
+      : super(key: key);
+
+  @override
+  State<Separator> createState() => _SeparatorState();
+}
+
+class _SeparatorState extends State<Separator> {
+  GlobalKey key = GlobalKey();
+  @override
+  void initState() {
+    super.initState();
+    // WidgetsBinding.instance.addPostFrameCallback((a) {
+    //   if (mounted) {
+    //     widget.sc.addListener(listenerer);
+    //   }
+    // });
+  }
+
+  void listenerer() {
+    final RenderBox? renderBox = key.currentContext != null
+        ? key.currentContext!.findRenderObject() as RenderBox
+        : null;
+    Offset? a = renderBox?.globalToLocal(Offset.zero);
+    if (widget.sc.position.userScrollDirection == ScrollDirection.reverse) {
+      if (a != null && a.dy >= -80 && a.dy <= -48) {
+        widget.fun(widget.name);
+        print('n' + widget.name);
+        // print('nb' + widget.nameBefore);
+      }
+    }
+    // if (widget.sc.position.userScrollDirection == ScrollDirection.forward) {
+    //   if (a != null && a.dy >= -130 && a.dy <= -110) {
+    //     // print('is it here?');
+    //     print(widget.name);
+    //     print(widget.nameBefore);
+    //     // print(a);
+    //     widget.fun(widget.nameBefore);
+    //   }
+    // }
+  }
+
+  @override
+  void dispose() {
+    widget.sc.removeListener(listenerer);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: key,
+      padding: EdgeInsets.all(8.0),
+      color: Colors.grey,
+      width: MediaQuery.of(context).size.width,
+      child: Text(widget.name),
     );
   }
 }

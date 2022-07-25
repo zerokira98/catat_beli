@@ -17,11 +17,14 @@ class _InsertProductCardState extends State<InsertProductCard>
   TextEditingController namec = TextEditingController(),
       datec = TextEditingController(),
       placec = TextEditingController(text: ''),
+      notec = TextEditingController(text: ''),
       barcodeC = TextEditingController();
   TextEditingController qtyc = TextEditingController();
   final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
+  bool noteVisible = false;
   FocusNode fsn = FocusNode();
+  DateFormat dateFormat = DateFormat('d/MM/y');
   @override
   void dispose() {
     // sbc.close();
@@ -30,6 +33,7 @@ class _InsertProductCardState extends State<InsertProductCard>
     placec.dispose();
     barcodeC.dispose();
     qtyc.dispose();
+    notec.dispose();
     hargaBeli.dispose();
     super.dispose();
   }
@@ -55,12 +59,20 @@ class _InsertProductCardState extends State<InsertProductCard>
   Widget build(BuildContext context) {
     if (widget.data.namaBarang != namec.text) {
       namec.text = widget.data.namaBarang ?? '';
+      if (namec.text.length == 1) {
+        namec.selection =
+            TextSelection.fromPosition(TextPosition(offset: namec.text.length));
+      }
     }
     if (widget.data.tempatBeli != placec.text) {
       placec.text = widget.data.tempatBeli ?? '';
     }
     if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
       hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+      if (hargaBeli.text.length == 1) {
+        hargaBeli.selection = TextSelection.fromPosition(
+            TextPosition(offset: hargaBeli.text.length));
+      }
     }
     if (widget.data.barcode?.toString() != barcodeC.text) {
       barcodeC.text = widget.data.barcode?.toString() ?? '';
@@ -70,7 +82,18 @@ class _InsertProductCardState extends State<InsertProductCard>
       qtyc.selection = TextSelection.fromPosition(
           TextPosition(offset: qtyc.text.indexOf('.')));
     }
-    datec.text = widget.data.ditambahkan.toString().substring(0, 10);
+    if (widget.data.note != notec.text) {
+      notec.text = widget.data.note ?? '';
+    }
+    datec.text = dateFormat.format(widget.data.ditambahkan!);
+    Widget additionalBottom = TextFormField(
+      controller: notec,
+      decoration: InputDecoration(label: Text('Note')),
+      onChanged: (v) {
+        BlocProvider.of<InsertstockBloc>(context)
+            .add(DataChange((widget.data.copywith(note: v))));
+      },
+    );
     Widget bottom = Row(
       children: [
         Expanded(
@@ -78,6 +101,8 @@ class _InsertProductCardState extends State<InsertProductCard>
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: TextFormField(
+              onEditingComplete: () => FocusScope.of(context).unfocus(
+                  disposition: UnfocusDisposition.previouslyFocusedChild),
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (text) {
                 if (double.tryParse(qtyc.text.trim()) == 0)
@@ -96,10 +121,10 @@ class _InsertProductCardState extends State<InsertProductCard>
               controller: qtyc,
               focusNode: fsn,
               onChanged: (v) {
-                print(v);
-                print('aaa');
+                // print(v);
+                // print('aaa');
                 var doublePcs = double.tryParse(qtyc.text.trim());
-                print(doublePcs);
+                // print(doublePcs);
                 if (doublePcs != null)
                   BlocProvider.of<InsertstockBloc>(context)
                       .add(DataChange(widget.data.copywith(pcs: doublePcs)));
@@ -120,6 +145,7 @@ class _InsertProductCardState extends State<InsertProductCard>
         Expanded(
           flex: 2,
           child: TextFormField(
+            onEditingComplete: () => FocusScope.of(context).unfocus(),
             controller: barcodeC,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (a) {
@@ -141,24 +167,32 @@ class _InsertProductCardState extends State<InsertProductCard>
                 suffixIcon: FutureBuilder<List>(
                     future: availableCameras(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data!.isEmpty)
-                        return Container();
-                      return InkWell(
-                          canRequestFocus: false,
-                          onTap: () async {
-                            String barcodeScan =
-                                await FlutterBarcodeScanner.scanBarcode(
-                                    '#ffffff', 'Batal', true, ScanMode.BARCODE);
-                            // print(barcodeScan);
-                            if (barcodeScan != '-1') {
-                              barcodeC.text = barcodeScan.trim();
-                              BlocProvider.of<InsertstockBloc>(context)
-                                  .add(DataChange(widget.data.copywith(
-                                barcode: int.tryParse(barcodeScan.trim()),
-                              )));
-                            }
-                          },
-                          child: Icon(Icons.qr_code));
+                      if (snapshot.hasData) {
+                        if (snapshot.data!.isEmpty) {
+                          return Container();
+                        } else {
+                          return InkWell(
+                              canRequestFocus: false,
+                              onTap: () async {
+                                String barcodeScan =
+                                    await FlutterBarcodeScanner.scanBarcode(
+                                        '#ffffff',
+                                        'Batal',
+                                        true,
+                                        ScanMode.BARCODE);
+                                // print(barcodeScan);
+                                if (barcodeScan != '-1') {
+                                  barcodeC.text = barcodeScan.trim();
+                                  BlocProvider.of<InsertstockBloc>(context)
+                                      .add(DataChange(widget.data.copywith(
+                                    barcode: int.tryParse(barcodeScan.trim()),
+                                  )));
+                                }
+                              },
+                              child: Icon(Icons.qr_code));
+                        }
+                      }
+                      return Container();
                     })),
           ),
         ),
@@ -166,6 +200,7 @@ class _InsertProductCardState extends State<InsertProductCard>
           flex: 2,
           child: TypeAheadFormField(
               textFieldConfiguration: TextFieldConfiguration(
+                onEditingComplete: () => FocusScope.of(context).unfocus(),
                 controller: placec,
                 onChanged: (v) {
                   BlocProvider.of<InsertstockBloc>(context).add(DataChange(
@@ -216,7 +251,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       child: Stack(
         children: [
           Container(
-            margin: EdgeInsets.all(16.0),
+            margin: EdgeInsets.all(8.0),
             padding: EdgeInsets.all(8.00),
             decoration: BoxDecoration(
               color: Theme.of(context).brightness == Brightness.dark
@@ -226,7 +261,7 @@ class _InsertProductCardState extends State<InsertProductCard>
               boxShadow: [
                 BoxShadow(
                     spreadRadius: 0.0,
-                    blurRadius: 12.0,
+                    blurRadius: 6.0,
                     color: Colors.grey[400]!)
               ],
             ),
@@ -249,12 +284,23 @@ class _InsertProductCardState extends State<InsertProductCard>
                           },
                           suggestionsBoxController: sbc,
                           textFieldConfiguration: TextFieldConfiguration(
+                              maxLines: 2,
+                              minLines: 1,
+                              onEditingComplete: () =>
+                                  FocusScope.of(context).unfocus(),
                               controller: namec,
                               onChanged: (v) {
+                                var nv = v;
+                                if (namec.text.isNotEmpty &&
+                                    namec.text.length >= 1) {
+                                  nv = namec.text[0].toUpperCase() +
+                                      namec.text.substring(1);
+                                }
                                 BlocProvider.of<InsertstockBloc>(context)
                                     .add(DataChange(widget.data.copywith(
-                                  namaBarang: namec.text,
-                                  productId: null,
+                                  namaBarang: nv,
+                                  productId:()=> null,
+
                                 )));
                               },
                               style: DefaultTextStyle.of(context)
@@ -293,9 +339,10 @@ class _InsertProductCardState extends State<InsertProductCard>
                             BlocProvider.of<InsertstockBloc>(context)
                                 .add(DataChange(widget.data.copywith(
                               namaBarang: suggestion.nama,
-                              productId: suggestion.id,
+                              productId: ()=>suggestion.id,
                               hargaBeli: res1.isNotEmpty ? res1.last.price : 0,
                               tempatBeli: tempat.single.nama,
+                              barcode: suggestion.barcode,
                               // hargaJual: suggestion,
                             )));
                           },
@@ -314,10 +361,16 @@ class _InsertProductCardState extends State<InsertProductCard>
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
+                            onEditingComplete: () =>
+                                FocusScope.of(context).unfocus(),
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
                             validator: (text) {
                               if (text!.isNotEmpty &&
+                                  RegExp(r'^[0]*$').hasMatch(text)) {
+                                return "can't zero";
+                              }
+                              if (text.isNotEmpty &&
                                   !RegExp(r'^[0-9]*$').hasMatch(text)) {
                                 return 'must be a number';
                               } else if (text.isEmpty) {
@@ -329,7 +382,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               print('test');
                               BlocProvider.of<InsertstockBloc>(context)
                                   .add(DataChange(widget.data.copywith(
-                                hargaBeli: int.tryParse(hargaBeli.text),
+                                hargaBeli: int.tryParse(hargaBeli.text) ?? 0,
                               )));
                             },
                             controller: hargaBeli,
@@ -364,7 +417,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 firstDate: DateTime(2020),
                                 lastDate: DateTime(2101));
                             if (picked != null) {
-                              datec.text = picked.toString().substring(0, 19);
+                              // datec.text = picked.toString().substring(0, 19);
                               print(picked.toString());
                               BlocProvider.of<InsertstockBloc>(context).add(
                                   DataChange(widget.data
@@ -372,6 +425,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                             }
                           },
                           child: TextField(
+                            onEditingComplete: () =>
+                                FocusScope.of(context).unfocus(),
                             controller: datec,
                             enabled: false,
                             onTap: () async {
@@ -396,12 +451,18 @@ class _InsertProductCardState extends State<InsertProductCard>
                   ],
                 ),
                 if (MediaQuery.of(context).orientation == Orientation.portrait)
-                  bottom
+                  bottom,
+                AnimatedClipRect(
+                    horizontalAnimation: false,
+                    duration: Duration(milliseconds: 250),
+                    reverseDuration: Duration(milliseconds: 250),
+                    open: noteVisible,
+                    child: additionalBottom),
               ],
             ),
           ),
           Positioned(
-            right: 8,
+            right: 0,
             top: 8,
             child: InkWell(
               canRequestFocus: false,
@@ -424,6 +485,33 @@ class _InsertProductCardState extends State<InsertProductCard>
               ),
             ),
           ),
+          Positioned(
+            right: 0,
+            top: 56,
+            child: InkWell(
+              canRequestFocus: false,
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                setState(() {
+                  noteVisible = !noteVisible;
+                });
+                // BlocProvider.of<InsertstockBloc>(context)
+                //     .add(RemoveCard(widget.data.cardId!));
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.brown.withOpacity(0.9),
+                ),
+                alignment: Alignment.center,
+                padding: EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.note_add,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -433,7 +521,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       child: AnimatedClipRect(
         curve: Curves.ease,
         reverseCurve: Curves.ease,
-        duration: Duration(milliseconds: 400),
+        duration: Duration(milliseconds: 250),
         horizontalAnimation: false,
         open: widget.data.open,
         child: theForm,

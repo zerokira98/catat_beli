@@ -8,6 +8,7 @@ import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
+import 'package:intl/intl.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
 
@@ -144,7 +145,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   horizontal: MediaQuery.of(context).orientation ==
                           Orientation.landscape
                       ? MediaQuery.of(context).size.width * 0.05
-                      : 8),
+                      : 4),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: Colors.black87,
@@ -185,11 +186,11 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                           .add(AddCard());
                                       FocusScope.of(context).unfocus();
                                       Future.delayed(
-                                          Duration(milliseconds: 600), () {
+                                          Duration(milliseconds: 400), () {
                                         scrollc.animateTo(
                                             scrollc.position.maxScrollExtent,
                                             duration:
-                                                Duration(milliseconds: 400),
+                                                Duration(milliseconds: 200),
                                             curve: Curves.ease);
                                       });
                                     },

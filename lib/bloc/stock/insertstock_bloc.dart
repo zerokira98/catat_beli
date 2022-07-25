@@ -61,8 +61,11 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
       } catch (e) {
         // print(e);
         emit(Loaded(data: data, success: false, msg: e.toString()));
-        await Future.delayed(Duration(seconds: 25));
-        emit((state as Loaded).clearMsg());
+        await Future.delayed(Duration(seconds: 12), () {
+          if (state is Loaded) {
+            emit((state as Loaded).clearMsg());
+          }
+        });
       }
     }
   }
@@ -77,6 +80,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
             ItemCards(
                 cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
                 ditambahkan: tambahDate,
+                tempatBeli: '',
                 pcs: 1,
                 open: false)
           ],
@@ -91,7 +95,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
           .map((e) => e.cardId == event.cardId ? e.copywith(open: false) : e)
           .toList(),
     ));
-    await Future.delayed(Duration(milliseconds: 410));
+    await Future.delayed(Duration(milliseconds: 260));
     emit(Loaded(
         data: (state as Loaded)
             .data
