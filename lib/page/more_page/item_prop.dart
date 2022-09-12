@@ -101,7 +101,7 @@ class _ListOfItemsState extends State<ListOfItems> {
                   if (snapshot.data != null && snapshot.hasData) {
                     if (optionVal == 2) {
                       changes = [];
-                      int count = 0;
+                      // int count = 0;
                       int wordCount = 0;
                       // List<Key> telobgst = [];
                       List<Map> wordCountList = [];
@@ -185,7 +185,7 @@ class _ListOfItemsState extends State<ListOfItems> {
                             );
                           }
                           if (changes[i - 1] is! StockItem) {
-                            count++;
+                            // count++;
                             // print('nsb$i' + changes[i - 1]);
                             // print(telobgst[count - 1]);
                             // if (namebefore == ' ') {

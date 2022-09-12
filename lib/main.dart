@@ -1,3 +1,4 @@
+import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
@@ -59,6 +60,9 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
+            create: (context) => ThemeCubit()..getThemeData(),
+          ),
+          BlocProvider(
             create: (context) =>
                 InsertstockBloc(RepositoryProvider.of<MyDatabase>(context))
                   ..add(Initiate()),
@@ -68,44 +72,46 @@ class App extends StatelessWidget {
                   StockviewBloc(RepositoryProvider.of<MyDatabase>(context))
                     ..add(InitiateView())),
         ],
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // themeMode: ThemeMode.dark,
-          darkTheme: ThemeData.dark(),
-          theme: ThemeData(fontFamily: 'OpenSans'),
-          home: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: FutureBuilder<SharedPreferences>(
-                future: SharedPreferences.getInstance(),
-                builder: (context, snapshot) {
-                  if (snapshot.data != null) {
-                    if (snapshot.data!.getBool('firstStart') == null) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        // Add Your Code here.
-
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return Dialog(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(24.0),
-                                  child: Text(
-                                      'It\'s my first published app. Lots of bugs is expected. :)\n' +
-                                          'No tutorial, use your instinct.'),
-                                ),
-                              );
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, state) {
+            print(state);
+            return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                themeMode: state,
+                darkTheme: ThemeData.dark(),
+                theme: ThemeData(fontFamily: 'OpenSans'),
+                home: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: FutureBuilder<SharedPreferences>(
+                      future: SharedPreferences.getInstance(),
+                      builder: (context, snapshot) {
+                        if (snapshot.data != null) {
+                          if (snapshot.data!.getBool('firstStart') == null) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(24.0),
+                                        child: Text(
+                                            'It\'s my first published app. Lots of bugs is expected. :)\n' +
+                                                'No tutorial, use your instinct.'),
+                                      ),
+                                    );
+                                  });
+                              snapshot.data!.setBool('firstStart', false);
                             });
-                        snapshot.data!.setBool('firstStart', false);
-                      });
-                    }
-                  }
-                  return Container(
-                    child: (Platform.isWindows)
-                        ? CustomWindow(child: InsertProductPage())
-                        : InsertProductPage(),
-                  );
-                }),
-          ),
+                          }
+                        }
+                        return Container(
+                          child: (Platform.isWindows)
+                              ? CustomWindow(child: InsertProductPage())
+                              : InsertProductPage(),
+                        );
+                      }),
+                ));
+          },
         ),
       ),
     );

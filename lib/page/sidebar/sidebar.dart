@@ -2,6 +2,7 @@ import 'dart:io';
 
 // import 'package:catatbeli/msc/db_moor.dart';
 // import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -124,14 +125,14 @@ class SideDrawer extends StatelessWidget {
             },
             title: Text('Restore .db'),
           ),
-          // ListTile(
-          //   title: Text('Telo'),
-          //   onTap: () async {
-          //     var a = await RepositoryProvider.of<MyDatabase>(context)
-          //         .showInsideStock();
-          //     print(a);
-          //   },
-          // )
+          ListTile(
+            title: Column(
+              children: [Text('DarkMode'), Icon(Icons.dark_mode)],
+            ),
+            onTap: () async {
+              context.read<ThemeCubit>().changeThemeData();
+            },
+          )
         ]),
       )
     ]));
