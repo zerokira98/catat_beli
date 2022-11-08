@@ -48,7 +48,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
       child: Scaffold(
           drawer: SideDrawer(),
           appBar: AppBar(
-            backgroundColor: Colors.black87,
+            backgroundColor: Theme.of(context).primaryColor,
             elevation: 7,
             title: Text('Masuk Barang'),
             actions: [
@@ -148,8 +148,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       : 4),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              color: Colors.black87,
+              color: Colors.black54,
               child: SingleChildScrollView(
+                padding: EdgeInsets.only(top: 12),
                 controller: scrollc,
                 child: BlocBuilder<InsertstockBloc, InsertstockState>(
                   builder: (context, state) {
@@ -196,7 +197,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                     },
                                     child: Text(
                                       'Tambah Item +',
-                                      style: TextStyle(color: Colors.white),
+                                      // style: TextStyle(color: Colors.white),
                                     ),
                                   ),
                                 ),

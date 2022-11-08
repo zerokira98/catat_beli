@@ -22,7 +22,7 @@ class ListOfStockItems extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget body = Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey[800],
+        // backgroundColor: Colors.grey[800],
         title: BlocBuilder<StockviewBloc, StockviewState>(
             builder: (context, state) {
           if (state is StockviewLoaded) {
@@ -45,7 +45,7 @@ class ListOfStockItems extends StatelessWidget {
                               .filter
                               .endDate))
                           .toString(),
-                  textScaleFactor: 0.7,
+                  textScaleFactor: 0.65,
                 )
               ],
             );

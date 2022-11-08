@@ -78,8 +78,13 @@ class App extends StatelessWidget {
             return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 themeMode: state,
-                darkTheme: ThemeData.dark(),
-                theme: ThemeData(fontFamily: 'OpenSans'),
+                darkTheme: ThemeData.dark(
+                  useMaterial3: true,
+                ),
+                theme: ThemeData(
+                    useMaterial3: true,
+                    fontFamily: 'OpenSans',
+                    primaryColor: Colors.amber[800]),
                 home: Scaffold(
                   backgroundColor: Colors.transparent,
                   body: FutureBuilder<SharedPreferences>(

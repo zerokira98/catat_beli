@@ -23,7 +23,7 @@ class SideDrawer extends StatelessWidget {
     return Drawer(
         child: Column(children: [
       Container(
-        height: 180,
+        height: 160,
         color: Theme.of(context).primaryColor,
         child: Padding(
           padding: const EdgeInsets.all(18.0),

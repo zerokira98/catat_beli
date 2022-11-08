@@ -319,10 +319,12 @@ class _EditItemPageState extends State<EditItemPage>
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.delete_forever,
+              size: 18,
             ),
             AutoSizeText(
               'Remove Item',
