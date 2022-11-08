@@ -101,7 +101,7 @@ class MyDatabase extends _$MyDatabase {
     a.where(stocks.dateAdd.isBiggerOrEqualValue(startDate) &
         stocks.dateAdd.isSmallerOrEqualValue(endDate));
 
-    return a.map<int>((e) => e.read(stocks.id.count())).getSingle();
+    return a.map<int>((e) => e.read(stocks.id.count())!).getSingle();
   }
 
   ///=========
@@ -139,8 +139,8 @@ class MyDatabase extends _$MyDatabase {
                   OrderingTerm(expression: tbl.dateAdd, mode: OrderingMode.asc)
             ])
             ..where((tbl) =>
-                tbl.dateAdd.isBiggerOrEqualValue(startDate) &
-                stocks.dateAdd.isSmallerOrEqualValue(endDate)))
+                tbl.dateAdd.isBiggerOrEqualValue(startDate!) &
+                stocks.dateAdd.isSmallerOrEqualValue(endDate!)))
           .join([
         leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
@@ -154,8 +154,8 @@ class MyDatabase extends _$MyDatabase {
     } else {
       query = (select(stocks)
             ..where((tbl) =>
-                tbl.dateAdd.isBiggerOrEqualValue(startDate) &
-                stocks.dateAdd.isSmallerOrEqualValue(endDate)))
+                tbl.dateAdd.isBiggerOrEqualValue(startDate!) &
+                stocks.dateAdd.isSmallerOrEqualValue(endDate!)))
           .join([
         leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
@@ -296,7 +296,7 @@ class MyDatabase extends _$MyDatabase {
   }
 
   Future updateStock(ItemCards a) async {
-    return await (update(stocks)..where((tbl) => tbl.id.equals(a.cardId)))
+    return await (update(stocks)..where((tbl) => tbl.id.equals(a.cardId!)))
         .write(StocksCompanion(
             dateAdd: Value(a.ditambahkan),
             price: Value(a.hargaBeli!),

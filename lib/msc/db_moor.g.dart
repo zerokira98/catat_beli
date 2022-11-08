@@ -3,7 +3,7 @@
 part of 'db_moor.dart';
 
 // **************************************************************************
-// MoorGenerator
+// DriftDatabaseGenerator
 // **************************************************************************
 
 // ignore_for_file: type=lint
@@ -15,7 +15,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   final String? note;
   final int? idItem;
   final int? idSupplier;
-  Stock(
+  const Stock(
       {required this.id,
       required this.price,
       required this.qty,
@@ -23,25 +23,6 @@ class Stock extends DataClass implements Insertable<Stock> {
       this.note,
       this.idItem,
       this.idSupplier});
-  factory Stock.fromData(Map<String, dynamic> data, {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return Stock(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      price: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}price'])!,
-      qty: const RealType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}qty'])!,
-      dateAdd: const DateTimeType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}date_add']),
-      note: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}note']),
-      idItem: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id_item']),
-      idSupplier: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id_supplier']),
-    );
-  }
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -49,16 +30,16 @@ class Stock extends DataClass implements Insertable<Stock> {
     map['price'] = Variable<int>(price);
     map['qty'] = Variable<double>(qty);
     if (!nullToAbsent || dateAdd != null) {
-      map['date_add'] = Variable<DateTime?>(dateAdd);
+      map['date_add'] = Variable<DateTime>(dateAdd);
     }
     if (!nullToAbsent || note != null) {
-      map['note'] = Variable<String?>(note);
+      map['note'] = Variable<String>(note);
     }
     if (!nullToAbsent || idItem != null) {
-      map['id_item'] = Variable<int?>(idItem);
+      map['id_item'] = Variable<int>(idItem);
     }
     if (!nullToAbsent || idSupplier != null) {
-      map['id_supplier'] = Variable<int?>(idSupplier);
+      map['id_supplier'] = Variable<int>(idSupplier);
     }
     return map;
   }
@@ -111,18 +92,18 @@ class Stock extends DataClass implements Insertable<Stock> {
           {int? id,
           int? price,
           double? qty,
-          DateTime? dateAdd,
-          String? note,
-          int? idItem,
-          int? idSupplier}) =>
+          Value<DateTime?> dateAdd = const Value.absent(),
+          Value<String?> note = const Value.absent(),
+          Value<int?> idItem = const Value.absent(),
+          Value<int?> idSupplier = const Value.absent()}) =>
       Stock(
         id: id ?? this.id,
         price: price ?? this.price,
         qty: qty ?? this.qty,
-        dateAdd: dateAdd ?? this.dateAdd,
-        note: note ?? this.note,
-        idItem: idItem ?? this.idItem,
-        idSupplier: idSupplier ?? this.idSupplier,
+        dateAdd: dateAdd.present ? dateAdd.value : this.dateAdd,
+        note: note.present ? note.value : this.note,
+        idItem: idItem.present ? idItem.value : this.idItem,
+        idSupplier: idSupplier.present ? idSupplier.value : this.idSupplier,
       );
   @override
   String toString() {
@@ -184,10 +165,10 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     Expression<int>? id,
     Expression<int>? price,
     Expression<double>? qty,
-    Expression<DateTime?>? dateAdd,
-    Expression<String?>? note,
-    Expression<int?>? idItem,
-    Expression<int?>? idSupplier,
+    Expression<DateTime>? dateAdd,
+    Expression<String>? note,
+    Expression<int>? idItem,
+    Expression<int>? idSupplier,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -232,16 +213,16 @@ class StocksCompanion extends UpdateCompanion<Stock> {
       map['qty'] = Variable<double>(qty.value);
     }
     if (dateAdd.present) {
-      map['date_add'] = Variable<DateTime?>(dateAdd.value);
+      map['date_add'] = Variable<DateTime>(dateAdd.value);
     }
     if (note.present) {
-      map['note'] = Variable<String?>(note.value);
+      map['note'] = Variable<String>(note.value);
     }
     if (idItem.present) {
-      map['id_item'] = Variable<int?>(idItem.value);
+      map['id_item'] = Variable<int>(idItem.value);
     }
     if (idSupplier.present) {
-      map['id_supplier'] = Variable<int?>(idSupplier.value);
+      map['id_supplier'] = Variable<int>(idSupplier.value);
     }
     return map;
   }
@@ -268,47 +249,47 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   $StocksTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _priceMeta = const VerificationMeta('price');
   @override
-  late final GeneratedColumn<int?> price = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> price = GeneratedColumn<int>(
       'price', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(0));
   final VerificationMeta _qtyMeta = const VerificationMeta('qty');
   @override
-  late final GeneratedColumn<double?> qty = GeneratedColumn<double?>(
+  late final GeneratedColumn<double> qty = GeneratedColumn<double>(
       'qty', aliasedName, false,
-      type: const RealType(),
+      type: DriftSqlType.double,
       requiredDuringInsert: false,
       defaultValue: Constant(1.0));
   final VerificationMeta _dateAddMeta = const VerificationMeta('dateAdd');
   @override
-  late final GeneratedColumn<DateTime?> dateAdd = GeneratedColumn<DateTime?>(
+  late final GeneratedColumn<DateTime> dateAdd = GeneratedColumn<DateTime>(
       'date_add', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   final VerificationMeta _noteMeta = const VerificationMeta('note');
   @override
-  late final GeneratedColumn<String?> note = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
       'note', aliasedName, true,
-      type: const StringType(), requiredDuringInsert: false);
+      type: DriftSqlType.string, requiredDuringInsert: false);
   final VerificationMeta _idItemMeta = const VerificationMeta('idItem');
   @override
-  late final GeneratedColumn<int?> idItem = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> idItem = GeneratedColumn<int>(
       'id_item', aliasedName, true,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: 'REFERENCES stockitems(id)');
   final VerificationMeta _idSupplierMeta = const VerificationMeta('idSupplier');
   @override
-  late final GeneratedColumn<int?> idSupplier = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> idSupplier = GeneratedColumn<int>(
       'id_supplier', aliasedName, true,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       $customConstraints: 'REFERENCES tempatbelis(id)');
   @override
@@ -359,8 +340,23 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Stock map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Stock.fromData(data,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Stock(
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      price: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}price'])!,
+      qty: attachedDatabase.options.types
+          .read(DriftSqlType.double, data['${effectivePrefix}qty'])!,
+      dateAdd: attachedDatabase.options.types
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_add']),
+      note: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      idItem: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}id_item']),
+      idSupplier: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}id_supplier']),
+    );
   }
 
   @override
@@ -373,24 +369,13 @@ class StockItem extends DataClass implements Insertable<StockItem> {
   final int id;
   final int? barcode;
   final String nama;
-  StockItem({required this.id, this.barcode, required this.nama});
-  factory StockItem.fromData(Map<String, dynamic> data, {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return StockItem(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      barcode: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}barcode']),
-      nama: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}nama'])!,
-    );
-  }
+  const StockItem({required this.id, this.barcode, required this.nama});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     if (!nullToAbsent || barcode != null) {
-      map['barcode'] = Variable<int?>(barcode);
+      map['barcode'] = Variable<int>(barcode);
     }
     map['nama'] = Variable<String>(nama);
     return map;
@@ -425,9 +410,13 @@ class StockItem extends DataClass implements Insertable<StockItem> {
     };
   }
 
-  StockItem copyWith({int? id, int? barcode, String? nama}) => StockItem(
+  StockItem copyWith(
+          {int? id,
+          Value<int?> barcode = const Value.absent(),
+          String? nama}) =>
+      StockItem(
         id: id ?? this.id,
-        barcode: barcode ?? this.barcode,
+        barcode: barcode.present ? barcode.value : this.barcode,
         nama: nama ?? this.nama,
       );
   @override
@@ -467,7 +456,7 @@ class StockItemsCompanion extends UpdateCompanion<StockItem> {
   }) : nama = Value(nama);
   static Insertable<StockItem> custom({
     Expression<int>? id,
-    Expression<int?>? barcode,
+    Expression<int>? barcode,
     Expression<String>? nama,
   }) {
     return RawValuesInsertable({
@@ -493,7 +482,7 @@ class StockItemsCompanion extends UpdateCompanion<StockItem> {
       map['id'] = Variable<int>(id.value);
     }
     if (barcode.present) {
-      map['barcode'] = Variable<int?>(barcode.value);
+      map['barcode'] = Variable<int>(barcode.value);
     }
     if (nama.present) {
       map['nama'] = Variable<String>(nama.value);
@@ -520,24 +509,24 @@ class $StockItemsTable extends StockItems
   $StockItemsTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _barcodeMeta = const VerificationMeta('barcode');
   @override
-  late final GeneratedColumn<int?> barcode = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> barcode = GeneratedColumn<int>(
       'barcode', aliasedName, true,
-      type: const IntType(), requiredDuringInsert: false);
+      type: DriftSqlType.int, requiredDuringInsert: false);
   final VerificationMeta _namaMeta = const VerificationMeta('nama');
   @override
-  late final GeneratedColumn<String?> nama =
-      GeneratedColumn<String?>('nama', aliasedName, false,
+  late final GeneratedColumn<String> nama =
+      GeneratedColumn<String>('nama', aliasedName, false,
           additionalChecks: GeneratedColumn.checkTextLength(
             minTextLength: 3,
           ),
-          type: const StringType(),
+          type: DriftSqlType.string,
           requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, barcode, nama];
@@ -570,8 +559,15 @@ class $StockItemsTable extends StockItems
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   StockItem map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return StockItem.fromData(data,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StockItem(
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      barcode: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}barcode']),
+      nama: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
+    );
   }
 
   @override
@@ -583,16 +579,7 @@ class $StockItemsTable extends StockItems
 class TempatBeli extends DataClass implements Insertable<TempatBeli> {
   final int id;
   final String nama;
-  TempatBeli({required this.id, required this.nama});
-  factory TempatBeli.fromData(Map<String, dynamic> data, {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return TempatBeli(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      nama: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}nama'])!,
-    );
-  }
+  const TempatBeli({required this.id, required this.nama});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -704,16 +691,16 @@ class $TempatBelisTable extends TempatBelis
   $TempatBelisTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
-      type: const IntType(),
+      type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _namaMeta = const VerificationMeta('nama');
   @override
-  late final GeneratedColumn<String?> nama = GeneratedColumn<String?>(
+  late final GeneratedColumn<String> nama = GeneratedColumn<String>(
       'nama', aliasedName, false,
-      type: const StringType(), requiredDuringInsert: true);
+      type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, nama];
   @override
@@ -741,8 +728,13 @@ class $TempatBelisTable extends TempatBelis
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   TempatBeli map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return TempatBeli.fromData(data,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TempatBeli(
+      id: attachedDatabase.options.types
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      nama: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
+    );
   }
 
   @override
@@ -752,12 +744,13 @@ class $TempatBelisTable extends TempatBelis
 }
 
 abstract class _$MyDatabase extends GeneratedDatabase {
-  _$MyDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
+  _$MyDatabase(QueryExecutor e) : super(e);
   late final $StocksTable stocks = $StocksTable(this);
   late final $StockItemsTable stockItems = $StockItemsTable(this);
   late final $TempatBelisTable tempatBelis = $TempatBelisTable(this);
   @override
-  Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
+  Iterable<TableInfo<Table, dynamic>> get allTables =>
+      allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [stocks, stockItems, tempatBelis];
