@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:catatbeli/page/stockview/edit_stock/edit_stock.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
@@ -52,35 +53,35 @@ class ListOfStockItems extends StatelessWidget {
           }
           return CircularProgressIndicator();
         }),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.refresh),
-              onPressed: () {
-                BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-              }),
-          Builder(
-            builder: (context) => IconButton(
-                icon: Icon(Icons.filter_alt),
-                onPressed: () {
-                  // BlocProvider.of<StockviewBloc>(context).add(Initializeview());
-                  Scaffold.of(context).showBottomSheet(
-                    (context) => Column(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(color: Colors.transparent)),
-                        ),
-                        FilterBox(),
-                      ],
-                    ),
-                    backgroundColor: Colors.black26,
-                  );
-                }),
-          )
-        ],
+        // actions: [
+        //   IconButton(
+        //       icon: Icon(Icons.refresh),
+        //       onPressed: () {
+        //         BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+        //       }),
+        //   Builder(
+        //     builder: (context) => IconButton(
+        //         icon: Icon(Icons.filter_alt),
+        //         onPressed: () {
+        //           // BlocProvider.of<StockviewBloc>(context).add(Initializeview());
+        //           Scaffold.of(context).showBottomSheet(
+        //             (context) => Column(
+        //               children: [
+        //                 Expanded(
+        //                   child: GestureDetector(
+        //                       onTap: () {
+        //                         Navigator.pop(context);
+        //                       },
+        //                       child: Container(color: Colors.transparent)),
+        //                 ),
+        //                 FilterBox(),
+        //               ],
+        //             ),
+        //             backgroundColor: Colors.black26,
+        //           );
+        //         }),
+        //   )
+        // ],
       ),
       body: Stack(
         children: [
@@ -198,7 +199,21 @@ class ListOfStockItems extends StatelessWidget {
                     if (state is StockviewLoaded) {
                       return Row(
                         children: [
-                          Expanded(child: Container()),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: Colors.white,
+                                    shadows: [Shadow(blurRadius: 4)],
+                                  ),
+                                  onPressed: () {
+                                    BlocProvider.of<StockviewBloc>(context)
+                                        .add(InitiateView());
+                                  }),
+                            ),
+                          ),
                           InkWell(
                             onTap: () {
                               if ((state.filter.maxRow / 20).floor() !=
@@ -228,7 +243,7 @@ class ListOfStockItems extends StatelessWidget {
                             ),
                           ),
                           Container(
-                            width: 50,
+                            // width: 50,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(
                                   Radius.elliptical(18.0, 4.0)),
@@ -236,24 +251,89 @@ class ListOfStockItems extends StatelessWidget {
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 4),
                             child: Center(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    (state.filter.currentPage + 1).toString(),
-                                    textScaleFactor: 1.4,
-                                  ),
-                                  Text(
-                                    '/',
-                                    textScaleFactor: 1.4,
-                                  ),
-                                  Text(
-                                    ((state.filter.maxRow / 20).floor() + 1)
-                                        .toString(),
-                                    textScaleFactor: 1.4,
-                                  ),
-                                ],
+                              child: InkWell(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        var pageTextControl =
+                                            TextEditingController();
+                                        return Dialog(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Container(
+                                                  width: 42,
+                                                  child: TextFormField(
+                                                    autofocus: true,
+                                                    autovalidateMode:
+                                                        AutovalidateMode
+                                                            .onUserInteraction,
+                                                    validator: (value) {
+                                                      if (value != null &&
+                                                          value.isNotEmpty) {
+                                                        bool hah = int.parse(
+                                                                value) >
+                                                            (((state.filter.maxRow +
+                                                                        1) /
+                                                                    20)
+                                                                .ceil());
+                                                        if (value == "0")
+                                                          return 'cant be zero';
+                                                        return hah
+                                                            ? 'over'
+                                                            : null;
+                                                      }
+                                                    },
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    controller: pageTextControl,
+                                                    onEditingComplete: () {
+                                                      BlocProvider.of<
+                                                                  StockviewBloc>(
+                                                              context)
+                                                          .add(FilterChange(state
+                                                              .filter
+                                                              .copyWith(
+                                                                  currentPage:
+                                                                      int.parse(
+                                                                              pageTextControl.text) -
+                                                                          1)));
+                                                      Navigator.pop(context);
+                                                    },
+                                                    decoration: InputDecoration(
+                                                        labelText: 'Page'),
+                                                  )),
+                                              Text('/'),
+                                              Text(((state.filter.maxRow + 1) /
+                                                      20)
+                                                  .ceil()
+                                                  .toString()),
+                                            ],
+                                          ),
+                                        );
+                                      });
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      (state.filter.currentPage + 1).toString(),
+                                      textScaleFactor: 1.4,
+                                    ),
+                                    Text(
+                                      '/',
+                                      textScaleFactor: 1.4,
+                                    ),
+                                    Text(
+                                      (((state.filter.maxRow + 1) / 20).ceil())
+                                          .toString(),
+                                      textScaleFactor: 1.4,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -261,7 +341,7 @@ class ListOfStockItems extends StatelessWidget {
                             onTap: () {
                               // print(state.filter.currentPage);
                               // print((state.filter.maxRow / 20).floor());
-                              if ((state.filter.maxRow / 20).floor() + 1 !=
+                              if (((state.filter.maxRow + 1) / 20).ceil() !=
                                   (state.filter.currentPage + 1)) {
                                 BlocProvider.of<StockviewBloc>(context).add(
                                     FilterChange(state.filter.copyWith(
@@ -279,7 +359,7 @@ class ListOfStockItems extends StatelessWidget {
                               child: Icon(
                                 Icons.arrow_right,
                                 color:
-                                    ((state.filter.maxRow / 20).floor() + 1 !=
+                                    (((state.filter.maxRow + 1) / 20).ceil() !=
                                             (state.filter.currentPage + 1))
                                         ? Colors.black
                                         : Colors.grey,

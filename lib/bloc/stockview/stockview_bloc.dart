@@ -43,11 +43,11 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       endDate: (event.filter.endDate),
       boughtPlace: event.filter.tempatBeli,
     );
-    print(data);
+    print(maxQ);
     emit(StockviewLoaded(
         filter: event.filter.copyWith(maxRow: maxQ),
         datas: data.map((e) {
-          print('e${e.stock.note}');
+          // print('e${e.stock.note}');
           return ItemCards(
             note: e.stock.note,
             ditambahkan: e.stock.dateAdd,

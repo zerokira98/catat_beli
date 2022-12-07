@@ -18,8 +18,8 @@ class _StockviewCardState extends State<StockviewCard> {
   double opacityval = 1.0;
   @override
   Widget build(BuildContext context) {
-    var telo = widget.data.note;
-    print('note:$telo');
+    // var telo = widget.data.note;
+    // print('note:$telo');
     var hargaBeli = numFormat.format(widget.data.hargaBeli);
     // var hargaJual = numFormat.format(widget.data.hargaJual);
     // print(widget.data.pcs);
@@ -239,7 +239,7 @@ class _StockviewCardState extends State<StockviewCard> {
                         InkWell(
                           onTap: () {
                             var width = MediaQuery.of(context).size.width;
-                            print(horizontal);
+                            // print(horizontal);
                             setState(() {
                               horizontal = width;
                               opacityval = 0.0;
@@ -282,6 +282,7 @@ class _StockviewCardState extends State<StockviewCard> {
                         child: AutoSizeText(
                       widget.data.namaBarang.toString(),
                       minFontSize: 12,
+                      style: TextStyle(height: 0),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     )),

@@ -102,12 +102,17 @@ class SideDrawer extends StatelessWidget {
               bool exist = await file.exists();
               if (exist) {
                 debugPrint('Exzist');
-                final params = SaveFileDialogParams(
-                    sourceFilePath: file.path,
-                    fileName:
-                        '${DateTime.now().toString().substring(0, 10)}.db');
-                final filePath =
-                    await FlutterFileDialog.saveFile(params: params);
+                if (Platform.isAndroid) {
+                  final params = SaveFileDialogParams(
+                      sourceFilePath: file.path,
+                      fileName:
+                          '${DateTime.now().toString().substring(0, 10)}.db');
+                  final filePath =
+                      await FlutterFileDialog.saveFile(params: params);
+                } else if (Platform.isWindows) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('not implemented yet, sorry')));
+                }
               }
             },
             title: Text('Backup .db'),
@@ -115,12 +120,18 @@ class SideDrawer extends StatelessWidget {
           ListTile(
             trailing: Icon(Icons.ac_unit),
             onTap: () async {
-              final filePath = await FlutterFileDialog.pickFile();
-              if (filePath != null) {
-                final importedFile = File(filePath);
-                final dbFolder = await getApplicationDocumentsDirectory();
-                final file = File(p.join(dbFolder.path, 'db.sqlite'));
-                file.writeAsBytes(await importedFile.readAsBytes());
+              if (Platform.isAndroid) {
+                final filePath = await FlutterFileDialog.pickFile();
+                if (filePath != null) {
+                  final importedFile = File(filePath);
+                  final dbFolder = await getApplicationDocumentsDirectory();
+                  final file = File(p.join(dbFolder.path, 'db.sqlite'));
+                  file.writeAsBytes(await importedFile.readAsBytes());
+                }
+              }
+              if (Platform.isWindows) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('not implemented yet, sorry')));
               }
             },
             title: Text('Restore .db'),

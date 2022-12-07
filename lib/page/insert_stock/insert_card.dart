@@ -165,11 +165,13 @@ class _InsertProductCardState extends State<InsertProductCard>
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 labelText: 'barcode',
                 suffixIcon: FutureBuilder<List>(
-                    future: availableCameras(),
+                    future: Platform.isAndroid || Platform.isIOS
+                        ? availableCameras()
+                        : Future.value([]),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         if (snapshot.data!.isEmpty) {
-                          return Container();
+                          return SizedBox();
                         } else {
                           return InkWell(
                               canRequestFocus: false,
@@ -192,7 +194,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               child: Icon(Icons.qr_code));
                         }
                       }
-                      return Container();
+                      return SizedBox();
                     })),
           ),
         ),
@@ -299,8 +301,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 BlocProvider.of<InsertstockBloc>(context)
                                     .add(DataChange(widget.data.copywith(
                                   namaBarang: nv,
-                                  productId:()=> null,
-
+                                  productId: () => null,
                                 )));
                               },
                               style: DefaultTextStyle.of(context)
@@ -339,7 +340,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             BlocProvider.of<InsertstockBloc>(context)
                                 .add(DataChange(widget.data.copywith(
                               namaBarang: suggestion.nama,
-                              productId: ()=>suggestion.id,
+                              productId: () => suggestion.id,
                               hargaBeli: res1.isNotEmpty ? res1.last.price : 0,
                               tempatBeli: tempat.single.nama,
                               barcode: suggestion.barcode,
