@@ -12,47 +12,58 @@ class InsertProductCard extends StatefulWidget {
 
 class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
-  SuggestionsBoxController? sbc;
+  SuggestionsBoxController sbc = SuggestionsBoxController();
   TextEditingController hargaBeli = TextEditingController();
   TextEditingController namec = TextEditingController(),
       datec = TextEditingController(),
       placec = TextEditingController(text: ''),
       notec = TextEditingController(text: ''),
-      barcodeC = TextEditingController();
-  TextEditingController qtyc = TextEditingController();
+      barcodeC = TextEditingController(),
+      qtyc = TextEditingController();
   final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
   bool noteVisible = false;
   FocusNode fsn = FocusNode();
   DateFormat dateFormat = DateFormat('d/MM/y');
+  bool wascreated = false;
   @override
   void dispose() {
     // sbc.close();
-    namec.dispose();
-    datec.dispose();
-    placec.dispose();
-    barcodeC.dispose();
-    qtyc.dispose();
-    notec.dispose();
-    hargaBeli.dispose();
+    // hargaBeli.dispose();
+    // namec.dispose();
+    // datec.dispose();
+    // placec.dispose();
+    // notec.dispose();
+    // barcodeC.dispose();
+    // qtyc.dispose();
+
+    // fsn.dispose();
+    // fsn.removeListener(fsnListener);
     super.dispose();
   }
 
   @override
   void initState() {
-    sbc = SuggestionsBoxController();
     // hargaBeli = ;
-    fsn.addListener(() {
-      if (fsn.hasFocus)
-        qtyc.selection =
-            TextSelection(baseOffset: 0, extentOffset: qtyc.text.length);
-    });
+    if (mounted) {
+      if (!wascreated) {
+        fsn.addListener(fsnListener);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted)
+            BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                widget.data.copywith(formkey: _formkey, open: true)));
+        });
+        wascreated = true;
+      }
+    }
 
     super.initState();
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) =>
-        BlocProvider.of<InsertstockBloc>(context).add(
-            DataChange(widget.data.copywith(formkey: _formkey, open: true))));
+  fsnListener() {
+    if (fsn.hasFocus)
+      qtyc.selection =
+          TextSelection(baseOffset: 0, extentOffset: qtyc.text.length);
   }
 
   @override
@@ -455,8 +466,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                   bottom,
                 AnimatedClipRect(
                     horizontalAnimation: false,
-                    duration: Duration(milliseconds: 250),
-                    reverseDuration: Duration(milliseconds: 250),
+                    duration: Duration(milliseconds: 260),
+                    reverseDuration: Duration(milliseconds: 260),
                     open: noteVisible,
                     child: additionalBottom),
               ],
@@ -518,11 +529,11 @@ class _InsertProductCardState extends State<InsertProductCard>
     );
 
     return AnimatedContainer(
-      duration: Duration(milliseconds: 250),
+      duration: Duration(milliseconds: 260),
       child: AnimatedClipRect(
         curve: Curves.ease,
         reverseCurve: Curves.ease,
-        duration: Duration(milliseconds: 250),
+        duration: Duration(milliseconds: 260),
         horizontalAnimation: false,
         open: widget.data.open,
         child: theForm,
@@ -566,6 +577,11 @@ class _AnimatedClipRectState extends State<AnimatedClipRect>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation _animation;
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {

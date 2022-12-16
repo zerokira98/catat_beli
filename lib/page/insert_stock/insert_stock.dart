@@ -21,6 +21,7 @@ class InsertProductPage extends StatefulWidget {
 
 class _InsertProductPageState extends State<InsertProductPage> {
   ScrollController scrollc = ScrollController();
+  bool disabletap = false;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -151,24 +152,24 @@ class _InsertProductPageState extends State<InsertProductPage> {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: Colors.black54,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 12),
-                controller: scrollc,
-                child: BlocBuilder<InsertstockBloc, InsertstockState>(
-                  builder: (context, state) {
-                    if (state is Loading) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    // if (state is InsertstockInitial) {
-                    //   return Center(child: CircularProgressIndicator());
-                    // }
-                    if (state is Loaded) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          for (int i = 0; i < state.data.length; i++)
-                            Row(children: [
+              child: BlocBuilder<InsertstockBloc, InsertstockState>(
+                builder: (context, state) {
+                  if (state is Loading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  // if (state is InsertstockInitial) {
+                  //   return Center(child: CircularProgressIndicator());
+                  // }
+                  if (state is Loaded) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: state.data.length,
+                            controller: scrollc,
+                            itemBuilder: (context, i) => Row(children: [
                               Text(
                                 '${i + 1}',
                                 style: TextStyle(color: Colors.white),
@@ -178,43 +179,69 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                     Key(state.data[i].cardId.toString())),
                               )
                             ]),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () {
+                          ),
+                        ),
+                        // for (int i = 0; i < state.data.length; i++)
+                        //   Row(children: [
+                        //     Text(
+                        //       '${i + 1}',
+                        //       style: TextStyle(color: Colors.white),
+                        //     ),
+                        //     Expanded(
+                        //       child: InsertProductCard(state.data[i],
+                        //           Key(state.data[i].cardId.toString())),
+                        //     )
+                        //   ]),
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    if (!disabletap) {
+                                      disabletap = true;
                                       BlocProvider.of<InsertstockBloc>(context)
                                           .add(AddCard());
                                       FocusScope.of(context).unfocus();
-                                      Future.delayed(
-                                          Duration(milliseconds: 400), () {
+                                      await Future.delayed(
+                                          Duration(milliseconds: 420), () {});
+                                      if (scrollc.position.maxScrollExtent -
+                                              scrollc.offset <=
+                                          180) {
+                                        print('here');
                                         scrollc.animateTo(
                                             scrollc.position.maxScrollExtent,
                                             duration:
-                                                Duration(milliseconds: 200),
+                                                Duration(milliseconds: 180),
                                             curve: Curves.ease);
-                                      });
-                                    },
-                                    child: Text(
-                                      'Tambah Item +',
-                                      // style: TextStyle(color: Colors.white),
-                                    ),
+                                      } else {
+                                        print('here 2');
+                                        scrollc.jumpTo(
+                                            scrollc.position.maxScrollExtent);
+                                      }
+                                      await Future.delayed(
+                                          Duration(milliseconds: 200), () {});
+                                      disabletap = false;
+                                    }
+                                  },
+                                  child: Text(
+                                    'Tambah Item +',
+                                    // style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Padding(
-                            padding: EdgeInsets.all(24.0),
-                          )
-                        ],
-                      );
-                    }
-                    return CircularProgressIndicator();
-                  },
-                ),
+                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.all(24.0),
+                        // )
+                      ],
+                    );
+                  }
+                  return CircularProgressIndicator();
+                },
               ),
             ),
           )),

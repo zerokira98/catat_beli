@@ -37,7 +37,7 @@ dependencies:
   equatable: ^2.0.3
   flutter_typeahead: ^4.0.0
   flutter_barcode_scanner: ^2.0.0
-  camera: ^0.10.0
+  camera: ^0.10.0+4
   intl: ^0.17.0
   flutter_keyboard_visibility: ^5.0.2
   url_launcher: ^6.0.12
