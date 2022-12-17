@@ -6,7 +6,9 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:ffi' as ffi;
 import 'dart:io';
@@ -22,6 +24,8 @@ main() async {
     db.dispose();
   }
   WidgetsFlutterBinding.ensureInitialized();
+  HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory: await getApplicationDocumentsDirectory());
   // Bloc = NewBlocObserver();
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
   // BlocOverrides.runZoned(
@@ -64,8 +68,8 @@ class App extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) =>
-                InsertstockBloc(RepositoryProvider.of<MyDatabase>(context))
-                  ..add(Initiate()),
+                InsertstockBloc(RepositoryProvider.of<MyDatabase>(context)),
+            // ..add(Initiate(refresh: false)),
           ),
           BlocProvider(
               create: (context) =>

@@ -69,8 +69,8 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   child: GestureDetector(
                     // highlightColor: Colors.green,
                     onTap: () {
-                      var state = (BlocProvider.of<InsertstockBloc>(context)
-                          .state as Loaded);
+                      var state =
+                          (BlocProvider.of<InsertstockBloc>(context).state);
 
                       BlocProvider.of<InsertstockBloc>(context)
                           .add(SendtoDB(state.data));
@@ -90,7 +90,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                           children: [
                             BlocBuilder<InsertstockBloc, InsertstockState>(
                               builder: (context, state) {
-                                if (state is Loading) {
+                                if (state.isLoading) {
                                   return CircularProgressIndicator();
                                 }
                                 return Container();
@@ -119,9 +119,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
           ),
           body: BlocListener<InsertstockBloc, InsertstockState>(
             listener: (context, state) {
-              if (state is Loaded) {
-                if (state.success != null) {
-                  if (state.success!) {
+              if (state.isLoaded) {
+                if (state.isSuccess != null) {
+                  if (state.isSuccess!) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       backgroundColor: Colors.green,
                       content: const Text('Berhasil'),
@@ -154,13 +154,23 @@ class _InsertProductPageState extends State<InsertProductPage> {
               color: Colors.black54,
               child: BlocBuilder<InsertstockBloc, InsertstockState>(
                 builder: (context, state) {
-                  if (state is Loading) {
+                  if (state.isLoading) {
+                    if (state.isLoaded == false) {
+                      return Center(
+                        child: ElevatedButton(
+                          child: Text('Load'),
+                          onPressed: () =>
+                              BlocProvider.of<InsertstockBloc>(context)
+                                  .add(Initiate()),
+                        ),
+                      );
+                    }
                     return Center(child: CircularProgressIndicator());
                   }
                   // if (state is InsertstockInitial) {
                   //   return Center(child: CircularProgressIndicator());
                   // }
-                  if (state is Loaded) {
+                  if (state.isLoaded) {
                     return Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -196,6 +206,16 @@ class _InsertProductPageState extends State<InsertProductPage> {
                           padding: const EdgeInsets.all(4.0),
                           child: Row(
                             children: [
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white),
+                                  onPressed: () {
+                                    BlocProvider.of<InsertstockBloc>(context)
+                                        .add(Initiate());
+                                  },
+                                  child: Text('Hapus Semua')),
+                              Padding(padding: EdgeInsets.all(4)),
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () async {
@@ -208,7 +228,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                           Duration(milliseconds: 420), () {});
                                       if (scrollc.position.maxScrollExtent -
                                               scrollc.offset <=
-                                          180) {
+                                          280) {
                                         print('here');
                                         scrollc.animateTo(
                                             scrollc.position.maxScrollExtent,

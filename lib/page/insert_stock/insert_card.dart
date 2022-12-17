@@ -23,7 +23,8 @@ class _InsertProductCardState extends State<InsertProductCard>
   final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
   bool noteVisible = false;
-  FocusNode fsn = FocusNode();
+  FocusNode fsn1 = FocusNode();
+  FocusNode fsn2 = FocusNode();
   DateFormat dateFormat = DateFormat('d/MM/y');
   bool wascreated = false;
   @override
@@ -37,8 +38,8 @@ class _InsertProductCardState extends State<InsertProductCard>
     // barcodeC.dispose();
     // qtyc.dispose();
 
-    // fsn.dispose();
-    // fsn.removeListener(fsnListener);
+    // fsn1.dispose();
+    // fsn1.removeListener(fsn1Listener);
     super.dispose();
   }
 
@@ -47,7 +48,8 @@ class _InsertProductCardState extends State<InsertProductCard>
     // hargaBeli = ;
     if (mounted) {
       if (!wascreated) {
-        fsn.addListener(fsnListener);
+        fsn1.addListener(fsn1Listener);
+        fsn2.addListener(fsn2Listener);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted)
             BlocProvider.of<InsertstockBloc>(context).add(DataChange(
@@ -60,10 +62,16 @@ class _InsertProductCardState extends State<InsertProductCard>
     super.initState();
   }
 
-  fsnListener() {
-    if (fsn.hasFocus)
+  fsn1Listener() {
+    if (fsn1.hasFocus)
       qtyc.selection =
           TextSelection(baseOffset: 0, extentOffset: qtyc.text.length);
+  }
+
+  fsn2Listener() {
+    if (fsn2.hasFocus)
+      placec.selection =
+          TextSelection(baseOffset: 0, extentOffset: placec.text.length);
   }
 
   @override
@@ -130,7 +138,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 return null;
               },
               controller: qtyc,
-              focusNode: fsn,
+              focusNode: fsn1,
               onChanged: (v) {
                 // print(v);
                 // print('aaa');
@@ -213,6 +221,7 @@ class _InsertProductCardState extends State<InsertProductCard>
           flex: 2,
           child: TypeAheadFormField(
               textFieldConfiguration: TextFieldConfiguration(
+                focusNode: fsn2,
                 onEditingComplete: () => FocusScope.of(context).unfocus(),
                 controller: placec,
                 onChanged: (v) {

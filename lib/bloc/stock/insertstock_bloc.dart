@@ -1,16 +1,25 @@
 import 'dart:async';
+// import 'dart:convert';
+// import 'dart:html';
 
-import 'package:bloc/bloc.dart';
+// import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
+// import 'package:flutter/cupertino.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'insertstock_event.dart';
 part 'insertstock_state.dart';
 
-class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
+class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
   final MyDatabase db;
-  InsertstockBloc(this.db) : super(InsertstockInitial()) {
+  InsertstockBloc(this.db)
+      : super(InsertstockState(
+          data: [],
+          isLoaded: false,
+          isLoading: true,
+        )) {
     on<Initiate>(_initiate);
     on<DataChange>(_dataChange);
     on<SendtoDB>(_sendToDB);
@@ -18,52 +27,72 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
     on<RemoveCard>(_removeCard);
   }
   void _initiate(Initiate event, Emitter<InsertstockState> emit) async {
+    // if (!event.refresh) {
     List<ItemCards> data = [];
+    print('telo');
+    emit(InsertstockState(
+        data: data,
+        isLoaded: false,
+        isLoading: true,
+        isSuccess: event.success));
+    await Future.delayed(Duration(milliseconds: 100));
     data.add(ItemCards(
         ditambahkan: DateTime.now(), pcs: 1.0, cardId: 1, open: false));
-    emit(Loaded(data: data, success: event.success));
+    emit(InsertstockState(
+        data: data,
+        isLoaded: true,
+        isLoading: false,
+        isSuccess: event.success));
+    // }
   }
 
   void _dataChange(DataChange event, Emitter<InsertstockState> emit) async {
-    if (state is Loaded) {
-      emit(Loaded(
-        data: (state as Loaded)
+    if (state.isLoaded) {
+      emit(InsertstockState(
+        data: (state)
             .data
             .map((e) => e.cardId == event.data.cardId ? event.data : e)
             .toList(),
+        isLoading: false,
+        isLoaded: true,
       ));
     }
   }
 
   FutureOr<void> _sendToDB(
       SendtoDB event, Emitter<InsertstockState> emit) async {
-    List<ItemCards> data = (state as Loaded)
+    List<ItemCards> data = (state)
         .data
         .map((e) => e.copywith(
               namaBarang: e.namaBarang?.trim(),
               tempatBeli: e.tempatBeli?.trim(),
             ))
         .toList();
-    emit(Loaded(data: data));
+    emit(InsertstockState(data: data, isLoaded: true, isLoading: false));
     // var state =
     //             (BlocProvider.of<StockBloc>(context).state as StockLoaded);
     bool valids = data.isNotEmpty
         ? data.every((element) => element.formkey!.currentState!.validate())
         : false;
     if (valids) {
-      emit(Loading());
-      await Future.delayed(Duration(seconds: 1));
+      emit(InsertstockState(data: data, isLoaded: true, isLoading: true));
       try {
         await db.addItems(data);
+        await Future.delayed(Duration(milliseconds: 500));
         // yield StockInitial();
         // add(StockInitialize(success: true));
         add(Initiate(success: true));
       } catch (e) {
         // print(e);
-        emit(Loaded(data: data, success: false, msg: e.toString()));
+        emit(InsertstockState(
+            data: data,
+            isLoaded: true,
+            isLoading: false,
+            isSuccess: false,
+            msg: e.toString()));
         await Future.delayed(Duration(seconds: 12), () {
-          if (state is Loaded) {
-            emit((state as Loaded).clearMsg());
+          if (state.isLoaded) {
+            emit((state).clearMsg());
           }
         });
       }
@@ -71,42 +100,75 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState> {
   }
 
   FutureOr<void> _addCard(AddCard event, Emitter<InsertstockState> emit) {
-    var prev = (state as Loaded).data;
+    var prev = (state).data;
     var tambahDate =
         prev.isNotEmpty ? prev.last.ditambahkan : DateTime.now().toUtc();
-    emit(Loaded(
-      data: prev +
-          [
-            ItemCards(
-                cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
-                ditambahkan: tambahDate,
-                tempatBeli: '',
-                pcs: 1,
-                open: false)
-          ],
-    ));
+    var tempatBeli = prev.isNotEmpty ? prev.last.tempatBeli : '';
+    emit(InsertstockState(
+        data: prev +
+            [
+              ItemCards(
+                  cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
+                  ditambahkan: tambahDate,
+                  tempatBeli: tempatBeli,
+                  pcs: 1,
+                  open: false)
+            ],
+        isLoaded: true,
+        isLoading: false));
   }
 
   FutureOr<void> _removeCard(
       RemoveCard event, Emitter<InsertstockState> emit) async {
-    emit(Loaded(
-      data: (state as Loaded)
+    emit(InsertstockState(
+      data: (state)
           .data
           .map((e) => e.cardId == event.cardId ? e.copywith(open: false) : e)
           .toList(),
+      isLoaded: true,
+      isLoading: false,
     ));
     await Future.delayed(Duration(milliseconds: 260));
-    emit(Loaded(
-        data: (state as Loaded)
-            .data
-            .where((e) => e.cardId != event.cardId)
-            .toList()));
+    emit(InsertstockState(
+      data: (state).data.where((e) => e.cardId != event.cardId).toList(),
+      isLoaded: true,
+      isLoading: false,
+    ));
 
-    if ((state as Loaded).data.isEmpty) {
+    if ((state).data.isEmpty) {
       // yield InsertstockInitial();
       await Future.delayed(Duration(milliseconds: 100));
 
       add(Initiate());
     }
+  }
+
+  @override
+  InsertstockState? fromJson(Map<String, dynamic> json) {
+    print('you here?');
+    print('${json['state']['data']}');
+    print('end you here?');
+    return InsertstockState(
+        data: (json['state']['data'] as List)
+            .map((e) => ItemCards().fromJson(e))
+            .toList(),
+        isLoaded: true,
+        isLoading: false,
+        isSuccess: false);
+    // return (json['state']);
+  }
+
+  @override
+  Map<String, dynamic>? toJson(InsertstockState state) {
+    print(state.data.map((ItemCards e) {
+      return e.toJson();
+    }).toList());
+    return {
+      'state': {
+        'data': state.data.map((ItemCards e) {
+          return e.toJson();
+        }).toList(),
+      }
+    };
   }
 }

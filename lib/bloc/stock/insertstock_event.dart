@@ -9,7 +9,8 @@ abstract class InsertstockEvent extends Equatable {
 
 class Initiate extends InsertstockEvent {
   final bool? success;
-  Initiate({this.success});
+  final bool refresh;
+  Initiate({this.success, refresh}) : this.refresh = refresh ?? false;
 }
 
 class SendtoDB extends InsertstockEvent {

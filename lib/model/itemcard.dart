@@ -46,7 +46,7 @@ class ItemCards extends Equatable {
         open: open ?? this.open,
         namaBarang: namaBarang ?? this.namaBarang,
         formkey: formkey ?? this.formkey,
-        productId: productId!=null?productId():this.productId,
+        productId: productId != null ? productId() : this.productId,
         ditambahkan: ditambahkan ?? this.ditambahkan,
         hargaBeli: hargaBeli ?? this.hargaBeli,
         note: note ?? this.note,
@@ -91,6 +91,41 @@ class ItemCards extends Equatable {
     // return 'open : $open';
     // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
     // $pcs, $tempatBeli, $id, $expdate, $barcode,$productId}''';
+  }
+
+  ItemCards fromJson(Map<String, dynamic> json) {
+    print('ditambah' + json['ditambahkan'].toString());
+    return ItemCards(
+        barcode: json['barcode'],
+        open: json['open'],
+        namaBarang: json['namaBarang'],
+        // formkey: formkey ?? this.formkey,
+        productId: json['productId'],
+        ditambahkan: DateTime.tryParse(json['ditambahkan'].toString()),
+        hargaBeli: json['hargaBeli'],
+        hargaJual: json['hargaJual'],
+        pcs: json['pcs'],
+        tempatBeli: json['tempatBeli'],
+        cardId: json['cardId'],
+        note: json['note']
+        // id: json['id']
+        );
+  }
+
+  Map<String, dynamic>? toJson() {
+    return {
+      'barcode': this.barcode,
+      'open': this.open,
+      'namaBarang': this.namaBarang,
+      'productId': this.productId,
+      'cardId': this.cardId,
+      'pcs': this.pcs,
+      'hargaBeli': this.hargaBeli,
+      'hargaJual': this.hargaJual,
+      'tempatBeli': this.tempatBeli,
+      'ditambahkan': this.ditambahkan.toString(),
+      'note': this.note,
+    };
   }
 
   static ItemCards fromMap(Map data) {
