@@ -579,12 +579,16 @@ class $StockItemsTable extends StockItems
 class TempatBeli extends DataClass implements Insertable<TempatBeli> {
   final int id;
   final String nama;
-  const TempatBeli({required this.id, required this.nama});
+  final String? alamat;
+  const TempatBeli({required this.id, required this.nama, this.alamat});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nama'] = Variable<String>(nama);
+    if (!nullToAbsent || alamat != null) {
+      map['alamat'] = Variable<String>(alamat);
+    }
     return map;
   }
 
@@ -592,6 +596,8 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
     return TempatBelisCompanion(
       id: Value(id),
       nama: Value(nama),
+      alamat:
+          alamat == null && nullToAbsent ? const Value.absent() : Value(alamat),
     );
   }
 
@@ -601,6 +607,7 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
     return TempatBeli(
       id: serializer.fromJson<int>(json['id']),
       nama: serializer.fromJson<String>(json['nama']),
+      alamat: serializer.fromJson<String?>(json['alamat']),
     );
   }
   @override
@@ -609,55 +616,72 @@ class TempatBeli extends DataClass implements Insertable<TempatBeli> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'nama': serializer.toJson<String>(nama),
+      'alamat': serializer.toJson<String?>(alamat),
     };
   }
 
-  TempatBeli copyWith({int? id, String? nama}) => TempatBeli(
+  TempatBeli copyWith(
+          {int? id,
+          String? nama,
+          Value<String?> alamat = const Value.absent()}) =>
+      TempatBeli(
         id: id ?? this.id,
         nama: nama ?? this.nama,
+        alamat: alamat.present ? alamat.value : this.alamat,
       );
   @override
   String toString() {
     return (StringBuffer('TempatBeli(')
           ..write('id: $id, ')
-          ..write('nama: $nama')
+          ..write('nama: $nama, ')
+          ..write('alamat: $alamat')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nama);
+  int get hashCode => Object.hash(id, nama, alamat);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is TempatBeli && other.id == this.id && other.nama == this.nama);
+      (other is TempatBeli &&
+          other.id == this.id &&
+          other.nama == this.nama &&
+          other.alamat == this.alamat);
 }
 
 class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
   final Value<int> id;
   final Value<String> nama;
+  final Value<String?> alamat;
   const TempatBelisCompanion({
     this.id = const Value.absent(),
     this.nama = const Value.absent(),
+    this.alamat = const Value.absent(),
   });
   TempatBelisCompanion.insert({
     this.id = const Value.absent(),
     required String nama,
+    this.alamat = const Value.absent(),
   }) : nama = Value(nama);
   static Insertable<TempatBeli> custom({
     Expression<int>? id,
     Expression<String>? nama,
+    Expression<String>? alamat,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nama != null) 'nama': nama,
+      if (alamat != null) 'alamat': alamat,
     });
   }
 
-  TempatBelisCompanion copyWith({Value<int>? id, Value<String>? nama}) {
+  TempatBelisCompanion copyWith(
+      {Value<int>? id, Value<String>? nama, Value<String?>? alamat}) {
     return TempatBelisCompanion(
       id: id ?? this.id,
       nama: nama ?? this.nama,
+      alamat: alamat ?? this.alamat,
     );
   }
 
@@ -670,6 +694,9 @@ class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
     if (nama.present) {
       map['nama'] = Variable<String>(nama.value);
     }
+    if (alamat.present) {
+      map['alamat'] = Variable<String>(alamat.value);
+    }
     return map;
   }
 
@@ -677,7 +704,8 @@ class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
   String toString() {
     return (StringBuffer('TempatBelisCompanion(')
           ..write('id: $id, ')
-          ..write('nama: $nama')
+          ..write('nama: $nama, ')
+          ..write('alamat: $alamat')
           ..write(')'))
         .toString();
   }
@@ -701,8 +729,13 @@ class $TempatBelisTable extends TempatBelis
   late final GeneratedColumn<String> nama = GeneratedColumn<String>(
       'nama', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  final VerificationMeta _alamatMeta = const VerificationMeta('alamat');
   @override
-  List<GeneratedColumn> get $columns => [id, nama];
+  late final GeneratedColumn<String> alamat = GeneratedColumn<String>(
+      'alamat', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [id, nama, alamat];
   @override
   String get aliasedName => _alias ?? 'tempat_belis';
   @override
@@ -721,6 +754,10 @@ class $TempatBelisTable extends TempatBelis
     } else if (isInserting) {
       context.missing(_namaMeta);
     }
+    if (data.containsKey('alamat')) {
+      context.handle(_alamatMeta,
+          alamat.isAcceptableOrUnknown(data['alamat']!, _alamatMeta));
+    }
     return context;
   }
 
@@ -734,6 +771,8 @@ class $TempatBelisTable extends TempatBelis
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       nama: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
+      alamat: attachedDatabase.options.types
+          .read(DriftSqlType.string, data['${effectivePrefix}alamat']),
     );
   }
 

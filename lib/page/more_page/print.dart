@@ -8,6 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+enum Periodtime { monthly, yearly }
 
 class PrintAlert extends StatefulWidget {
   @override
@@ -31,7 +34,7 @@ class _PrintAlertState extends State<PrintAlert> {
     'Desember',
   ];
   var multivalue = 0;
-
+  var period = Periodtime.monthly;
   var selectedDateYear = DateTime.now().year;
 
   @override
@@ -113,12 +116,12 @@ class _PrintAlertState extends State<PrintAlert> {
           .cell(CellIndex.indexByColumnRow(
               columnIndex: 4, rowIndex: sheet.maxRows - 1))
           .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
-      if(i==data.length-1){
+      if (i == data.length - 1) {
         sheet.appendRow(
             ['', '', '', 'total hari ini :', numFormat.format(totalHarian)]);
         sheet
             .cell(CellIndex.indexByColumnRow(
-            columnIndex: 4, rowIndex: sheet.maxRows - 1))
+                columnIndex: 4, rowIndex: sheet.maxRows - 1))
             .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
       }
     }
@@ -281,33 +284,68 @@ class _PrintAlertState extends State<PrintAlert> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Print'),
+      title: Row(
+        children: [
+          Text('Print'),
+          Expanded(
+              child: DropdownButton(
+            alignment: Alignment.centerRight,
+            isExpanded: true,
+            value: period,
+            onChanged: (Periodtime? value) {
+              if (value != null) {
+                setState(() {
+                  period = value;
+                });
+              }
+            },
+            items: [
+              DropdownMenuItem(
+                alignment: Alignment.centerRight,
+                child: Text('Monthly'),
+                value: Periodtime.monthly,
+              ),
+              DropdownMenuItem(
+                alignment: Alignment.centerRight,
+                child: Text('Yearly'),
+                value: Periodtime.yearly,
+              ),
+            ],
+          ))
+        ],
+      ),
       actionsPadding: EdgeInsets.all(8.0),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Text('Month'),
-              Padding(padding: EdgeInsets.all(12.0)),
-              Expanded(
-                child: DropdownButton<int>(
-                  isExpanded: true,
-                  onChanged: (val) {
-                    setState(() {
-                      multivalue = val!;
-                    });
-                  },
-                  items: [
-                    for (int i = 0; i < 12; i++)
-                      DropdownMenuItem(
-                          child: Text(dataBulan[i].toString()), value: i)
-                  ],
-                  value: multivalue,
+          if (period == Periodtime.yearly)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text('Starts from January'),
+            ),
+          if (period == Periodtime.monthly)
+            Row(
+              children: [
+                Text('Month'),
+                Padding(padding: EdgeInsets.all(12.0)),
+                Expanded(
+                  child: DropdownButton<int>(
+                    isExpanded: true,
+                    onChanged: (val) {
+                      setState(() {
+                        multivalue = val!;
+                      });
+                    },
+                    items: [
+                      for (int i = 0; i < 12; i++)
+                        DropdownMenuItem(
+                            child: Text(dataBulan[i].toString()), value: i)
+                    ],
+                    value: multivalue,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           Row(
             children: [
               Text('Year'),
@@ -354,9 +392,21 @@ class _PrintAlertState extends State<PrintAlert> {
                   future: getApplicationDocumentsDirectory(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      return Text(
-                        'file saved at: ${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}.csv',
-                        textScaleFactor: 0.7,
+                      return InkWell(
+                        onTap: () async {
+                          Process.run('explorer.exe ', [
+                            '/select,',
+                            '${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}${selectedDateYear}.xlsx',
+                          ]);
+                          // var a = await launchUrl(Uri.parse(
+                          //     'file:///${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}.csv'));
+                          // print(a);
+                        },
+                        child: Text(
+                          'file saved at:\n${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}${selectedDateYear}.xlsx',
+                          textScaleFactor: 0.79,
+                          style: TextStyle(color: Colors.blue),
+                        ),
                       );
                     }
                     return Container();
@@ -376,7 +426,15 @@ class _PrintAlertState extends State<PrintAlert> {
               child: Text('Open Directory')),
         TextButton(
             onPressed: () async {
-              convert(context);
+              switch (period) {
+                case Periodtime.monthly:
+                  convert(context);
+                  break;
+                case Periodtime.yearly:
+                  throw UnimplementedError();
+                // break;
+                default:
+              }
             },
             child: Text('Print'))
       ],

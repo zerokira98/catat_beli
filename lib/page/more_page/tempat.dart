@@ -50,8 +50,10 @@ class _TempatEditState extends State<TempatEdit> {
 class FormTempatEdit extends StatelessWidget {
   final TempatBeli tempatBeli;
   final TextEditingController namaController;
+  final TextEditingController alamatController;
   FormTempatEdit(this.tempatBeli, {Key? key})
       : namaController = TextEditingController(text: tempatBeli.nama),
+        alamatController = TextEditingController(text: tempatBeli.alamat ?? ''),
         // : this.tempatBeli = tempatBeli,
         super(key: key);
   final formKey = GlobalKey<FormState>();
@@ -83,6 +85,19 @@ class FormTempatEdit extends StatelessWidget {
                         },
                         controller: namaController,
                         decoration: InputDecoration(label: Text('Nama Tempat')),
+                      ),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null) {
+                            return "Can't be empty";
+                          }
+                          if (value.length < 2) {
+                            return "At least 3 char";
+                          }
+                          return null;
+                        },
+                        controller: alamatController,
+                        decoration: InputDecoration(label: Text('Alamat')),
                       )
                     ],
                   ),
@@ -91,13 +106,17 @@ class FormTempatEdit extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.all(8.0),
               ),
-              CupertinoButton(
+              ElevatedButton(
                   child: Text('Save'),
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       print('here');
                       await RepositoryProvider.of<MyDatabase>(context)
-                          .updateNamaTempat(tempatBeli.id, namaController.text);
+                          .updateNamaTempat(
+                        tempatBeli.id,
+                        namaController.text,
+                        alamatController.text,
+                      );
                       print('here' + namaController.text);
                       Navigator.pop(context);
                     } else {

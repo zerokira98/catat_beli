@@ -73,7 +73,7 @@ class SideDrawer extends StatelessWidget {
               Navigator.push(context,
                   CupertinoPageRoute(builder: (context) => ListOfItems()));
             },
-            title: Text('Ganti deskripsi produk'),
+            title: Text('Ganti Nama Barang'),
           ),
           ListTile(
             trailing: Icon(Icons.edit),

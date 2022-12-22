@@ -30,6 +30,7 @@ class StockItems extends Table {
 class TempatBelis extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get nama => text()();
+  TextColumn get alamat => text().nullable()();
 }
 
 class StockWithDetails {
@@ -60,7 +61,7 @@ LazyDatabase _openConnection() {
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
@@ -69,6 +70,9 @@ class MyDatabase extends _$MyDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.addColumn(stocks, stocks.note);
+          }
+          if (from < 3) {
+            await m.addColumn(tempatBelis, tempatBelis.alamat);
           }
         },
         beforeOpen: (d) async {
@@ -281,9 +285,11 @@ class MyDatabase extends _$MyDatabase {
   //   return into(tempatBelis).insert(TempatBelisCompanion(nama: Value('TOP')));
   // }
 
-  Future updateNamaTempat(int id, String nama) async {
-    return (update(tempatBelis)..where((tbl) => tbl.id.equals(id)))
-        .write(TempatBelisCompanion(nama: Value(nama)));
+  Future updateNamaTempat(int id, String nama, String? alamat) async {
+    return (update(tempatBelis)..where((tbl) => tbl.id.equals(id))).write(
+        TempatBelisCompanion(
+            nama: Value(nama),
+            alamat: alamat != null ? Value(alamat) : Value.absent()));
   }
 
   Future updateItemProp(
