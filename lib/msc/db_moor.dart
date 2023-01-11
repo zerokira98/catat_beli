@@ -232,13 +232,14 @@ class MyDatabase extends _$MyDatabase {
 
         if (data.productId == null) {
           List<StockItem> a = await (select(stockItems)
-                ..where((tbl) => tbl.nama.equals(data.namaBarang!)))
+                ..where((tbl) => tbl.nama.equals(data.namaBarang.value)))
               .get();
           if (a.isEmpty) {
             itemId = await into(stockItems).insert(StockItemsCompanion(
-              nama: Value(data.namaBarang!),
-              barcode:
-                  data.barcode != null ? Value(data.barcode) : Value.absent(),
+              nama: Value(data.namaBarang.value),
+              barcode: data.barcode.value != 0
+                  ? Value(data.barcode.value)
+                  : Value.absent(),
             ));
           } else {
             itemId = a.single.id;
@@ -246,11 +247,11 @@ class MyDatabase extends _$MyDatabase {
         }
         //---------get tempat id
         var aa = await (select(tempatBelis)
-              ..where((tbl) => tbl.nama.equals(data.tempatBeli ?? '')))
+              ..where((tbl) => tbl.nama.equals(data.tempatBeli.value)))
             .get();
         if (aa.isEmpty) {
           tempatId = await into(tempatBelis)
-              .insert(TempatBelisCompanion(nama: Value(data.tempatBeli!)));
+              .insert(TempatBelisCompanion(nama: Value(data.tempatBeli.value)));
         } else {
           tempatId = aa.single.id;
         }
@@ -258,8 +259,8 @@ class MyDatabase extends _$MyDatabase {
           idItem: Value(itemId),
           note: Value(data.note),
           idSupplier: Value(tempatId),
-          price: Value(data.hargaBeli!),
-          qty: Value(data.pcs!),
+          price: Value(data.hargaBeli.value),
+          qty: Value(data.pcs.value),
           dateAdd: Value(data.ditambahkan),
         ));
       }
@@ -305,7 +306,7 @@ class MyDatabase extends _$MyDatabase {
     return await (update(stocks)..where((tbl) => tbl.id.equals(a.cardId!)))
         .write(StocksCompanion(
             dateAdd: Value(a.ditambahkan),
-            price: Value(a.hargaBeli!),
-            qty: Value(a.pcs!)));
+            price: Value(a.hargaBeli.value),
+            qty: Value(a.pcs.value)));
   }
 }

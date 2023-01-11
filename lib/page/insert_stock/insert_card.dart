@@ -5,7 +5,8 @@ class InsertProductCard extends StatefulWidget {
   Key get key => _key;
   final Key _key;
   final ItemCards data;
-  InsertProductCard(this.data, this._key);
+  final ScrollController scrollc;
+  InsertProductCard(this.data, this._key, this.scrollc);
   @override
   _InsertProductCardState createState() => _InsertProductCardState();
 }
@@ -26,7 +27,6 @@ class _InsertProductCardState extends State<InsertProductCard>
   FocusNode fsn1 = FocusNode();
   FocusNode fsn2 = FocusNode();
   DateFormat dateFormat = DateFormat('d/MM/y');
-  bool wascreated = false;
   @override
   void dispose() {
     // sbc.close();
@@ -47,15 +47,19 @@ class _InsertProductCardState extends State<InsertProductCard>
   void initState() {
     // hargaBeli = ;
     if (mounted) {
-      if (!wascreated) {
-        fsn1.addListener(fsn1Listener);
-        fsn2.addListener(fsn2Listener);
+      print(widget.data.created);
+      fsn1.addListener(fsn1Listener);
+      fsn2.addListener(fsn2Listener);
+      if (widget.data.created == false) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted)
-            BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                widget.data.copywith(formkey: _formkey, open: true)));
+            BlocProvider.of<InsertstockBloc>(context).add(
+                DataChange(widget.data.copywith(open: true, created: true)));
+          // Future.delayed(Duration(milliseconds: 400), () {
+          //   widget.scrollc.animateTo(widget.scrollc.position.maxScrollExtent,
+          //       duration: Duration(milliseconds: 450), curve: Curves.easeInOut);
+          // });
         });
-        wascreated = true;
       }
     }
 
@@ -76,28 +80,81 @@ class _InsertProductCardState extends State<InsertProductCard>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.data.namaBarang != namec.text) {
-      namec.text = widget.data.namaBarang ?? '';
+    String? namabarangError() {
+      switch (widget.data.namaBarang.error) {
+        case NamaBarangValidationError.empty:
+          return 'Empty';
+        case NamaBarangValidationError.atleast3:
+          return '3 or more char';
+        default:
+          null;
+      }
+    }
+
+    String? pcsError() {
+      switch (widget.data.pcs.error) {
+        case PcsValidationError.empty:
+          return "can't be a 0";
+        case PcsValidationError.negative:
+          return "Negative value";
+        default:
+          null;
+      }
+    }
+
+    String? hargabeliError() {
+      // return widget.data.hargaBeli.invalid ? 'invalid' : null;
+      switch (widget.data.hargaBeli.error) {
+        case HargabeliValidationError.empty:
+          return "Empty";
+        case HargabeliValidationError.negative:
+          return "cant negative";
+        // case HargabeliValidationError.toosmall:
+        //   return "sus, toosmall";
+        default:
+          null;
+      }
+    }
+
+    String? barcodeError() {
+      switch (widget.data.barcode.error) {
+        case BarcodeValidationError.negative:
+          return "Negative";
+        default:
+          null;
+      }
+    }
+
+    if (widget.data.namaBarang.value != namec.text) {
+      namec.text = widget.data.namaBarang.value;
       if (namec.text.length == 1) {
         namec.selection =
             TextSelection.fromPosition(TextPosition(offset: namec.text.length));
       }
     }
-    if (widget.data.tempatBeli != placec.text) {
-      placec.text = widget.data.tempatBeli ?? '';
+    if (widget.data.tempatBeli.value != placec.text) {
+      placec.text = widget.data.tempatBeli.value;
     }
-    if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
-      hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+    if (widget.data.hargaBeli.value.toString() != hargaBeli.text) {
+      hargaBeli.text = widget.data.hargaBeli.value.toString();
       if (hargaBeli.text.length == 1) {
         hargaBeli.selection = TextSelection.fromPosition(
             TextPosition(offset: hargaBeli.text.length));
       }
     }
-    if (widget.data.barcode?.toString() != barcodeC.text) {
-      barcodeC.text = widget.data.barcode?.toString() ?? '';
+    if (widget.data.barcode.value.toString() != barcodeC.text) {
+      if (widget.data.barcode.value.toString() == '0') {
+        barcodeC.text = '';
+      }
+      // else if (int.tryParse(barcodeC.text) == null) {
+      //   barcodeC.text = '';
+      // }
+      else {
+        barcodeC.text = widget.data.barcode.value.toString();
+      }
     }
-    if (widget.data.pcs?.toString() != qtyc.text) {
-      qtyc.text = widget.data.pcs?.toString() ?? '';
+    if (widget.data.pcs.value.toString() != qtyc.text) {
+      qtyc.text = widget.data.pcs.value.toString();
       qtyc.selection = TextSelection.fromPosition(
           TextPosition(offset: qtyc.text.indexOf('.')));
     }
@@ -116,7 +173,7 @@ class _InsertProductCardState extends State<InsertProductCard>
     Widget bottom = Row(
       children: [
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Padding(
             padding: const EdgeInsets.all(4.0),
             child: TextFormField(
@@ -145,12 +202,13 @@ class _InsertProductCardState extends State<InsertProductCard>
                 var doublePcs = double.tryParse(qtyc.text.trim());
                 // print(doublePcs);
                 if (doublePcs != null)
-                  BlocProvider.of<InsertstockBloc>(context)
-                      .add(DataChange(widget.data.copywith(pcs: doublePcs)));
+                  BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                      widget.data.copywith(pcs: Pcs.dirty(doublePcs))));
                 // FocusScope.of(context).
               },
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
+                errorText: pcsError(),
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 label: AutoSizeText(
                   'jumlah unit',
@@ -162,63 +220,48 @@ class _InsertProductCardState extends State<InsertProductCard>
           ),
         ),
         Expanded(
-          flex: 2,
-          child: TextFormField(
-            onEditingComplete: () => FocusScope.of(context).unfocus(),
-            controller: barcodeC,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (a) {
-              if (a != null && a.isNotEmpty) {
-                if (int.tryParse(a) == null) {
-                  print('hey');
-                  return 'invalid barcode';
-                }
-              }
-              return null;
-            },
-            onChanged: (a) {
-              BlocProvider.of<InsertstockBloc>(context).add(
-                  DataChange(widget.data.copywith(barcode: int.tryParse(a))));
-            },
-            decoration: InputDecoration(
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                labelText: 'barcode',
-                suffixIcon: FutureBuilder<List>(
-                    future: Platform.isAndroid || Platform.isIOS
-                        ? availableCameras()
-                        : Future.value([]),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.isEmpty) {
-                          return SizedBox();
-                        } else {
-                          return InkWell(
-                              canRequestFocus: false,
-                              onTap: () async {
-                                String barcodeScan =
-                                    await FlutterBarcodeScanner.scanBarcode(
-                                        '#ffffff',
-                                        'Batal',
-                                        true,
-                                        ScanMode.BARCODE);
-                                // print(barcodeScan);
-                                if (barcodeScan != '-1') {
-                                  barcodeC.text = barcodeScan.trim();
-                                  BlocProvider.of<InsertstockBloc>(context)
-                                      .add(DataChange(widget.data.copywith(
-                                    barcode: int.tryParse(barcodeScan.trim()),
-                                  )));
-                                }
-                              },
-                              child: Icon(Icons.qr_code));
-                        }
-                      }
-                      return SizedBox();
-                    })),
-          ),
-        ),
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
+                    final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        initialDatePickerMode: DatePickerMode.day,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2101));
+                    if (picked != null) {
+                      // datec.text = picked.toString().substring(0, 19);
+                      print(picked.toString());
+                      BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                          widget.data.copywith(ditambahkan: picked)));
+                    }
+                  },
+                  child: TextField(
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                    controller: datec,
+                    enabled: false,
+                    onTap: () async {
+                      FocusScope.of(context).unfocus();
+                    },
+                    keyboardType: TextInputType.datetime,
+                    decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+
+                      label: AutoSizeText('Tanggal Beli'),
+                      // labelText: 'Buy date',
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            )),
         Expanded(
-          flex: 2,
+          flex: 6,
           child: TypeAheadFormField(
               textFieldConfiguration: TextFieldConfiguration(
                 focusNode: fsn2,
@@ -226,7 +269,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                 controller: placec,
                 onChanged: (v) {
                   BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                      widget.data.copywith(tempatBeli: placec.text)));
+                      widget.data.copywith(
+                          tempatBeli: Tempatbeli.dirty(placec.text))));
                 },
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
@@ -234,7 +278,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                       onTap: () {
                         BlocProvider.of<InsertstockBloc>(context)
                             .add(DataChange(widget.data.copywith(
-                          tempatBeli: '',
+                          tempatBeli: Tempatbeli.pure(),
                         )));
                       },
                       child: Icon(Icons.close_rounded)),
@@ -244,8 +288,9 @@ class _InsertProductCardState extends State<InsertProductCard>
                 ),
               ),
               onSuggestionSelected: (TempatBeli val) {
-                BlocProvider.of<InsertstockBloc>(context).add(
-                    DataChange(widget.data.copywith(tempatBeli: val.nama)));
+                BlocProvider.of<InsertstockBloc>(context).add(DataChange(widget
+                    .data
+                    .copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
               },
               itemBuilder: (context, TempatBeli datas) {
                 return ListTile(
@@ -298,12 +343,12 @@ class _InsertProductCardState extends State<InsertProductCard>
                         child: TypeAheadFormField(
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           // autovalidate: ,
-                          validator: (text) {
-                            if (text!.length <= 2) {
-                              return '3 or more character';
-                            }
-                            return null;
-                          },
+                          // validator: (text) {
+                          //   if (text!.length <= 2) {
+                          //     return '3 or more character';
+                          //   }
+                          //   return null;
+                          // },
                           suggestionsBoxController: sbc,
                           textFieldConfiguration: TextFieldConfiguration(
                               maxLines: 2,
@@ -320,7 +365,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 }
                                 BlocProvider.of<InsertstockBloc>(context)
                                     .add(DataChange(widget.data.copywith(
-                                  namaBarang: nv,
+                                  namaBarang: NamaBarang.dirty(nv),
                                   productId: () => null,
                                 )));
                               },
@@ -328,6 +373,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                   .style
                                   .copyWith(fontStyle: FontStyle.italic),
                               decoration: InputDecoration(
+                                  errorText: namabarangError(),
                                   border: OutlineInputBorder(),
                                   labelText: 'Nama item')),
                           suggestionsCallback: (pattern) async {
@@ -359,11 +405,12 @@ class _InsertProductCardState extends State<InsertProductCard>
                                     .tempatwithid(res1.last.idSupplier!);
                             BlocProvider.of<InsertstockBloc>(context)
                                 .add(DataChange(widget.data.copywith(
-                              namaBarang: suggestion.nama,
+                              namaBarang: NamaBarang.dirty(suggestion.nama),
                               productId: () => suggestion.id,
-                              hargaBeli: res1.isNotEmpty ? res1.last.price : 0,
-                              tempatBeli: tempat.single.nama,
-                              barcode: suggestion.barcode,
+                              hargaBeli: Hargabeli.dirty(
+                                  res1.isNotEmpty ? res1.last.price : 0),
+                              tempatBeli: Tempatbeli.dirty(tempat.single.nama),
+                              barcode: Barcode.dirty(suggestion.barcode ?? 0),
                               // hargaJual: suggestion,
                             )));
                           },
@@ -378,7 +425,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 Row(
                   children: [
                     Expanded(
-                        flex: 2,
+                        flex: 4,
                         child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: TextFormField(
@@ -386,29 +433,19 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 FocusScope.of(context).unfocus(),
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            validator: (text) {
-                              if (text!.isNotEmpty &&
-                                  RegExp(r'^[0]*$').hasMatch(text)) {
-                                return "can't zero";
-                              }
-                              if (text.isNotEmpty &&
-                                  !RegExp(r'^[0-9]*$').hasMatch(text)) {
-                                return 'must be a number';
-                              } else if (text.isEmpty) {
-                                return 'tidak boleh kosong';
-                              }
-                              return null;
-                            },
+                            // validator: (text) {},
                             onChanged: (v) {
                               print('test');
                               BlocProvider.of<InsertstockBloc>(context)
                                   .add(DataChange(widget.data.copywith(
-                                hargaBeli: int.tryParse(hargaBeli.text) ?? 0,
+                                hargaBeli: Hargabeli.dirty(
+                                    int.tryParse(hargaBeli.text) ?? 0),
                               )));
                             },
                             controller: hargaBeli,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
+                                errorText: hargabeliError(),
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
                                 // labelText: 'Harga beli ',
@@ -417,55 +454,85 @@ class _InsertProductCardState extends State<InsertProductCard>
                                     onTap: () {
                                       BlocProvider.of<InsertstockBloc>(context)
                                           .add(DataChange(widget.data.copywith(
-                                        hargaBeli: 0,
+                                        hargaBeli: Hargabeli.dirty(0),
                                       )));
                                     },
                                     child: Icon(Icons.close_rounded))),
                           ),
                         )),
                     Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () async {
-                            FocusScope.of(context).unfocus();
-                            final DateTime? picked = await showDatePicker(
-                                context: context,
-                                initialDate: selectedDate,
-                                initialDatePickerMode: DatePickerMode.day,
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2101));
-                            if (picked != null) {
-                              // datec.text = picked.toString().substring(0, 19);
-                              print(picked.toString());
-                              BlocProvider.of<InsertstockBloc>(context).add(
-                                  DataChange(widget.data
-                                      .copywith(ditambahkan: picked)));
-                            }
-                          },
-                          child: TextField(
-                            onEditingComplete: () =>
-                                FocusScope.of(context).unfocus(),
-                            controller: datec,
-                            enabled: false,
-                            onTap: () async {
-                              FocusScope.of(context).unfocus();
-                            },
-                            keyboardType: TextInputType.datetime,
-                            decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-
-                              label: AutoSizeText('Tanggal Beli'),
-                              // labelText: 'Buy date',
-                              fillColor: Colors.white,
-                            ),
-                          ),
-                        ),
+                      flex: 5,
+                      child: TextFormField(
+                        keyboardType: TextInputType.number,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).unfocus(),
+                        controller: barcodeC,
+                        // autovalidateMode: AutovalidateMode.onUserInteraction,
+                        // validator: (a) {
+                        //   if (a != null && a.isNotEmpty) {
+                        //     if (int.tryParse(a) == null) {
+                        //       print('hey');
+                        //       return 'invalid barcode';
+                        //     }
+                        //   }
+                        //   return null;
+                        // },
+                        onChanged: (a) {
+                          if (int.tryParse(a) == null) {
+                            print('helo$a');
+                            barcodeC.clear();
+                            return;
+                          }
+                          BlocProvider.of<InsertstockBloc>(context).add(
+                              DataChange(widget.data.copywith(
+                                  barcode:
+                                      Barcode.dirty(int.tryParse(a) ?? 0))));
+                        },
+                        decoration: InputDecoration(
+                            errorText: barcodeError(),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelText: 'barcode',
+                            suffixIcon: FutureBuilder<List>(
+                                future: Platform.isAndroid || Platform.isIOS
+                                    ? availableCameras()
+                                    : Future.value([]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data!.isEmpty) {
+                                      return SizedBox();
+                                    } else {
+                                      return InkWell(
+                                          canRequestFocus: false,
+                                          onTap: () async {
+                                            String barcodeScan =
+                                                await FlutterBarcodeScanner
+                                                    .scanBarcode(
+                                                        '#ffffff',
+                                                        'Batal',
+                                                        true,
+                                                        ScanMode.BARCODE);
+                                            // print(barcodeScan);
+                                            if (barcodeScan != '-1') {
+                                              barcodeC.text =
+                                                  barcodeScan.trim();
+                                              BlocProvider.of<InsertstockBloc>(
+                                                      context)
+                                                  .add(DataChange(
+                                                      widget.data.copywith(
+                                                barcode: Barcode.dirty(
+                                                    int.tryParse(barcodeScan
+                                                            .trim()) ??
+                                                        0),
+                                              )));
+                                            }
+                                          },
+                                          child: Icon(Icons.qr_code));
+                                    }
+                                  }
+                                  return SizedBox();
+                                })),
                       ),
-                    )),
+                    ),
                     if (MediaQuery.of(context).orientation ==
                         Orientation.landscape)
                       Expanded(flex: 3, child: bottom)
@@ -537,16 +604,13 @@ class _InsertProductCardState extends State<InsertProductCard>
       ),
     );
 
-    return AnimatedContainer(
+    return AnimatedClipRect(
+      curve: Curves.ease,
+      reverseCurve: Curves.ease,
       duration: Duration(milliseconds: 260),
-      child: AnimatedClipRect(
-        curve: Curves.ease,
-        reverseCurve: Curves.ease,
-        duration: Duration(milliseconds: 260),
-        horizontalAnimation: false,
-        open: widget.data.open,
-        child: theForm,
-      ),
+      horizontalAnimation: false,
+      open: widget.data.open,
+      child: theForm,
     );
   }
 }

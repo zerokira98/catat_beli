@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
@@ -51,12 +52,12 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           return ItemCards(
             note: e.stock.note,
             ditambahkan: e.stock.dateAdd,
-            namaBarang: e.item.nama,
+            namaBarang: NamaBarang.dirty(e.item.nama),
             cardId: e.stock.id,
-            pcs: e.stock.qty,
+            pcs: Pcs.dirty(e.stock.qty),
             productId: e.item.id,
-            tempatBeli: e.tempatBeli.nama,
-            hargaBeli: e.stock.price,
+            tempatBeli: Tempatbeli.dirty(e.tempatBeli.nama),
+            hargaBeli: Hargabeli.dirty(e.stock.price),
           );
         }).toList()));
   }
@@ -84,12 +85,12 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           .map((e) => ItemCards(
                 note: e.stock.note,
                 ditambahkan: e.stock.dateAdd,
-                namaBarang: e.item.nama,
+                namaBarang: NamaBarang.dirty(e.item.nama),
                 cardId: e.stock.id,
-                pcs: e.stock.qty,
+                pcs: Pcs.dirty(e.stock.qty),
                 productId: e.item.id,
-                tempatBeli: e.tempatBeli.nama,
-                hargaBeli: e.stock.price,
+                tempatBeli: Tempatbeli.dirty(e.tempatBeli.nama),
+                hargaBeli: Hargabeli.dirty(e.stock.price),
               ))
           .toList(),
     ));

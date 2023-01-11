@@ -20,10 +20,11 @@ class _StockviewCardState extends State<StockviewCard> {
   Widget build(BuildContext context) {
     // var telo = widget.data.note;
     // print('note:$telo');
-    var hargaBeli = numFormat.format(widget.data.hargaBeli);
+    var hargaBeli = numFormat.format(widget.data.hargaBeli.value);
     // var hargaJual = numFormat.format(widget.data.hargaJual);
     // print(widget.data.pcs);
-    var totalBeli = numFormat.format(widget.data.pcs! * widget.data.hargaBeli!);
+    var totalBeli =
+        numFormat.format(widget.data.pcs.value * widget.data.hargaBeli.value);
     // print('tempat:' + (widget.data.tempatBeli ?? ''));
     // return Container();
     return GestureDetector(
@@ -280,7 +281,7 @@ class _StockviewCardState extends State<StockviewCard> {
                   children: [
                     Expanded(
                         child: AutoSizeText(
-                      widget.data.namaBarang.toString(),
+                      widget.data.namaBarang.value.toString(),
                       minFontSize: 12,
                       style: TextStyle(height: 0),
                       maxLines: 2,
@@ -293,7 +294,7 @@ class _StockviewCardState extends State<StockviewCard> {
                       ),
                     ),
                     // Expanded(child: Container()),
-                    Text('Total : ${widget.data.pcs}'),
+                    Text('Total : ${widget.data.pcs.value}'),
                   ],
                 ),
                 subtitle: Column(
@@ -306,7 +307,7 @@ class _StockviewCardState extends State<StockviewCard> {
                         Expanded(
                           flex: 3,
                           child: AutoSizeText(
-                            '${widget.data.tempatBeli}',
+                            '${widget.data.tempatBeli.value}',
                             maxLines: 1,
                           ),
                         ),

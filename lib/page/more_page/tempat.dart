@@ -97,7 +97,8 @@ class FormTempatEdit extends StatelessWidget {
                           return null;
                         },
                         controller: alamatController,
-                        decoration: InputDecoration(label: Text('Alamat')),
+                        decoration:
+                            InputDecoration(label: Text('Alamat/Deskripsi')),
                       )
                     ],
                   ),

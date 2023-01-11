@@ -1,51 +1,55 @@
+import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+import 'package:formz/formz.dart';
+// import 'itemcard_formz.dart';
 
-class ItemCards extends Equatable {
-  final String? namaBarang;
-  final int? hargaBeli;
+class ItemCards extends Equatable with FormzMixin {
+  final NamaBarang namaBarang;
+  final Hargabeli hargaBeli;
   final int? hargaJual;
-  final double? pcs;
-  final GlobalKey<FormState>? formkey;
+  final Pcs pcs;
   final int? productId;
   final int? cardId; //~??????
   final String? note;
-  final String? tempatBeli;
-  final int? barcode;
+  final Tempatbeli tempatBeli;
+  final Barcode barcode;
   final bool? open;
+  final bool? created;
   final DateTime? ditambahkan;
 
-  ItemCards(
-      {this.namaBarang,
-      this.hargaBeli,
+  const ItemCards(
+      {this.namaBarang = const NamaBarang.pure(),
+      this.hargaBeli = const Hargabeli.pure(),
       this.productId,
       this.hargaJual,
-      this.pcs,
+      this.pcs = const Pcs.pure(),
+      this.created,
       this.note,
-      this.formkey,
-      this.barcode,
-      this.tempatBeli,
+      this.barcode = const Barcode.pure(),
+      this.tempatBeli = const Tempatbeli.pure(),
       this.open,
       this.ditambahkan,
       this.cardId});
   ItemCards copywith(
-      {String? namaBarang,
-      int? hargaBeli,
+      {NamaBarang? namaBarang,
+      Hargabeli? hargaBeli,
       int? hargaJual,
-      double? pcs,
-      String? tempatBeli,
+      Pcs? pcs,
+      Tempatbeli? tempatBeli,
       int? Function()? productId,
       bool? open,
+      bool? created,
       String? note,
-      GlobalKey<FormState>? formkey,
-      int? barcode,
+      // GlobalKey<FormState>? formkey,
+      Barcode? barcode,
       DateTime? ditambahkan,
       int? id}) {
     return ItemCards(
         barcode: barcode ?? this.barcode,
         open: open ?? this.open,
+        created: created ?? this.created,
         namaBarang: namaBarang ?? this.namaBarang,
-        formkey: formkey ?? this.formkey,
         productId: productId != null ? productId() : this.productId,
         ditambahkan: ditambahkan ?? this.ditambahkan,
         hargaBeli: hargaBeli ?? this.hargaBeli,
@@ -66,10 +70,10 @@ class ItemCards extends Equatable {
         cardId,
         note,
         open,
+        // created,
         barcode,
         productId,
         ditambahkan,
-        formkey
       ];
 
   @override
@@ -83,10 +87,10 @@ class ItemCards extends Equatable {
       tempatBeli,
       cardId,
       open,
+      created,
       barcode,
       productId,
       ditambahkan,
-      formkey
     ].toString();
     // return 'open : $open';
     // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
@@ -98,14 +102,15 @@ class ItemCards extends Equatable {
     return ItemCards(
         barcode: json['barcode'],
         open: json['open'],
-        namaBarang: json['namaBarang'],
+        namaBarang: NamaBarang.dirty(json['namaBarang']),
+        created: true,
         // formkey: formkey ?? this.formkey,
         productId: json['productId'],
         ditambahkan: DateTime.tryParse(json['ditambahkan'].toString()),
-        hargaBeli: json['hargaBeli'],
+        hargaBeli: Hargabeli.dirty(json['hargaBeli']),
         hargaJual: json['hargaJual'],
-        pcs: json['pcs'],
-        tempatBeli: json['tempatBeli'],
+        pcs: Pcs.dirty(json['pcs']),
+        tempatBeli: Tempatbeli.dirty(json['tempatBeli']),
         cardId: json['cardId'],
         note: json['note']
         // id: json['id']
@@ -114,15 +119,16 @@ class ItemCards extends Equatable {
 
   Map<String, dynamic>? toJson() {
     return {
-      'barcode': this.barcode,
+      'barcode': this.barcode.value,
       'open': this.open,
-      'namaBarang': this.namaBarang,
+      'created': true,
+      'namaBarang': this.namaBarang.value,
       'productId': this.productId,
       'cardId': this.cardId,
-      'pcs': this.pcs,
-      'hargaBeli': this.hargaBeli,
+      'pcs': this.pcs.value,
+      'hargaBeli': this.hargaBeli.value,
       'hargaJual': this.hargaJual,
-      'tempatBeli': this.tempatBeli,
+      'tempatBeli': this.tempatBeli.value,
       'ditambahkan': this.ditambahkan.toString(),
       'note': this.note,
     };
@@ -143,4 +149,9 @@ class ItemCards extends Equatable {
       // id: data['id']
     );
   }
+
+  @override
+  // TODO: implement inputs
+  List<FormzInput> get inputs =>
+      [namaBarang, hargaBeli, pcs, tempatBeli, barcode];
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
+import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -128,16 +129,20 @@ class _InsertProductPageState extends State<InsertProductPage> {
                     ));
                   } else {
                     if (state.msg != null && state.msg!.isNotEmpty)
-                      showGeneralDialog(
-                          context: context,
-                          pageBuilder: (context, a1, a2) {
-                            return Dialog(
-                              child: Text(state.msg!),
-                            );
-                          });
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: const Text('Terjadi kesalahan'),
-                    ));
+                      // showDialog(
+                      //     context: context,
+                      //     builder: (context) {
+                      //       return AlertDialog(
+                      //         // insetPadding: EdgeInsets.all(12),
+                      //         // children: [
+                      //         //   Text(state.msg!),
+                      //         // ],
+                      //         content: Text(state.msg!),
+                      //       );
+                      //     });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Terjadi kesalahan:${state.msg!}'),
+                      ));
                   }
                 }
               }
@@ -180,13 +185,27 @@ class _InsertProductPageState extends State<InsertProductPage> {
                             itemCount: state.data.length,
                             controller: scrollc,
                             itemBuilder: (context, i) => Row(children: [
-                              Text(
-                                '${i + 1}',
-                                style: TextStyle(color: Colors.white),
+                              Column(
+                                children: [
+                                  Text(
+                                    '${i + 1}',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  Text(
+                                    '-',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: i % 2 == 0
+                                            ? Colors.blue
+                                            : Colors.yellow),
+                                  )
+                                ],
                               ),
                               Expanded(
-                                child: InsertProductCard(state.data[i],
-                                    Key(state.data[i].cardId.toString())),
+                                child: InsertProductCard(
+                                    state.data[i],
+                                    Key(state.data[i].cardId.toString()),
+                                    scrollc),
                               )
                             ]),
                           ),
@@ -225,21 +244,18 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                           .add(AddCard());
                                       FocusScope.of(context).unfocus();
                                       await Future.delayed(
-                                          Duration(milliseconds: 420), () {});
-                                      if (scrollc.position.maxScrollExtent -
-                                              scrollc.offset <=
-                                          280) {
-                                        print('here');
-                                        scrollc.animateTo(
-                                            scrollc.position.maxScrollExtent,
-                                            duration:
-                                                Duration(milliseconds: 180),
-                                            curve: Curves.ease);
-                                      } else {
-                                        print('here 2');
-                                        scrollc.jumpTo(
-                                            scrollc.position.maxScrollExtent);
-                                      }
+                                          Duration(milliseconds: 460), () {});
+                                      var seconds = 500;
+
+                                      await scrollc.animateTo(
+                                          scrollc.position.maxScrollExtent,
+                                          duration: Duration(
+                                              milliseconds: (scrollc.position
+                                                              .maxScrollExtent -
+                                                          scrollc.offset)
+                                                      .ceil() +
+                                                  seconds),
+                                          curve: Curves.easeInOut);
                                       await Future.delayed(
                                           Duration(milliseconds: 200), () {});
                                       disabletap = false;

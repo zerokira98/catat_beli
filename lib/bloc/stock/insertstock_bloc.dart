@@ -3,9 +3,11 @@ import 'dart:async';
 // import 'dart:html';
 
 // import 'package:bloc/bloc.dart';
+import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
+import 'package:formz/formz.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -37,7 +39,11 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         isSuccess: event.success));
     await Future.delayed(Duration(milliseconds: 100));
     data.add(ItemCards(
-        ditambahkan: DateTime.now(), pcs: 1.0, cardId: 1, open: false));
+        ditambahkan: DateTime.now(),
+        created: false,
+        pcs: Pcs.dirty(1.0),
+        cardId: 1,
+        open: false));
     emit(InsertstockState(
         data: data,
         isLoaded: true,
@@ -60,19 +66,23 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
   }
 
   FutureOr<void> _sendToDB(
-      SendtoDB event, Emitter<InsertstockState> emit) async {
+    SendtoDB event,
+    Emitter<InsertstockState> emit,
+  ) async {
     List<ItemCards> data = (state)
         .data
         .map((e) => e.copywith(
-              namaBarang: e.namaBarang?.trim(),
-              tempatBeli: e.tempatBeli?.trim(),
+              namaBarang: NamaBarang.dirty(e.namaBarang.value.trim()),
+              tempatBeli: Tempatbeli.dirty(e.tempatBeli.value.trim()),
             ))
         .toList();
     emit(InsertstockState(data: data, isLoaded: true, isLoading: false));
     // var state =
     //             (BlocProvider.of<StockBloc>(context).state as StockLoaded);
+
     bool valids = data.isNotEmpty
-        ? data.every((element) => element.formkey!.currentState!.validate())
+        ? data.every((ItemCards element) =>
+            element.status == FormzStatus.valid) //true if always true
         : false;
     if (valids) {
       emit(InsertstockState(data: data, isLoaded: true, isLoading: true));
@@ -96,6 +106,18 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
           }
         });
       }
+    } else {
+      emit(InsertstockState(
+          data: data,
+          isLoaded: true,
+          isLoading: false,
+          isSuccess: false,
+          msg: 'There is invalid data'));
+      await Future.delayed(Duration(seconds: 10), () {
+        if (state.isLoaded) {
+          emit((state).clearMsg());
+        }
+      });
     }
   }
 
@@ -103,15 +125,16 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     var prev = (state).data;
     var tambahDate =
         prev.isNotEmpty ? prev.last.ditambahkan : DateTime.now().toUtc();
-    var tempatBeli = prev.isNotEmpty ? prev.last.tempatBeli : '';
+    var tempatBeli = prev.isNotEmpty ? prev.last.tempatBeli.value : '';
     emit(InsertstockState(
         data: prev +
             [
               ItemCards(
                   cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
                   ditambahkan: tambahDate,
-                  tempatBeli: tempatBeli,
-                  pcs: 1,
+                  created: false,
+                  tempatBeli: Tempatbeli.dirty(tempatBeli),
+                  pcs: Pcs.dirty(1),
                   open: false)
             ],
         isLoaded: true,
@@ -147,7 +170,14 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
   InsertstockState? fromJson(Map<String, dynamic> json) {
     print('you here?');
     print('${json['state']['data']}');
-    print('end you here?');
+    var prevData = (json['state']['data'] as List).map((e) {
+      print('a');
+      return ItemCards().fromJson(e);
+    }).toList();
+    print(prevData);
+    // if (prevData.isEmpty) {
+    //   add(Initiate());
+    // } else {
     return InsertstockState(
         data: (json['state']['data'] as List)
             .map((e) => ItemCards().fromJson(e))
@@ -155,6 +185,7 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         isLoaded: true,
         isLoading: false,
         isSuccess: false);
+    // }
     // return (json['state']);
   }
 

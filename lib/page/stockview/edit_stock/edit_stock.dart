@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 // import 'package:camera/camera.dart';
 // import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
+import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -99,16 +100,16 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
     // print('a');
     // print(BlocProvider.of<EditstockCubit>(context).state);
     if (widget.data.namaBarang != nameC.text) {
-      nameC.text = widget.data.namaBarang ?? '';
+      nameC.text = widget.data.namaBarang.value;
     }
-    if (widget.data.tempatBeli != placeC.text) {
-      placeC.text = widget.data.tempatBeli ?? '';
+    if (widget.data.tempatBeli.value != placeC.text) {
+      placeC.text = widget.data.tempatBeli.value;
     }
-    if (widget.data.hargaBeli?.toString() != hargaBeli.text) {
-      hargaBeli.text = widget.data.hargaBeli?.toString() ?? '';
+    if (widget.data.hargaBeli.value != hargaBeli.text) {
+      hargaBeli.text = widget.data.hargaBeli.value.toString();
     }
-    if (widget.data.pcs?.toString() != qtyc.text) {
-      qtyc.text = widget.data.pcs?.toString() ?? '';
+    if (widget.data.pcs.value.toString() != qtyc.text) {
+      qtyc.text = widget.data.pcs.value.toString();
       qtyc.selection = TextSelection.fromPosition(
           TextPosition(offset: qtyc.text.indexOf('.')));
     }
@@ -140,8 +141,8 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                   onChanged: (v) {
                     var doublePcs = double.tryParse(qtyc.text.trim());
                     if (doublePcs != null)
-                      BlocProvider.of<EditstockCubit>(context)
-                          .update(widget.data.copywith(pcs: doublePcs));
+                      BlocProvider.of<EditstockCubit>(context).update(
+                          widget.data.copywith(pcs: Pcs.dirty(doublePcs)));
                     // FocusScope.of(context).
                   },
                   keyboardType: TextInputType.number,
@@ -203,7 +204,8 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                       controller: placeC,
                       onChanged: (v) {
                         BlocProvider.of<EditstockCubit>(context).update(
-                            (widget.data.copywith(tempatBeli: placeC.text)));
+                            (widget.data.copywith(
+                                tempatBeli: Tempatbeli.dirty(placeC.text))));
                       },
                       keyboardType: TextInputType.text,
                       decoration: InputDecoration(
@@ -211,7 +213,7 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                             onTap: () {
                               BlocProvider.of<EditstockCubit>(context)
                                   .update((widget.data.copywith(
-                                tempatBeli: '',
+                                tempatBeli: Tempatbeli.pure(),
                               )));
                             },
                             child: Icon(Icons.close_rounded)),
@@ -221,8 +223,9 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                       ),
                     ),
                     onSuggestionSelected: (TempatBeli val) {
-                      BlocProvider.of<EditstockCubit>(context)
-                          .update((widget.data.copywith(tempatBeli: val.nama)));
+                      BlocProvider.of<EditstockCubit>(context).update((widget
+                          .data
+                          .copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
                     },
                     itemBuilder: (context, TempatBeli datas) {
                       return ListTile(
@@ -367,7 +370,8 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                               print('test');
                               BlocProvider.of<EditstockCubit>(context)
                                   .update((widget.data.copywith(
-                                hargaBeli: int.tryParse(hargaBeli.text),
+                                hargaBeli: Hargabeli.dirty(
+                                    int.tryParse(hargaBeli.text) ?? 0),
                               )));
                             },
                             controller: hargaBeli,
@@ -380,7 +384,7 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                                     onTap: () {
                                       BlocProvider.of<EditstockCubit>(context)
                                           .update((widget.data.copywith(
-                                        hargaBeli: 0,
+                                        hargaBeli: Hargabeli.pure(),
                                       )));
                                     },
                                     child: Icon(Icons.close_rounded))),
