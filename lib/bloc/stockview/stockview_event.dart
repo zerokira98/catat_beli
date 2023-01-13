@@ -9,7 +9,8 @@ abstract class StockviewEvent extends Equatable {
 
 class InitiateView extends StockviewEvent {
   final String? message;
-  InitiateView({this.message});
+  final bool search;
+  InitiateView({this.message, bool? search}) : this.search = search ?? false;
 }
 
 class DeleteEntry extends StockviewEvent {
@@ -23,4 +24,9 @@ class DeleteEntry extends StockviewEvent {
 class FilterChange extends StockviewEvent {
   final Filter filter;
   FilterChange(this.filter);
+}
+
+class PageChange extends StockviewEvent {
+  final Filter filter;
+  PageChange(this.filter);
 }

@@ -26,8 +26,14 @@ class Filter extends Equatable {
   final String? nama;
   final String? tempatBeli;
   final int? barcode;
+
+  ///curent page starts from 0
   final int currentPage;
-  final int maxRow;
+
+  ///maxpage starts from 0
+  final int maxPage;
+
+  ///
   final DateTime startDate;
   final DateTime endDate;
   Filter(
@@ -35,14 +41,14 @@ class Filter extends Equatable {
       this.tempatBeli,
       this.barcode,
       required this.currentPage,
-      required this.maxRow,
+      required this.maxPage,
       required this.startDate,
       required this.endDate});
   Filter copyWith({
     String? nama,
     String? tempatBeli,
     int? currentPage,
-    int? maxRow,
+    int? maxPage,
     DateTime? startDate,
     DateTime? endDate,
     int? barcode,
@@ -52,7 +58,7 @@ class Filter extends Equatable {
       tempatBeli: tempatBeli ?? this.tempatBeli,
       barcode: barcode ?? this.barcode,
       currentPage: currentPage ?? this.currentPage,
-      maxRow: maxRow ?? this.maxRow,
+      maxPage: maxPage ?? this.maxPage,
       startDate: startDate ?? this.startDate,
       endDate: endDate ?? this.endDate,
     );
@@ -60,5 +66,5 @@ class Filter extends Equatable {
 
   @override
   List<Object?> get props =>
-      [nama, tempatBeli, currentPage, maxRow, startDate, endDate, barcode];
+      [nama, tempatBeli, currentPage, maxPage, startDate, endDate, barcode];
 }

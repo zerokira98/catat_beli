@@ -60,6 +60,7 @@ class FilterBox extends StatelessWidget {
                       flex: 3,
                       child: TextField(
                         controller: namaBarang,
+                        autofocus: true,
                         decoration: InputDecoration(
                           labelText: 'Nama barang',
                         ),
@@ -254,7 +255,7 @@ class FilterBox extends StatelessWidget {
                                 .add(FilterChange(state.filter.copyWith(
                               barcode: int.tryParse(barcodeController.text),
                               nama: namaBarang.text,
-                              currentPage: 0,
+                              // currentPage: 0,
                               tempatBeli: tempatBeliController.text,
                               // startDate: dateFrom.text,
                               // endDate: dateTo.text,

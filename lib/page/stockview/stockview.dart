@@ -15,13 +15,53 @@ part 'filterbox.dart';
 
 final numFormat = new NumberFormat("#,##0", 'id_ID');
 
-class ListOfStockItems extends StatelessWidget {
+class ListOfStockItems extends StatefulWidget {
+  final bool search;
+
+  ListOfStockItems({bool? search}) : this.search = search ?? false;
+
+  @override
+  State<ListOfStockItems> createState() => _ListOfStockItemsState();
+}
+
+class _ListOfStockItemsState extends State<ListOfStockItems> {
   final ScrollController _scontrol = ScrollController();
+  // Key scaffkey =GlobalKey<Scaff>();
+  bool search = false;
   final format = DateFormat('d MMMM y', 'id_ID');
+  @override
+  void initState() {
+    search = widget.search;
+    super.initState();
+    if (mounted && search) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        showBottomSheet(
+          context: context,
+          builder: (context) => Column(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(color: Colors.transparent)),
+              ),
+              FilterBox(),
+            ],
+          ),
+          backgroundColor: Colors.black26,
+        );
+        setState(() {
+          search = false;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     Widget body = Scaffold(
+      // key: ,
       appBar: AppBar(
         // backgroundColor: Colors.grey[800],
         title: BlocBuilder<StockviewBloc, StockviewState>(
@@ -53,35 +93,6 @@ class ListOfStockItems extends StatelessWidget {
           }
           return CircularProgressIndicator();
         }),
-        // actions: [
-        //   IconButton(
-        //       icon: Icon(Icons.refresh),
-        //       onPressed: () {
-        //         BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-        //       }),
-        //   Builder(
-        //     builder: (context) => IconButton(
-        //         icon: Icon(Icons.filter_alt),
-        //         onPressed: () {
-        //           // BlocProvider.of<StockviewBloc>(context).add(Initializeview());
-        //           Scaffold.of(context).showBottomSheet(
-        //             (context) => Column(
-        //               children: [
-        //                 Expanded(
-        //                   child: GestureDetector(
-        //                       onTap: () {
-        //                         Navigator.pop(context);
-        //                       },
-        //                       child: Container(color: Colors.transparent)),
-        //                 ),
-        //                 FilterBox(),
-        //               ],
-        //             ),
-        //             backgroundColor: Colors.black26,
-        //           );
-        //         }),
-        //   )
-        // ],
       ),
       body: Stack(
         children: [
@@ -109,10 +120,17 @@ class ListOfStockItems extends StatelessWidget {
                         } else {
                           widget = ListView.builder(
                             key: UniqueKey(),
+                            // reverse: state.filter.currentPage ==
+                            //     state.filter.maxPage,
                             controller: _scontrol,
                             padding: EdgeInsets.only(bottom: 42),
                             itemBuilder: (context, i) {
                               ItemCards data = state.datas[i];
+                              // if (state.filter.currentPage ==
+                              //     state.filter.maxPage) {
+                              //   data =
+                              //       state.datas[(state.datas.length - 1) - i];
+                              // }
                               // print(data.ditambahkan.weekday);
                               // return Container();
                               return Column(
@@ -197,8 +215,10 @@ class ListOfStockItems extends StatelessWidget {
                   builder: (context, state) {
                     ///---------- Pagination
                     if (state is StockviewLoaded) {
+                      // print('curr' + state.filter.currentPage.toString());
                       return Row(
                         children: [
+                          ///Refresh to initState
                           Expanded(
                             child: Container(
                               alignment: Alignment.centerLeft,
@@ -214,13 +234,34 @@ class ListOfStockItems extends StatelessWidget {
                                   }),
                             ),
                           ),
+
+                          ///Scroll up button
+                          Container(
+                            // alignment: Alignment.centerRight,
+                            child: Builder(
+                              builder: (context) => IconButton(
+                                  padding: EdgeInsets.all(2),
+                                  icon: Icon(
+                                    Icons.keyboard_double_arrow_up,
+                                    color: Colors.white,
+                                    shadows: [Shadow(blurRadius: 4)],
+                                  ),
+                                  onPressed: () {
+                                    _scontrol.animateTo(0,
+                                        duration: Duration(milliseconds: 450),
+                                        curve: Curves.easeInOut);
+                                  }),
+                            ),
+                          ),
+
+                          ///Previous page Button
                           InkWell(
                             onTap: () {
-                              if ((state.filter.maxRow / 20).floor() !=
-                                      state.filter.currentPage - 1 &&
-                                  state.filter.currentPage != 0) {
+                              if (state.filter.currentPage > 0 &&
+                                  state.filter.currentPage <=
+                                      state.filter.maxPage) {
                                 BlocProvider.of<StockviewBloc>(context).add(
-                                    FilterChange(state.filter.copyWith(
+                                    PageChange(state.filter.copyWith(
                                         currentPage:
                                             state.filter.currentPage - 1)));
                               }
@@ -234,16 +275,17 @@ class ListOfStockItems extends StatelessWidget {
                               ),
                               child: Icon(
                                 Icons.arrow_left,
-                                color: ((state.filter.maxRow / 20).floor() !=
-                                            state.filter.currentPage - 1 &&
-                                        state.filter.currentPage != 0)
+                                color: (state.filter.currentPage > 0 &&
+                                        state.filter.currentPage <=
+                                            state.filter.maxPage)
                                     ? Colors.black
                                     : Colors.grey,
                               ),
                             ),
                           ),
+
+                          ///Page Numbering
                           Container(
-                            // width: 50,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(
                                   Radius.elliptical(18.0, 4.0)),
@@ -253,6 +295,7 @@ class ListOfStockItems extends StatelessWidget {
                             child: Center(
                               child: InkWell(
                                 onTap: () {
+                                  final _formsKey = GlobalKey<FormState>();
                                   showDialog(
                                       context: context,
                                       builder: (context) {
@@ -265,50 +308,57 @@ class ListOfStockItems extends StatelessWidget {
                                             children: [
                                               Container(
                                                   width: 42,
-                                                  child: TextFormField(
-                                                    autofocus: true,
-                                                    autovalidateMode:
-                                                        AutovalidateMode
-                                                            .onUserInteraction,
-                                                    validator: (value) {
-                                                      if (value != null &&
-                                                          value.isNotEmpty) {
-                                                        bool hah = int.parse(
-                                                                value) >
-                                                            (((state.filter.maxRow +
-                                                                        1) /
-                                                                    20)
-                                                                .ceil());
-                                                        if (value == "0")
-                                                          return 'cant be zero';
-                                                        return hah
-                                                            ? 'over'
-                                                            : null;
-                                                      }
-                                                    },
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    controller: pageTextControl,
-                                                    onEditingComplete: () {
-                                                      BlocProvider.of<
-                                                                  StockviewBloc>(
-                                                              context)
-                                                          .add(FilterChange(state
-                                                              .filter
-                                                              .copyWith(
-                                                                  currentPage:
-                                                                      int.parse(
-                                                                              pageTextControl.text) -
-                                                                          1)));
-                                                      Navigator.pop(context);
-                                                    },
-                                                    decoration: InputDecoration(
-                                                        labelText: 'Page'),
+                                                  child: Form(
+                                                    key: _formsKey,
+                                                    child: TextFormField(
+                                                      autofocus: true,
+                                                      autovalidateMode:
+                                                          AutovalidateMode
+                                                              .onUserInteraction,
+                                                      validator: (value) {
+                                                        if (value != null &&
+                                                            value.isNotEmpty) {
+                                                          bool hah = (int.parse(
+                                                                      value) -
+                                                                  1) >
+                                                              (state.filter
+                                                                  .maxPage);
+                                                          if (value == "0")
+                                                            return 'cant be zero';
+                                                          return hah
+                                                              ? 'over'
+                                                              : null;
+                                                        }
+                                                      },
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      controller:
+                                                          pageTextControl,
+                                                      onEditingComplete: () {
+                                                        if (_formsKey
+                                                            .currentState!
+                                                            .validate()) {
+                                                          BlocProvider.of<
+                                                                      StockviewBloc>(
+                                                                  context)
+                                                              .add(PageChange(state
+                                                                  .filter
+                                                                  .copyWith(
+                                                                      currentPage:
+                                                                          int.parse(pageTextControl.text) -
+                                                                              1)));
+                                                          Navigator.pop(
+                                                              context);
+                                                        }
+                                                      },
+                                                      decoration:
+                                                          InputDecoration(
+                                                              labelText:
+                                                                  'Page'),
+                                                    ),
                                                   )),
                                               Text('/'),
-                                              Text(((state.filter.maxRow + 1) /
-                                                      20)
-                                                  .ceil()
+                                              Text((state.filter.maxPage + 1)
                                                   .toString()),
                                             ],
                                           ),
@@ -328,8 +378,7 @@ class ListOfStockItems extends StatelessWidget {
                                       textScaleFactor: 1.4,
                                     ),
                                     Text(
-                                      (((state.filter.maxRow + 1) / 20).ceil())
-                                          .toString(),
+                                      (state.filter.maxPage + 1).toString(),
                                       textScaleFactor: 1.4,
                                     ),
                                   ],
@@ -337,14 +386,14 @@ class ListOfStockItems extends StatelessWidget {
                               ),
                             ),
                           ),
+
+                          ///Next page Button
                           InkWell(
                             onTap: () {
-                              // print(state.filter.currentPage);
-                              // print((state.filter.maxRow / 20).floor());
-                              if (((state.filter.maxRow + 1) / 20).ceil() !=
-                                  (state.filter.currentPage + 1)) {
+                              if (state.filter.maxPage >
+                                  state.filter.currentPage) {
                                 BlocProvider.of<StockviewBloc>(context).add(
-                                    FilterChange(state.filter.copyWith(
+                                    PageChange(state.filter.copyWith(
                                         currentPage:
                                             state.filter.currentPage + 1)));
                               }
@@ -358,14 +407,36 @@ class ListOfStockItems extends StatelessWidget {
                               ),
                               child: Icon(
                                 Icons.arrow_right,
-                                color:
-                                    (((state.filter.maxRow + 1) / 20).ceil() !=
-                                            (state.filter.currentPage + 1))
-                                        ? Colors.black
-                                        : Colors.grey,
+                                color: (state.filter.maxPage >
+                                        (state.filter.currentPage))
+                                    ? Colors.black
+                                    : Colors.grey,
                               ),
                             ),
                           ),
+
+                          ///Scroll down Button
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: Builder(
+                              builder: (context) => IconButton(
+                                  padding: EdgeInsets.all(2),
+                                  icon: Icon(
+                                    Icons.keyboard_double_arrow_down,
+                                    color: Colors.white,
+                                    shadows: [Shadow(blurRadius: 4)],
+                                  ),
+                                  onPressed: () {
+                                    // print(_scontrol.position.maxScrollExtent);
+                                    _scontrol.animateTo(
+                                        _scontrol.position.maxScrollExtent + 80,
+                                        duration: Duration(milliseconds: 450),
+                                        curve: Curves.easeInOut);
+                                  }),
+                            ),
+                          ),
+
+                          ///Filter button
                           Expanded(
                               child: Container(
                             alignment: Alignment.centerRight,

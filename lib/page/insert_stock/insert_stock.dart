@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
+import 'package:catatbeli/page/stockview/stockview.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -149,11 +152,6 @@ class _InsertProductPageState extends State<InsertProductPage> {
             },
             child: Container(
               // padding: EdgeInsets.only(top: 12.0),
-              padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).orientation ==
-                          Orientation.landscape
-                      ? MediaQuery.of(context).size.width * 0.05
-                      : 4),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: Colors.black54,
@@ -181,50 +179,65 @@ class _InsertProductPageState extends State<InsertProductPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: state.data.length,
-                            controller: scrollc,
-                            itemBuilder: (context, i) => Row(children: [
-                              Column(
-                                children: [
-                                  Text(
-                                    '${i + 1}',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  Text(
-                                    '-',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: i % 2 == 0
-                                            ? Colors.blue
-                                            : Colors.yellow),
-                                  )
-                                ],
-                              ),
-                              Expanded(
-                                child: InsertProductCard(
-                                    state.data[i],
-                                    Key(state.data[i].cardId.toString()),
-                                    scrollc),
-                              )
-                            ]),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: MediaQuery.of(context)
+                                            .orientation ==
+                                        Orientation.landscape
+                                    ? MediaQuery.of(context).size.width * 0.05
+                                    : 4),
+                            child: ListView.builder(
+                              itemCount: state.data.length,
+                              controller: scrollc,
+                              itemBuilder: (context, i) => Row(children: [
+                                Column(
+                                  children: [
+                                    Text(
+                                      '${i + 1}',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Text(
+                                      '-',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: i % 2 == 0
+                                              ? Colors.blue
+                                              : Colors.yellow),
+                                    )
+                                  ],
+                                ),
+                                Expanded(
+                                  child: InsertProductCard(
+                                      state.data[i],
+                                      Key(state.data[i].cardId.toString()),
+                                      scrollc),
+                                )
+                              ]),
+                            ),
                           ),
                         ),
-                        // for (int i = 0; i < state.data.length; i++)
-                        //   Row(children: [
-                        //     Text(
-                        //       '${i + 1}',
-                        //       style: TextStyle(color: Colors.white),
-                        //     ),
-                        //     Expanded(
-                        //       child: InsertProductCard(state.data[i],
-                        //           Key(state.data[i].cardId.toString())),
-                        //     )
-                        //   ]),
-                        Padding(
+                        Container(
+                          decoration: BoxDecoration(color: Colors.grey[800]),
                           padding: const EdgeInsets.all(4.0),
                           child: Row(
                             children: [
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white),
+                                  onPressed: () {
+                                    BlocProvider.of<StockviewBloc>(context)
+                                        .add(InitiateView(search: true));
+                                    Navigator.push(
+                                        context,
+                                        CupertinoPageRoute(
+                                            builder: (context) => Scaffold(
+                                                  body: ListOfStockItems(
+                                                      search: true),
+                                                )));
+                                  },
+                                  child: Icon(Icons.search)),
+                              Padding(padding: EdgeInsets.only(right: 8)),
                               ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.red,
