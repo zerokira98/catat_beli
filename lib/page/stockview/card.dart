@@ -88,7 +88,7 @@ class _StockviewCardState extends State<StockviewCard> {
         margin: EdgeInsets.symmetric(
           horizontal:
               MediaQuery.of(context).orientation == Orientation.landscape
-                  ? MediaQuery.of(context).size.width * 0.05
+                  ? MediaQuery.of(context).size.width * 0.1
                   : 0,
           vertical: 0,
         ),

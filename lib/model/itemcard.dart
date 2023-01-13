@@ -151,7 +151,6 @@ class ItemCards extends Equatable with FormzMixin {
   }
 
   @override
-  // TODO: implement inputs
   List<FormzInput> get inputs =>
       [namaBarang, hargaBeli, pcs, tempatBeli, barcode];
 }

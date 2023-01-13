@@ -87,7 +87,7 @@ class _InsertProductCardState extends State<InsertProductCard>
         case NamaBarangValidationError.atleast3:
           return '3 or more char';
         default:
-          null;
+          return null;
       }
     }
 
@@ -98,7 +98,7 @@ class _InsertProductCardState extends State<InsertProductCard>
         case PcsValidationError.negative:
           return "Negative value";
         default:
-          null;
+          return null;
       }
     }
 
@@ -112,7 +112,7 @@ class _InsertProductCardState extends State<InsertProductCard>
         // case HargabeliValidationError.toosmall:
         //   return "sus, toosmall";
         default:
-          null;
+          return null;
       }
     }
 
@@ -121,7 +121,7 @@ class _InsertProductCardState extends State<InsertProductCard>
         case BarcodeValidationError.negative:
           return "Negative";
         default:
-          null;
+          return null;
       }
     }
 
@@ -535,7 +535,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                     ),
                     if (MediaQuery.of(context).orientation ==
                         Orientation.landscape)
-                      Expanded(flex: 3, child: bottom)
+                      Expanded(flex: 8, child: bottom)
                   ],
                 ),
                 if (MediaQuery.of(context).orientation == Orientation.portrait)

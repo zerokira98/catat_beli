@@ -109,7 +109,7 @@ class SideDrawer extends StatelessWidget {
                           '${DateTime.now().toString().substring(0, 10)}.db');
                   final filePath =
                       await FlutterFileDialog.saveFile(params: params);
-                } else if (Platform.isWindows) {
+                } else if (!Platform.isAndroid) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('not implemented yet, sorry')));
                 }
