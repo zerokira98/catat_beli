@@ -25,10 +25,10 @@ class FilterBox extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.light
                     ? Colors.white
-                    : Theme.of(context).backgroundColor,
+                    : Theme.of(context).colorScheme.background,
                 border: Border.all(color: Colors.grey[50]!),
                 borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(24.0))),
+                    BorderRadius.vertical(top: Radius.circular(18.0))),
             child: Column(
               children: [
                 Row(

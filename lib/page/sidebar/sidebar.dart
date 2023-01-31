@@ -3,6 +3,7 @@ import 'dart:io';
 // import 'package:catatbeli/msc/db_moor.dart';
 // import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,9 +15,17 @@ import 'package:catatbeli/page/more_page/tempat.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 
-class SideDrawer extends StatelessWidget {
+class SideDrawer extends StatefulWidget {
   const SideDrawer({Key? key}) : super(key: key);
+
+  @override
+  State<SideDrawer> createState() => _SideDrawerState();
+}
+
+class _SideDrawerState extends State<SideDrawer> {
+  FlexScheme? dropdownvalue;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +33,9 @@ class SideDrawer extends StatelessWidget {
         child: Column(children: [
       Container(
         height: 160,
-        color: Theme.of(context).primaryColor,
+        decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.only(topRight: Radius.circular(16))),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: SafeArea(
@@ -33,7 +44,7 @@ class SideDrawer extends StatelessWidget {
                 Expanded(
                     child: Text(
                   'Pencatatan Pembelian',
-                  textScaleFactor: 1.3,
+                  textScaleFactor: 1.35,
                   style: TextStyle(color: Colors.white),
                 )),
               ],
@@ -95,6 +106,14 @@ class SideDrawer extends StatelessWidget {
             title: Text('Print to Excel'),
           ),
           ListTile(
+            trailing: Icon(Icons.auto_graph),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('not implemented yet, sorry')));
+            },
+            title: Text('Statistik'),
+          ),
+          ListTile(
             trailing: Icon(Icons.ac_unit),
             onTap: () async {
               final dbFolder = await getApplicationDocumentsDirectory();
@@ -109,6 +128,8 @@ class SideDrawer extends StatelessWidget {
                           '${DateTime.now().toString().substring(0, 10)}.db');
                   final filePath =
                       await FlutterFileDialog.saveFile(params: params);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('file saved at:$filePath')));
                 } else if (!Platform.isAndroid) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('not implemented yet, sorry')));
@@ -130,8 +151,20 @@ class SideDrawer extends StatelessWidget {
                 }
               }
               if (Platform.isWindows) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('not implemented yet, sorry')));
+                try {
+                  var dbFolder = await getApplicationDocumentsDirectory();
+                  var a = await FilePicker.platform
+                      .pickFiles(initialDirectory: dbFolder.path);
+                  print(a);
+                  if (a != null && a.isSinglePick) {
+                    final importedFile = File(a.files[0].path!);
+                    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+                    file.writeAsBytes(await importedFile.readAsBytes());
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('cancelled:' + e.toString())));
+                }
               }
             },
             title: Text('Restore .db'),
@@ -141,8 +174,34 @@ class SideDrawer extends StatelessWidget {
               children: [Text('DarkMode'), Icon(Icons.dark_mode)],
             ),
             onTap: () async {
-              context.read<ThemeCubit>().changeThemeData();
+              context.read<ThemeCubit>().changeDarkLight();
             },
+          ),
+          Row(
+            children: [
+              Text('Color : '),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton<FlexScheme>(
+                  isExpanded: true,
+                  items: [
+                    for (FlexScheme a in FlexScheme.values)
+                      DropdownMenuItem(
+                        child: Text(a.name),
+                        value: a,
+                      ),
+                  ],
+                  value: dropdownvalue,
+                  onChanged: (value) {
+                    dropdownvalue = value;
+                    if (value != null) {
+                      context.read<ThemeCubit>().changeColorScheme(value);
+                    }
+                  },
+                ),
+              )),
+            ],
           )
         ]),
       )

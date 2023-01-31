@@ -162,106 +162,108 @@ class _InsertProductCardState extends State<InsertProductCard>
       notec.text = widget.data.note ?? '';
     }
     datec.text = dateFormat.format(widget.data.ditambahkan!);
-    Widget additionalBottom = TextFormField(
-      controller: notec,
-      decoration: InputDecoration(label: Text('Note')),
-      onChanged: (v) {
-        BlocProvider.of<InsertstockBloc>(context)
-            .add(DataChange((widget.data.copywith(note: v))));
-      },
+    Widget additionalBottom = Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: TextFormField(
+        controller: notec,
+        decoration: InputDecoration(label: Text('Note')),
+        onChanged: (v) {
+          BlocProvider.of<InsertstockBloc>(context)
+              .add(DataChange((widget.data.copywith(note: v))));
+        },
+      ),
     );
     Widget bottom = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          flex: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: TextFormField(
-              onEditingComplete: () => FocusScope.of(context).unfocus(
-                  disposition: UnfocusDisposition.previouslyFocusedChild),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (text) {
-                if (double.tryParse(qtyc.text.trim()) == 0)
-                  return 'cant be zero';
-                if (double.tryParse(qtyc.text.trim()) == null) {
-                  return 'Invalid type';
-                }
-                if (text!.isNotEmpty &&
-                    !RegExp(r'^\d+(\.\d+)*$').hasMatch(text)) {
-                  return 'must be a number';
-                } else if (text.isEmpty) {
-                  return 'tidak boleh kosong';
-                }
-                return null;
-              },
-              controller: qtyc,
-              focusNode: fsn1,
-              onChanged: (v) {
-                // print(v);
-                // print('aaa');
-                var doublePcs = double.tryParse(qtyc.text.trim());
-                // print(doublePcs);
-                if (doublePcs != null)
-                  BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                      widget.data.copywith(pcs: Pcs.dirty(doublePcs))));
-                // FocusScope.of(context).
-              },
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                errorText: pcsError(),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                label: AutoSizeText(
-                  'jumlah unit',
-                  maxLines: 1,
-                ),
-                // labelText: 'jumlah unit',
+          flex: 3,
+          child: TextFormField(
+            onEditingComplete: () => FocusScope.of(context).unfocus(
+                disposition: UnfocusDisposition.previouslyFocusedChild),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (text) {
+              if (double.tryParse(qtyc.text.trim()) == 0) return 'cant be zero';
+              if (double.tryParse(qtyc.text.trim()) == null) {
+                return 'Invalid type';
+              }
+              if (text!.isNotEmpty &&
+                  !RegExp(r'^\d+(\.\d+)*$').hasMatch(text)) {
+                return 'must be a number';
+              } else if (text.isEmpty) {
+                return 'tidak boleh kosong';
+              }
+              return null;
+            },
+            controller: qtyc,
+            focusNode: fsn1,
+            onChanged: (v) {
+              // print(v);
+              // print('aaa');
+              var doublePcs = double.tryParse(qtyc.text.trim());
+              // print(doublePcs);
+              if (doublePcs != null)
+                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                    widget.data.copywith(pcs: Pcs.dirty(doublePcs))));
+              // FocusScope.of(context).
+            },
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              errorText: pcsError(),
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              label: AutoSizeText(
+                'jumlah unit',
+                maxLines: 1,
               ),
+              // labelText: 'jumlah unit',
             ),
           ),
         ),
+        Padding(padding: EdgeInsets.all(2)),
         Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
+            flex: 5,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () async {
+                  FocusScope.of(context).unfocus();
+                  final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      initialDatePickerMode: DatePickerMode.day,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2101));
+                  if (picked != null) {
+                    // datec.text = picked.toString().substring(0, 19);
+                    print(picked.toString());
+                    BlocProvider.of<InsertstockBloc>(context).add(
+                        DataChange(widget.data.copywith(ditambahkan: picked)));
+                  }
+                },
+                child: TextField(
+                  onEditingComplete: () => FocusScope.of(context).unfocus(),
+                  controller: datec,
+                  enabled: false,
+                  // style: TextStyle(fontSize: 14),
                   onTap: () async {
                     FocusScope.of(context).unfocus();
-                    final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        initialDatePickerMode: DatePickerMode.day,
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2101));
-                    if (picked != null) {
-                      // datec.text = picked.toString().substring(0, 19);
-                      print(picked.toString());
-                      BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                          widget.data.copywith(ditambahkan: picked)));
-                    }
                   },
-                  child: TextField(
-                    onEditingComplete: () => FocusScope.of(context).unfocus(),
-                    controller: datec,
-                    enabled: false,
-                    onTap: () async {
-                      FocusScope.of(context).unfocus();
-                    },
-                    keyboardType: TextInputType.datetime,
-                    decoration: InputDecoration(
-                      floatingLabelBehavior: FloatingLabelBehavior.always,
-
-                      label: AutoSizeText('Tanggal Beli'),
-                      // labelText: 'Buy date',
-                      fillColor: Colors.white,
+                  keyboardType: TextInputType.datetime,
+                  decoration: InputDecoration(
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    label: AutoSizeText(
+                      'Tanggal Beli',
+                      maxLines: 1,
                     ),
+                    // labelText: 'Buy date',
+                    // fillColor: Colors.white,
                   ),
                 ),
               ),
             )),
+        Padding(padding: EdgeInsets.all(2)),
         Expanded(
-          flex: 6,
+          flex: 7,
           child: TypeAheadFormField(
               textFieldConfiguration: TextFieldConfiguration(
                 focusNode: fsn2,
@@ -317,117 +319,123 @@ class _InsertProductCardState extends State<InsertProductCard>
       key: _formkey,
       child: Stack(
         children: [
-          Container(
-            margin: EdgeInsets.all(8.0),
-            padding: EdgeInsets.all(8.00),
-            decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.black
-                  : Colors.grey[200],
-              borderRadius: BorderRadius.circular(8.0),
-              boxShadow: [
-                BoxShadow(
-                    spreadRadius: 0.0,
-                    blurRadius: 6.0,
-                    color: Colors.grey[400]!)
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: Row(
+          Card(
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+            elevation: 3,
+            child: Container(
+              // margin: EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(6.0),
+              decoration: BoxDecoration(
+                // color: Theme.of(context).brightness == Brightness.dark
+                //     ? Colors.black
+                //     : Colors.grey[200],
+                borderRadius: BorderRadius.circular(8.0),
+                // boxShadow: [
+                //   BoxShadow(
+                //       spreadRadius: 0.0,
+                //       blurRadius: 6.0,
+                //       color: Colors.grey[400]!)
+                // ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: 14.0, left: 4, top: 4, bottom: 0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TypeAheadFormField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            // autovalidate: ,
+                            // validator: (text) {
+                            //   if (text!.length <= 2) {
+                            //     return '3 or more character';
+                            //   }
+                            //   return null;
+                            // },
+                            suggestionsBoxController: sbc,
+                            textFieldConfiguration: TextFieldConfiguration(
+                                maxLines: 2,
+                                minLines: 1,
+                                onEditingComplete: () =>
+                                    FocusScope.of(context).unfocus(),
+                                controller: namec,
+                                onChanged: (v) {
+                                  var nv = v;
+                                  if (namec.text.isNotEmpty &&
+                                      namec.text.length >= 1) {
+                                    nv = namec.text[0].toUpperCase() +
+                                        namec.text.substring(1);
+                                  }
+                                  BlocProvider.of<InsertstockBloc>(context)
+                                      .add(DataChange(widget.data.copywith(
+                                    namaBarang: NamaBarang.dirty(nv),
+                                    productId: () => null,
+                                  )));
+                                },
+                                style: DefaultTextStyle.of(context)
+                                    .style
+                                    .copyWith(fontStyle: FontStyle.italic),
+                                decoration: InputDecoration(
+                                    errorText: namabarangError(),
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Nama item')),
+                            suggestionsCallback: (pattern) async {
+                              List<StockItem> a = [];
+                              if (pattern.length >= 3) {
+                                a = await RepositoryProvider.of<MyDatabase>(
+                                        context)
+                                    .showInsideItems(pattern);
+                              }
+                              // print('hello');
+                              // print(a);
+                              return a;
+                            },
+                            itemBuilder: (context, StockItem suggestion) {
+                              if (suggestion.nama == '[deleted]')
+                                return Container();
+                              return ListTile(
+                                leading: Icon(Icons.shopping_cart),
+                                title: Text(suggestion.nama),
+                              );
+                            },
+                            onSuggestionSelected: (StockItem suggestion) async {
+                              var res1 = await RepositoryProvider.of<
+                                      MyDatabase>(context)
+                                  .showInsideStock(idBarang: (suggestion.id));
+                              // print('heres');
+                              var tempat =
+                                  await RepositoryProvider.of<MyDatabase>(
+                                          context)
+                                      .tempatwithid(res1.last.idSupplier!);
+                              BlocProvider.of<InsertstockBloc>(context)
+                                  .add(DataChange(widget.data.copywith(
+                                namaBarang: NamaBarang.dirty(suggestion.nama),
+                                productId: () => suggestion.id,
+                                hargaBeli: Hargabeli.dirty(
+                                    res1.isNotEmpty ? res1.last.price : 0),
+                                tempatBeli:
+                                    Tempatbeli.dirty(tempat.single.nama),
+                                barcode: Barcode.dirty(suggestion.barcode ?? 0),
+                                // hargaJual: suggestion,
+                              )));
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(2),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: TypeAheadFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          // autovalidate: ,
-                          // validator: (text) {
-                          //   if (text!.length <= 2) {
-                          //     return '3 or more character';
-                          //   }
-                          //   return null;
-                          // },
-                          suggestionsBoxController: sbc,
-                          textFieldConfiguration: TextFieldConfiguration(
-                              maxLines: 2,
-                              minLines: 1,
-                              onEditingComplete: () =>
-                                  FocusScope.of(context).unfocus(),
-                              controller: namec,
-                              onChanged: (v) {
-                                var nv = v;
-                                if (namec.text.isNotEmpty &&
-                                    namec.text.length >= 1) {
-                                  nv = namec.text[0].toUpperCase() +
-                                      namec.text.substring(1);
-                                }
-                                BlocProvider.of<InsertstockBloc>(context)
-                                    .add(DataChange(widget.data.copywith(
-                                  namaBarang: NamaBarang.dirty(nv),
-                                  productId: () => null,
-                                )));
-                              },
-                              style: DefaultTextStyle.of(context)
-                                  .style
-                                  .copyWith(fontStyle: FontStyle.italic),
-                              decoration: InputDecoration(
-                                  errorText: namabarangError(),
-                                  border: OutlineInputBorder(),
-                                  labelText: 'Nama item')),
-                          suggestionsCallback: (pattern) async {
-                            List<StockItem> a = [];
-                            if (pattern.length >= 3) {
-                              a = await RepositoryProvider.of<MyDatabase>(
-                                      context)
-                                  .showInsideItems(pattern);
-                            }
-                            // print('hello');
-                            // print(a);
-                            return a;
-                          },
-                          itemBuilder: (context, StockItem suggestion) {
-                            if (suggestion.nama == '[deleted]')
-                              return Container();
-                            return ListTile(
-                              leading: Icon(Icons.shopping_cart),
-                              title: Text(suggestion.nama),
-                            );
-                          },
-                          onSuggestionSelected: (StockItem suggestion) async {
-                            var res1 =
-                                await RepositoryProvider.of<MyDatabase>(context)
-                                    .showInsideStock(idBarang: (suggestion.id));
-                            // print('heres');
-                            var tempat =
-                                await RepositoryProvider.of<MyDatabase>(context)
-                                    .tempatwithid(res1.last.idSupplier!);
-                            BlocProvider.of<InsertstockBloc>(context)
-                                .add(DataChange(widget.data.copywith(
-                              namaBarang: NamaBarang.dirty(suggestion.nama),
-                              productId: () => suggestion.id,
-                              hargaBeli: Hargabeli.dirty(
-                                  res1.isNotEmpty ? res1.last.price : 0),
-                              tempatBeli: Tempatbeli.dirty(tempat.single.nama),
-                              barcode: Barcode.dirty(suggestion.barcode ?? 0),
-                              // hargaJual: suggestion,
-                            )));
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                        flex: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
+                          flex: 4,
                           child: TextFormField(
                             onEditingComplete: () =>
                                 FocusScope.of(context).unfocus(),
@@ -449,7 +457,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
                                 // labelText: 'Harga beli ',
-                                label: AutoSizeText('Harga Beli'),
+                                label: AutoSizeText('Harga Beli', maxLines: 1),
                                 suffixIcon: InkWell(
                                     onTap: () {
                                       BlocProvider.of<InsertstockBloc>(context)
@@ -458,95 +466,100 @@ class _InsertProductCardState extends State<InsertProductCard>
                                       )));
                                     },
                                     child: Icon(Icons.close_rounded))),
-                          ),
-                        )),
-                    Expanded(
-                      flex: 5,
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        onEditingComplete: () =>
-                            FocusScope.of(context).unfocus(),
-                        controller: barcodeC,
-                        // autovalidateMode: AutovalidateMode.onUserInteraction,
-                        // validator: (a) {
-                        //   if (a != null && a.isNotEmpty) {
-                        //     if (int.tryParse(a) == null) {
-                        //       print('hey');
-                        //       return 'invalid barcode';
-                        //     }
-                        //   }
-                        //   return null;
-                        // },
-                        onChanged: (a) {
-                          if (int.tryParse(a) == null) {
-                            print('helo$a');
-                            barcodeC.clear();
-                            return;
-                          }
-                          BlocProvider.of<InsertstockBloc>(context).add(
-                              DataChange(widget.data.copywith(
-                                  barcode:
-                                      Barcode.dirty(int.tryParse(a) ?? 0))));
-                        },
-                        decoration: InputDecoration(
-                            errorText: barcodeError(),
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
-                            labelText: 'barcode',
-                            suffixIcon: FutureBuilder<List>(
-                                future: Platform.isAndroid || Platform.isIOS
-                                    ? availableCameras()
-                                    : Future.value([]),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    if (snapshot.data!.isEmpty) {
-                                      return SizedBox();
-                                    } else {
-                                      return InkWell(
-                                          canRequestFocus: false,
-                                          onTap: () async {
-                                            String barcodeScan =
-                                                await FlutterBarcodeScanner
-                                                    .scanBarcode(
-                                                        '#ffffff',
-                                                        'Batal',
-                                                        true,
-                                                        ScanMode.BARCODE);
-                                            // print(barcodeScan);
-                                            if (barcodeScan != '-1') {
-                                              barcodeC.text =
-                                                  barcodeScan.trim();
-                                              BlocProvider.of<InsertstockBloc>(
-                                                      context)
-                                                  .add(DataChange(
-                                                      widget.data.copywith(
-                                                barcode: Barcode.dirty(
-                                                    int.tryParse(barcodeScan
-                                                            .trim()) ??
-                                                        0),
-                                              )));
-                                            }
-                                          },
-                                          child: Icon(Icons.qr_code));
+                          )),
+                      Padding(padding: EdgeInsets.all(2)),
+                      Expanded(
+                        flex: 5,
+                        child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          onEditingComplete: () =>
+                              FocusScope.of(context).unfocus(),
+                          controller: barcodeC,
+                          // autovalidateMode: AutovalidateMode.onUserInteraction,
+                          // validator: (a) {
+                          //   if (a != null && a.isNotEmpty) {
+                          //     if (int.tryParse(a) == null) {
+                          //       print('hey');
+                          //       return 'invalid barcode';
+                          //     }
+                          //   }
+                          //   return null;
+                          // },
+                          onChanged: (a) {
+                            if (int.tryParse(a) == null) {
+                              print('helo$a');
+                              barcodeC.clear();
+                              return;
+                            }
+                            BlocProvider.of<InsertstockBloc>(context).add(
+                                DataChange(widget.data.copywith(
+                                    barcode:
+                                        Barcode.dirty(int.tryParse(a) ?? 0))));
+                          },
+                          decoration: InputDecoration(
+                              errorText: barcodeError(),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              labelText: 'barcode',
+                              suffixIcon: FutureBuilder<List>(
+                                  future: Platform.isAndroid || Platform.isIOS
+                                      ? availableCameras()
+                                      : Future.value([]),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      if (snapshot.data!.isEmpty) {
+                                        return SizedBox();
+                                      } else {
+                                        return InkWell(
+                                            canRequestFocus: false,
+                                            onTap: () async {
+                                              String barcodeScan =
+                                                  await FlutterBarcodeScanner
+                                                      .scanBarcode(
+                                                          '#ffffff',
+                                                          'Batal',
+                                                          true,
+                                                          ScanMode.BARCODE);
+                                              // print(barcodeScan);
+                                              if (barcodeScan != '-1') {
+                                                barcodeC.text =
+                                                    barcodeScan.trim();
+                                                BlocProvider.of<
+                                                            InsertstockBloc>(
+                                                        context)
+                                                    .add(DataChange(
+                                                        widget.data.copywith(
+                                                  barcode: Barcode.dirty(
+                                                      int.tryParse(barcodeScan
+                                                              .trim()) ??
+                                                          0),
+                                                )));
+                                              }
+                                            },
+                                            child: Icon(Icons.qr_code));
+                                      }
                                     }
-                                  }
-                                  return SizedBox();
-                                })),
+                                    return SizedBox();
+                                  })),
+                        ),
                       ),
-                    ),
-                    if (MediaQuery.of(context).orientation ==
-                        Orientation.landscape)
-                      Expanded(flex: 8, child: bottom)
-                  ],
-                ),
-                if (MediaQuery.of(context).orientation == Orientation.portrait)
-                  bottom,
-                AnimatedClipRect(
-                    horizontalAnimation: false,
-                    duration: Duration(milliseconds: 260),
-                    reverseDuration: Duration(milliseconds: 260),
-                    open: noteVisible,
-                    child: additionalBottom),
-              ],
+                      if (MediaQuery.of(context).orientation ==
+                          Orientation.landscape)
+                        Expanded(flex: 8, child: bottom)
+                    ],
+                  ),
+                  Padding(padding: EdgeInsets.only(bottom: 8)),
+                  if (MediaQuery.of(context).orientation ==
+                      Orientation.portrait)
+                    bottom,
+                  AnimatedClipRect(
+                      horizontalAnimation: false,
+                      duration: Duration(milliseconds: 260),
+                      reverseDuration: Duration(milliseconds: 260),
+                      open: noteVisible,
+                      child: additionalBottom),
+                ],
+              ),
             ),
           ),
           Positioned(

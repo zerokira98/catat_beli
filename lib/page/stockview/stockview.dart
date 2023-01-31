@@ -28,9 +28,14 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
   final ScrollController _scontrol = ScrollController();
   // Key scaffkey =GlobalKey<Scaff>();
   bool search = false;
+  // bool maxScroll = false;
+  // bool zeroScroll = true;
   final format = DateFormat('d MMMM y', 'id_ID');
   @override
   void initState() {
+    // _scontrol.addListener(() {
+    //   if (_scontrol.offset == _scontrol.position.maxScrollExtent) {}
+    // });
     search = widget.search;
     super.initState();
     if (mounted && search) {
@@ -135,7 +140,7 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                               // return Container();
                               return Column(
                                 children: [
-                                  ///---- date seperator
+                                  ///---- date separator
                                   if ((i >= 1 &&
                                           data.ditambahkan
                                                   .toString()
@@ -153,7 +158,8 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                                               padding: EdgeInsets.all(8.0),
                                               margin:
                                                   EdgeInsets.only(bottom: 8.0),
-                                              color: Colors.grey[700],
+                                              color: Theme.of(context)
+                                                  .primaryColorDark,
                                               child: Text(
                                                 DateFormat('EEEE, d MMMM y',
                                                         'id_ID')
@@ -178,6 +184,20 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                         return AnimatedSwitcher(
                           duration: Duration(milliseconds: 450),
                           child: widget,
+                          // switchInCurve: Curves,
+                          transitionBuilder: (child, animation) {
+                            var begin = 0.0;
+                            var end = 1.0;
+                            final tween = Tween(begin: begin, end: end).animate(
+                                CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeInOut));
+                            return SizeTransition(
+                              sizeFactor: tween,
+                              child:
+                                  FadeTransition(opacity: tween, child: child),
+                            );
+                          },
                         );
                       }
                       return Center(child: CircularProgressIndicator());
@@ -197,8 +217,8 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                 // border:
                 //     Border(top: BorderSide(color: Colors.black12, width: 1)),
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.elliptical(28, 8),
-                    topRight: Radius.elliptical(28, 8)),
+                    topLeft: Radius.elliptical(12, 12),
+                    topRight: Radius.elliptical(12, 12)),
                 boxShadow: [
                   BoxShadow(color: Colors.white54, offset: Offset(0, -1))
                 ],
@@ -289,7 +309,7 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(
                                   Radius.elliptical(18.0, 4.0)),
-                              color: Theme.of(context).backgroundColor,
+                              color: Theme.of(context).colorScheme.background,
                             ),
                             padding: EdgeInsets.symmetric(horizontal: 4),
                             child: Center(
@@ -316,6 +336,7 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                                                           AutovalidateMode
                                                               .onUserInteraction,
                                                       validator: (value) {
+                                                        String? a;
                                                         if (value != null &&
                                                             value.isNotEmpty) {
                                                           bool hah = (int.parse(
@@ -323,12 +344,14 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                                                                   1) >
                                                               (state.filter
                                                                   .maxPage);
-                                                          if (value == "0")
-                                                            return 'cant be zero';
-                                                          return hah
-                                                              ? 'over'
-                                                              : null;
+                                                          if (value == "0") {
+                                                            a = 'cant be zero';
+                                                          } else if (hah) {
+                                                            a = 'over';
+                                                          }
+                                                          return a;
                                                         }
+                                                        return a;
                                                       },
                                                       keyboardType:
                                                           TextInputType.number,
@@ -465,6 +488,8 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                                         ],
                                       ),
                                       backgroundColor: Colors.black26,
+                                      // shape:
+                                      //     CircleBorder(side: BorderSide.none),
                                     );
                                   }),
                             ),

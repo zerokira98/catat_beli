@@ -37,13 +37,13 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         isLoaded: false,
         isLoading: true,
         isSuccess: event.success));
-    await Future.delayed(Duration(milliseconds: 100));
     data.add(ItemCards(
         ditambahkan: DateTime.now(),
         created: false,
         pcs: Pcs.dirty(1.0),
         cardId: 1,
         open: false));
+    await Future.delayed(Duration(milliseconds: 300));
     emit(InsertstockState(
         data: data,
         isLoaded: true,
@@ -174,23 +174,24 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
       print('a');
       return ItemCards().fromJson(e);
     }).toList();
-    print(prevData);
-    // if (prevData.isEmpty) {
-    //   add(Initiate());
-    // } else {
-    return InsertstockState(
-        data: (json['state']['data'] as List)
-            .map((e) => ItemCards().fromJson(e))
-            .toList(),
-        isLoaded: true,
-        isLoading: false,
-        isSuccess: false);
-    // }
+    // print(prevData);
+    if (prevData.isEmpty) {
+      add(Initiate());
+    } else {
+      return InsertstockState(
+          data: (json['state']['data'] as List)
+              .map((e) => ItemCards().fromJson(e))
+              .toList(),
+          isLoaded: true,
+          isLoading: false,
+          isSuccess: false);
+    }
     // return (json['state']);
   }
 
   @override
   Map<String, dynamic>? toJson(InsertstockState state) {
+    print('tojson');
     print(state.data.map((ItemCards e) {
       return e.toJson();
     }).toList());

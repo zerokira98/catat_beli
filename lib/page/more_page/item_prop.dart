@@ -16,7 +16,7 @@ class ListOfItems extends StatefulWidget {
 }
 
 class _ListOfItemsState extends State<ListOfItems> {
-  ScrollController sc = ScrollController();
+  late ScrollController sc;
   List changes = [];
   int optionVal = 2;
   var options = [
@@ -40,6 +40,7 @@ class _ListOfItemsState extends State<ListOfItems> {
   late Future<List<StockItem>> getData;
   @override
   void initState() {
+    sc = ScrollController();
     getData = RepositoryProvider.of<MyDatabase>(context)
         .showInsideItems(null, optionVal);
     super.initState();
@@ -109,7 +110,6 @@ class _ListOfItemsState extends State<ListOfItems> {
                       for (int a = 0; a < snapshot.data!.length; a++) {
                         if (a == 0) {
                           changes.add(snapshot.data![a].nama[0]);
-                          // telobgst.add(Key(snapshot.data![a].nama[0]));
                         } else if (snapshot.data![a].nama[0] !=
                             snapshot.data![a - 1].nama[0]) {
                           wordCountList.add({
@@ -117,7 +117,6 @@ class _ListOfItemsState extends State<ListOfItems> {
                             'count': wordCount
                           });
                           changes.add(snapshot.data![a].nama[0]);
-                          // telobgst.add(Key(snapshot.data![a].nama[0]));
                           wordCount = 0;
                         } else if (snapshot.data![a] == snapshot.data!.last) {
                           wordCountList.add({
@@ -185,12 +184,6 @@ class _ListOfItemsState extends State<ListOfItems> {
                             );
                           }
                           if (changes[i - 1] is! StockItem) {
-                            // count++;
-                            // print('nsb$i' + changes[i - 1]);
-                            // print(telobgst[count - 1]);
-                            // if (namebefore == ' ') {
-                            //   namebefore = changes[i - 1];
-                            // }
                             return Separator(
                               // key: telobgst[count - 1],
                               sc: sc,
@@ -290,7 +283,7 @@ class EditItemPage extends StatefulWidget {
 
 class _EditItemPageState extends State<EditItemPage>
     with TickerProviderStateMixin {
-  late SuggestionsBoxController sbc;
+  SuggestionsBoxController sbc = SuggestionsBoxController();
 
   TextEditingController namec = TextEditingController(),
       hargaJual = TextEditingController(),
@@ -303,7 +296,7 @@ class _EditItemPageState extends State<EditItemPage>
   @override
   void initState() {
     data = widget.data;
-    sbc = SuggestionsBoxController();
+    // sbc =
     super.initState();
   }
 
@@ -318,22 +311,24 @@ class _EditItemPageState extends State<EditItemPage>
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.delete_forever,
-              size: 18,
-            ),
-            AutoSizeText(
-              'Remove Item',
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              maxFontSize: 12,
-              // minFontSize: 8,
-            ),
-          ],
+        child: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.delete_forever,
+                size: 18,
+              ),
+              AutoSizeText(
+                'Remove Item',
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                maxFontSize: 12,
+                // minFontSize: 8,
+              ),
+            ],
+          ),
         ),
         onPressed: () async {
           bool a = await showDialog(
@@ -419,8 +414,7 @@ class _EditItemPageState extends State<EditItemPage>
                         children: [
                           Padding(
                             padding: EdgeInsets.all(4.0),
-                            child: Material(
-                              child: TypeAheadFormField(
+                            child: TextFormField(
                                 // autovalidate: true,
                                 validator: (text) {
                                   if (text!.length <= 2) {
@@ -429,47 +423,16 @@ class _EditItemPageState extends State<EditItemPage>
 
                                   return null;
                                 },
-                                suggestionsBoxController: sbc,
-                                textFieldConfiguration: TextFieldConfiguration(
-                                    maxLines: 2,
-                                    minLines: 1,
-                                    controller: namec,
-                                    onChanged: (v) {
-                                      // dO Something
-                                    },
-                                    // style: DefaultTextStyle.of(context)
-                                    //     .style
-                                    //     .copyWith(fontStyle: FontStyle.italic),
-                                    decoration: InputDecoration(
-                                        border: OutlineInputBorder(),
-                                        labelText: 'Nama item')),
-                                suggestionsCallback: (pattern) async {
-                                  var res =
-                                      await RepositoryProvider.of<MyDatabase>(
-                                              context)
-                                          .showInsideItems(pattern);
-                                  return res;
+                                // suggestionsBoxController: sbc,
+                                maxLines: 2,
+                                minLines: 1,
+                                controller: namec,
+                                onChanged: (v) {
+                                  // dO Something
                                 },
-                                itemBuilder: (context, StockItem suggestion) {
-                                  return ListTile(
-                                    leading: Icon(Icons.shopping_cart),
-                                    title: Text(suggestion.nama),
-                                    // subtitle:
-                                    //     Text('\$${suggestion['HARGA_JUAL']}'),
-                                  );
-                                },
-                                onSuggestionSelected:
-                                    (dynamic suggestion) async {
-                                  // var res = await RepositoryProvider.of<
-                                  //         DatabaseRepository>(context)
-                                  //     .showInsideStock(
-                                  //         idbarang: suggestion['ID']);
-                                  // print(res);
-
-                                  /// dO sOMETHING
-                                },
-                              ),
-                            ),
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    labelText: 'Nama item')),
                           ),
                           Row(
                             children: [

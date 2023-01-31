@@ -218,9 +218,19 @@ class MyDatabase extends _$MyDatabase {
       (u) => OrderingTerm.desc(u.nama),
     ];
     a.orderBy([sortIndex[sort]]);
-    return nama == null
-        ? a.get()
-        : (a..where((tbl) => tbl.nama.contains(nama))).get();
+    if (nama == null) {
+      return a.get();
+    } else {
+      if (nama.split(' ').length > 1) {
+        var namaArr = nama.split(' ');
+        for (var val in namaArr) {
+          a..where((tbl) => tbl.nama.contains(val));
+        }
+      } else {
+        a..where((tbl) => tbl.nama.contains(nama));
+      }
+      return (a).get();
+    }
   }
 
   ///========

@@ -77,11 +77,11 @@ class _StockviewCardState extends State<StockviewCard> {
           });
         }
         Future.delayed(Duration(seconds: 4), () {
-          // if (horizontal != 0.0)
-          setState(() {
-            horizontal = 0.0;
-            opacityval = 1.0;
-          });
+          if (horizontal != 0.0)
+            setState(() {
+              horizontal = 0.0;
+              opacityval = 1.0;
+            });
         });
       },
       child: Container(

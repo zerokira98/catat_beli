@@ -1,4 +1,7 @@
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:catatbeli/page/sidebar/sidebar.dart';
+import 'package:catatbeli/msc/themedatas.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
@@ -6,6 +9,7 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,9 +29,10 @@ main() async {
   }
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
-      storageDirectory: await getApplicationDocumentsDirectory());
+      storageDirectory: await getTemporaryDirectory());
   // Bloc = NewBlocObserver();
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
+// ;
   // BlocOverrides.runZoned(
   //   () => runApp(App()),
   //   blocObserver: NewBlocObserver(),
@@ -64,7 +69,8 @@ class App extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => ThemeCubit()..getThemeData(),
+            create: (context) =>
+                ThemeCubit(themeDatas: ThemeDatas())..getThemeData(),
           ),
           BlocProvider(
             create: (context) =>
@@ -76,20 +82,14 @@ class App extends StatelessWidget {
                   StockviewBloc(RepositoryProvider.of<MyDatabase>(context))
                     ..add(InitiateView())),
         ],
-        child: BlocBuilder<ThemeCubit, ThemeMode>(
+        child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
             print(state);
             return MaterialApp(
                 debugShowCheckedModeBanner: false,
-                themeMode: state,
-                darkTheme: ThemeData.dark(
-                  useMaterial3: true,
-                ),
-                theme: ThemeData(
-                    useMaterial3: true,
-                    fontFamily: 'OpenSans',
-                    primaryColor: Colors.amber[800]),
+                theme: state.themeData,
                 home: Scaffold(
+                  // drawer: SideDrawer(),
                   backgroundColor: Colors.transparent,
                   body: FutureBuilder<SharedPreferences>(
                       future: SharedPreferences.getInstance(),

@@ -2,11 +2,134 @@
 
 part of 'db_moor.dart';
 
-// **************************************************************************
-// DriftDatabaseGenerator
-// **************************************************************************
-
 // ignore_for_file: type=lint
+class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StocksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _priceMeta = const VerificationMeta('price');
+  @override
+  late final GeneratedColumn<int> price = GeneratedColumn<int>(
+      'price', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
+  static const VerificationMeta _qtyMeta = const VerificationMeta('qty');
+  @override
+  late final GeneratedColumn<double> qty = GeneratedColumn<double>(
+      'qty', aliasedName, false,
+      type: DriftSqlType.double,
+      requiredDuringInsert: false,
+      defaultValue: Constant(1.0));
+  static const VerificationMeta _dateAddMeta =
+      const VerificationMeta('dateAdd');
+  @override
+  late final GeneratedColumn<DateTime> dateAdd = GeneratedColumn<DateTime>(
+      'date_add', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+      'note', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _idItemMeta = const VerificationMeta('idItem');
+  @override
+  late final GeneratedColumn<int> idItem = GeneratedColumn<int>(
+      'id_item', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: 'REFERENCES stockitems(id)');
+  static const VerificationMeta _idSupplierMeta =
+      const VerificationMeta('idSupplier');
+  @override
+  late final GeneratedColumn<int> idSupplier = GeneratedColumn<int>(
+      'id_supplier', aliasedName, true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      $customConstraints: 'REFERENCES tempatbelis(id)');
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, price, qty, dateAdd, note, idItem, idSupplier];
+  @override
+  String get aliasedName => _alias ?? 'stocks';
+  @override
+  String get actualTableName => 'stocks';
+  @override
+  VerificationContext validateIntegrity(Insertable<Stock> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('price')) {
+      context.handle(
+          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+    }
+    if (data.containsKey('qty')) {
+      context.handle(
+          _qtyMeta, qty.isAcceptableOrUnknown(data['qty']!, _qtyMeta));
+    }
+    if (data.containsKey('date_add')) {
+      context.handle(_dateAddMeta,
+          dateAdd.isAcceptableOrUnknown(data['date_add']!, _dateAddMeta));
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
+    }
+    if (data.containsKey('id_item')) {
+      context.handle(_idItemMeta,
+          idItem.isAcceptableOrUnknown(data['id_item']!, _idItemMeta));
+    }
+    if (data.containsKey('id_supplier')) {
+      context.handle(
+          _idSupplierMeta,
+          idSupplier.isAcceptableOrUnknown(
+              data['id_supplier']!, _idSupplierMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Stock map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Stock(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      price: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}price'])!,
+      qty: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}qty'])!,
+      dateAdd: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_add']),
+      note: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}note']),
+      idItem: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id_item']),
+      idSupplier: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id_supplier']),
+    );
+  }
+
+  @override
+  $StocksTable createAlias(String alias) {
+    return $StocksTable(attachedDatabase, alias);
+  }
+}
+
 class Stock extends DataClass implements Insertable<Stock> {
   final int id;
   final int price;
@@ -242,96 +365,59 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   }
 }
 
-class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
+class $StockItemsTable extends StockItems
+    with TableInfo<$StockItemsTable, StockItem> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $StocksTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
+  $StockItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
+      hasAutoIncrement: true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _priceMeta = const VerificationMeta('price');
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _barcodeMeta =
+      const VerificationMeta('barcode');
   @override
-  late final GeneratedColumn<int> price = GeneratedColumn<int>(
-      'price', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: Constant(0));
-  final VerificationMeta _qtyMeta = const VerificationMeta('qty');
+  late final GeneratedColumn<int> barcode = GeneratedColumn<int>(
+      'barcode', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _namaMeta = const VerificationMeta('nama');
   @override
-  late final GeneratedColumn<double> qty = GeneratedColumn<double>(
-      'qty', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: Constant(1.0));
-  final VerificationMeta _dateAddMeta = const VerificationMeta('dateAdd');
+  late final GeneratedColumn<String> nama =
+      GeneratedColumn<String>('nama', aliasedName, false,
+          additionalChecks: GeneratedColumn.checkTextLength(
+            minTextLength: 3,
+          ),
+          type: DriftSqlType.string,
+          requiredDuringInsert: true);
   @override
-  late final GeneratedColumn<DateTime> dateAdd = GeneratedColumn<DateTime>(
-      'date_add', aliasedName, true,
-      type: DriftSqlType.dateTime, requiredDuringInsert: false);
-  final VerificationMeta _noteMeta = const VerificationMeta('note');
+  List<GeneratedColumn> get $columns => [id, barcode, nama];
   @override
-  late final GeneratedColumn<String> note = GeneratedColumn<String>(
-      'note', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  final VerificationMeta _idItemMeta = const VerificationMeta('idItem');
+  String get aliasedName => _alias ?? 'stock_items';
   @override
-  late final GeneratedColumn<int> idItem = GeneratedColumn<int>(
-      'id_item', aliasedName, true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      $customConstraints: 'REFERENCES stockitems(id)');
-  final VerificationMeta _idSupplierMeta = const VerificationMeta('idSupplier');
+  String get actualTableName => 'stock_items';
   @override
-  late final GeneratedColumn<int> idSupplier = GeneratedColumn<int>(
-      'id_supplier', aliasedName, true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      $customConstraints: 'REFERENCES tempatbelis(id)');
-  @override
-  List<GeneratedColumn> get $columns =>
-      [id, price, qty, dateAdd, note, idItem, idSupplier];
-  @override
-  String get aliasedName => _alias ?? 'stocks';
-  @override
-  String get actualTableName => 'stocks';
-  @override
-  VerificationContext validateIntegrity(Insertable<Stock> instance,
+  VerificationContext validateIntegrity(Insertable<StockItem> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('price')) {
+    if (data.containsKey('barcode')) {
+      context.handle(_barcodeMeta,
+          barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta));
+    }
+    if (data.containsKey('nama')) {
       context.handle(
-          _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
-    }
-    if (data.containsKey('qty')) {
-      context.handle(
-          _qtyMeta, qty.isAcceptableOrUnknown(data['qty']!, _qtyMeta));
-    }
-    if (data.containsKey('date_add')) {
-      context.handle(_dateAddMeta,
-          dateAdd.isAcceptableOrUnknown(data['date_add']!, _dateAddMeta));
-    }
-    if (data.containsKey('note')) {
-      context.handle(
-          _noteMeta, note.isAcceptableOrUnknown(data['note']!, _noteMeta));
-    }
-    if (data.containsKey('id_item')) {
-      context.handle(_idItemMeta,
-          idItem.isAcceptableOrUnknown(data['id_item']!, _idItemMeta));
-    }
-    if (data.containsKey('id_supplier')) {
-      context.handle(
-          _idSupplierMeta,
-          idSupplier.isAcceptableOrUnknown(
-              data['id_supplier']!, _idSupplierMeta));
+          _namaMeta, nama.isAcceptableOrUnknown(data['nama']!, _namaMeta));
+    } else if (isInserting) {
+      context.missing(_namaMeta);
     }
     return context;
   }
@@ -339,29 +425,21 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Stock map(Map<String, dynamic> data, {String? tablePrefix}) {
+  StockItem map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Stock(
-      id: attachedDatabase.options.types
+    return StockItem(
+      id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      price: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}price'])!,
-      qty: attachedDatabase.options.types
-          .read(DriftSqlType.double, data['${effectivePrefix}qty'])!,
-      dateAdd: attachedDatabase.options.types
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}date_add']),
-      note: attachedDatabase.options.types
-          .read(DriftSqlType.string, data['${effectivePrefix}note']),
-      idItem: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}id_item']),
-      idSupplier: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}id_supplier']),
+      barcode: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}barcode']),
+      nama: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
     );
   }
 
   @override
-  $StocksTable createAlias(String alias) {
-    return $StocksTable(attachedDatabase, alias);
+  $StockItemsTable createAlias(String alias) {
+    return $StockItemsTable(attachedDatabase, alias);
   }
 }
 
@@ -501,50 +579,44 @@ class StockItemsCompanion extends UpdateCompanion<StockItem> {
   }
 }
 
-class $StockItemsTable extends StockItems
-    with TableInfo<$StockItemsTable, StockItem> {
+class $TempatBelisTable extends TempatBelis
+    with TableInfo<$TempatBelisTable, TempatBeli> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $StockItemsTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
+  $TempatBelisTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
       'id', aliasedName, false,
+      hasAutoIncrement: true,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _barcodeMeta = const VerificationMeta('barcode');
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _namaMeta = const VerificationMeta('nama');
   @override
-  late final GeneratedColumn<int> barcode = GeneratedColumn<int>(
-      'barcode', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  final VerificationMeta _namaMeta = const VerificationMeta('nama');
+  late final GeneratedColumn<String> nama = GeneratedColumn<String>(
+      'nama', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _alamatMeta = const VerificationMeta('alamat');
   @override
-  late final GeneratedColumn<String> nama =
-      GeneratedColumn<String>('nama', aliasedName, false,
-          additionalChecks: GeneratedColumn.checkTextLength(
-            minTextLength: 3,
-          ),
-          type: DriftSqlType.string,
-          requiredDuringInsert: true);
+  late final GeneratedColumn<String> alamat = GeneratedColumn<String>(
+      'alamat', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   @override
-  List<GeneratedColumn> get $columns => [id, barcode, nama];
+  List<GeneratedColumn> get $columns => [id, nama, alamat];
   @override
-  String get aliasedName => _alias ?? 'stock_items';
+  String get aliasedName => _alias ?? 'tempat_belis';
   @override
-  String get actualTableName => 'stock_items';
+  String get actualTableName => 'tempat_belis';
   @override
-  VerificationContext validateIntegrity(Insertable<StockItem> instance,
+  VerificationContext validateIntegrity(Insertable<TempatBeli> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('barcode')) {
-      context.handle(_barcodeMeta,
-          barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta));
     }
     if (data.containsKey('nama')) {
       context.handle(
@@ -552,27 +624,31 @@ class $StockItemsTable extends StockItems
     } else if (isInserting) {
       context.missing(_namaMeta);
     }
+    if (data.containsKey('alamat')) {
+      context.handle(_alamatMeta,
+          alamat.isAcceptableOrUnknown(data['alamat']!, _alamatMeta));
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  StockItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+  TempatBeli map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return StockItem(
-      id: attachedDatabase.options.types
+    return TempatBeli(
+      id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      barcode: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}barcode']),
-      nama: attachedDatabase.options.types
+      nama: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
+      alamat: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}alamat']),
     );
   }
 
   @override
-  $StockItemsTable createAlias(String alias) {
-    return $StockItemsTable(attachedDatabase, alias);
+  $TempatBelisTable createAlias(String alias) {
+    return $TempatBelisTable(attachedDatabase, alias);
   }
 }
 
@@ -711,84 +787,13 @@ class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
   }
 }
 
-class $TempatBelisTable extends TempatBelis
-    with TableInfo<$TempatBelisTable, TempatBeli> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $TempatBelisTable(this.attachedDatabase, [this._alias]);
-  final VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
-  final VerificationMeta _namaMeta = const VerificationMeta('nama');
-  @override
-  late final GeneratedColumn<String> nama = GeneratedColumn<String>(
-      'nama', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  final VerificationMeta _alamatMeta = const VerificationMeta('alamat');
-  @override
-  late final GeneratedColumn<String> alamat = GeneratedColumn<String>(
-      'alamat', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [id, nama, alamat];
-  @override
-  String get aliasedName => _alias ?? 'tempat_belis';
-  @override
-  String get actualTableName => 'tempat_belis';
-  @override
-  VerificationContext validateIntegrity(Insertable<TempatBeli> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('nama')) {
-      context.handle(
-          _namaMeta, nama.isAcceptableOrUnknown(data['nama']!, _namaMeta));
-    } else if (isInserting) {
-      context.missing(_namaMeta);
-    }
-    if (data.containsKey('alamat')) {
-      context.handle(_alamatMeta,
-          alamat.isAcceptableOrUnknown(data['alamat']!, _alamatMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  TempatBeli map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return TempatBeli(
-      id: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      nama: attachedDatabase.options.types
-          .read(DriftSqlType.string, data['${effectivePrefix}nama'])!,
-      alamat: attachedDatabase.options.types
-          .read(DriftSqlType.string, data['${effectivePrefix}alamat']),
-    );
-  }
-
-  @override
-  $TempatBelisTable createAlias(String alias) {
-    return $TempatBelisTable(attachedDatabase, alias);
-  }
-}
-
 abstract class _$MyDatabase extends GeneratedDatabase {
   _$MyDatabase(QueryExecutor e) : super(e);
   late final $StocksTable stocks = $StocksTable(this);
   late final $StockItemsTable stockItems = $StockItemsTable(this);
   late final $TempatBelisTable tempatBelis = $TempatBelisTable(this);
   @override
-  Iterable<TableInfo<Table, dynamic>> get allTables =>
+  Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>

@@ -37,7 +37,7 @@ class Tempatbeli extends FormzInput<String, TempatbeliValidationError> {
 
   @override
   TempatbeliValidationError? validator(String value) {
-    if (value == '') return TempatbeliValidationError.empty;
+    // if (value == '') return TempatbeliValidationError.empty;
     return null;
   }
 }
