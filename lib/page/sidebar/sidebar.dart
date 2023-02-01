@@ -3,6 +3,7 @@ import 'dart:io';
 // import 'package:catatbeli/msc/db_moor.dart';
 // import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:catatbeli/page/statistic_page/statistic_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -108,8 +109,13 @@ class _SideDrawerState extends State<SideDrawer> {
           ListTile(
             trailing: Icon(Icons.auto_graph),
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('not implemented yet, sorry')));
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => StatsPage(),
+                  ));
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //     SnackBar(content: Text('not implemented yet, sorry')));
             },
             title: Text('Statistik'),
           ),

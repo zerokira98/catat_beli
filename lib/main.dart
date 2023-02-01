@@ -41,7 +41,7 @@ main() async {
   if (Platform.isWindows) {
     doWhenWindowReady(() {
       appWindow.size = Size(480, 720);
-      appWindow.minSize = Size(480, 720);
+      appWindow.minSize = Size(420, 720);
       appWindow.maximize();
       appWindow.show();
     });

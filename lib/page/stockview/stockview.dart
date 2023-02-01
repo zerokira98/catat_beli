@@ -276,6 +276,13 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
 
                           ///Previous page Button
                           InkWell(
+                            onLongPress: () {
+                              if (state.filter.currentPage != 0) {
+                                BlocProvider.of<StockviewBloc>(context).add(
+                                    PageChange(
+                                        state.filter.copyWith(currentPage: 0)));
+                              }
+                            },
                             onTap: () {
                               if (state.filter.currentPage > 0 &&
                                   state.filter.currentPage <=
@@ -412,6 +419,14 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
 
                           ///Next page Button
                           InkWell(
+                            onLongPress: () {
+                              if (state.filter.currentPage !=
+                                  state.filter.maxPage) {
+                                BlocProvider.of<StockviewBloc>(context).add(
+                                    PageChange(state.filter.copyWith(
+                                        currentPage: state.filter.maxPage)));
+                              }
+                            },
                             onTap: () {
                               if (state.filter.maxPage >
                                   state.filter.currentPage) {

@@ -290,6 +290,7 @@ class _EditItemPageState extends State<EditItemPage>
       barcodeC = TextEditingController(),
       qtyc = TextEditingController();
   late StockItem data;
+  bool switchValue = false;
   final _formkey = GlobalKey<FormState>();
   // int optionVal = 0;
   DateTime selectedDate = DateTime.now();
@@ -511,6 +512,19 @@ class _EditItemPageState extends State<EditItemPage>
                               // )),
                             ],
                           ),
+                          Row(
+                            children: [
+                              Text('Sembunyikan dari input suggestion'),
+                              Expanded(child: Container()),
+                              Switch(
+                                  value: switchValue,
+                                  onChanged: (a) {
+                                    setState(() {
+                                      switchValue = a;
+                                    });
+                                  })
+                            ],
+                          )
                         ],
                       ),
                     ),
