@@ -17,8 +17,10 @@ class ListOfItems extends StatefulWidget {
 
 class _ListOfItemsState extends State<ListOfItems> {
   late ScrollController sc;
+  TextEditingController namaC = TextEditingController();
   List changes = [];
   int optionVal = 2;
+  bool showHiddenOnly = false;
   var options = [
     DropdownMenuItem(
       child: Text('Date Asc'),
@@ -97,7 +99,8 @@ class _ListOfItemsState extends State<ListOfItems> {
           Positioned.fill(
             child: FutureBuilder<List<StockItem>>(
                 future: RepositoryProvider.of<MyDatabase>(context)
-                    .showInsideItems(null, optionVal),
+                    .showInsideItems(namaC.text.isEmpty ? null : namaC.text,
+                        optionVal, showHiddenOnly),
                 builder: (context, snapshot) {
                   if (snapshot.data != null && snapshot.hasData) {
                     if (optionVal == 2) {
@@ -156,8 +159,39 @@ class _ListOfItemsState extends State<ListOfItems> {
                                                 });
                                               },
                                               value: optionVal),
+                                          Expanded(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: TextFormField(
+                                              controller: namaC,
+                                              decoration: InputDecoration(
+                                                  suffix: IconButton(
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          namaC.clear();
+                                                        });
+                                                      },
+                                                      icon: Icon(
+                                                          Icons.close_sharp)),
+                                                  labelText: 'Nama barang'),
+                                            ),
+                                          ))
                                         ],
                                       ),
+                                      Row(
+                                        children: [
+                                          Text('Show hidden only'),
+                                          Expanded(child: Container()),
+                                          Switch(
+                                            value: showHiddenOnly,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                showHiddenOnly = value;
+                                              });
+                                            },
+                                          )
+                                        ],
+                                      )
                                     ],
                                   )),
                             );
@@ -296,6 +330,14 @@ class _EditItemPageState extends State<EditItemPage>
   DateTime selectedDate = DateTime.now();
   @override
   void initState() {
+    var ishidden = RepositoryProvider.of<MyDatabase>(context)
+        .viewHidden(widget.data.id)
+        .then((value) {
+      setState(() {
+        switchValue = value.isNotEmpty;
+      });
+    });
+    ;
     data = widget.data;
     // sbc =
     super.initState();
@@ -514,14 +556,32 @@ class _EditItemPageState extends State<EditItemPage>
                           ),
                           Row(
                             children: [
-                              Text('Sembunyikan dari input suggestion'),
-                              Expanded(child: Container()),
+                              Expanded(
+                                child: ListTile(
+                                  title:
+                                      Text('Sembunyikan dari input suggestion'),
+                                  subtitle:
+                                      Text('tetap muncul di histori stock'),
+                                ),
+                              ),
                               Switch(
                                   value: switchValue,
-                                  onChanged: (a) {
+                                  onChanged: (a) async {
+                                    print(await await RepositoryProvider.of<
+                                            MyDatabase>(context)
+                                        .viewHidden());
                                     setState(() {
                                       switchValue = a;
                                     });
+                                    if (a) {
+                                      await RepositoryProvider.of<MyDatabase>(
+                                              context)
+                                          .addToHidden(data.id);
+                                    } else {
+                                      await RepositoryProvider.of<MyDatabase>(
+                                              context)
+                                          .removeFromHidden(data.id);
+                                    }
                                   })
                             ],
                           )

@@ -33,6 +33,11 @@ class TempatBelis extends Table {
   TextColumn get alamat => text().nullable()();
 }
 
+class HiddenItems extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get itemsId => integer().unique().references(StockItems, #id)();
+}
+
 class StockWithDetails {
   StockWithDetails(this.stock, this.item, this.tempatBeli);
 
@@ -57,11 +62,21 @@ LazyDatabase _openConnection() {
   });
 }
 
-@DriftDatabase(tables: [Stocks, StockItems, TempatBelis])
+@DriftDatabase(tables: [
+  Stocks,
+  StockItems,
+  TempatBelis,
+  HiddenItems
+], queries: {
+  'showItemswithHide':
+      'SELECT * FROM stock_items WHERE stock_items.nama=:id stock_items.id NOT IN (SELECT items_id FROM hidden_items);',
+  'showItemsHiddenOnly':
+      'SELECT * FROM stock_items WHERE stock_items.id IN (SELECT items_id FROM hidden_items);'
+})
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
@@ -73,6 +88,9 @@ class MyDatabase extends _$MyDatabase {
           }
           if (from < 3) {
             await m.addColumn(tempatBelis, tempatBelis.alamat);
+          }
+          if (from < 4) {
+            await m.createTable(hiddenItems);
           }
         },
         beforeOpen: (d) async {
@@ -86,6 +104,38 @@ class MyDatabase extends _$MyDatabase {
 
   Future<List<StockItem>> get dataItem => select(stockItems).get();
   Future<List<Stock>> get dataStock => select(stocks).get();
+
+  ///==============
+  Future test() async {
+    var a = select(stockItems);
+    var b = select(hiddenItems);
+    var resB = await b.get();
+    var mapB = resB.map((e) => e.itemsId);
+    a..where((tbl) => tbl.id.isIn(mapB));
+    // a..where((tbl) => tbl.nama.equals('1pres Surya 12'));
+    return a.get();
+  }
+
+  ///==============
+  Future addToHidden(int itemId) async {
+    return into(hiddenItems)
+        .insert(HiddenItemsCompanion.insert(itemsId: itemId));
+  }
+
+  ///==============
+  Future<List> viewHidden([int? idBarang]) async {
+    var a = select(hiddenItems);
+    if (idBarang != null) {
+      a..where((tbl) => tbl.itemsId.equals(idBarang));
+    }
+    return a.get();
+  }
+
+  ///==============
+  Future removeFromHidden(int itemId) async {
+    return (delete(hiddenItems)..where((tbl) => tbl.itemsId.equals(itemId)))
+        .go();
+  }
 
   ///================
   Future deleteStock(int cardId) async {
@@ -193,6 +243,42 @@ class MyDatabase extends _$MyDatabase {
         .toList();
   }
 
+  Future<List<AvailData>> availMonthwithCount(DateTime year) async {
+    ///----------Declare default variables
+    var time = year;
+    DateTime startDate = DateTime(time.year, 1, 1);
+    DateTime endDate = DateTime(time.year, 12, 31);
+
+    /// Return variable
+    ///
+    List<TypedResult> a;
+
+    // int max = await ;
+    // var sumOfprice = CustomExpression<double>("");
+    Expression<int> sumOfprice = stocks.id.count();
+    var query;
+    query = (select(stocks)
+          ..orderBy([
+            (tbl) =>
+                OrderingTerm(expression: tbl.dateAdd, mode: OrderingMode.asc)
+          ])
+          ..where((tbl) =>
+              tbl.dateAdd.isBiggerOrEqualValue(startDate) &
+              stocks.dateAdd.isSmallerOrEqualValue(endDate)))
+        .join([
+      leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
+      leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
+    ])
+      ..addColumns([sumOfprice])
+      ..groupBy([stocks.dateAdd.month]);
+
+    a = await query.get();
+    return a
+        .map<AvailData>(
+            (e) => AvailData(e.readTable(stocks).dateAdd!, e.read(sumOfprice)!))
+        .toList();
+  }
+
   ///====
   Future<List<Stock>> showInsideStock({int? idBarang}) => idBarang == null
       ? select(stocks).get()
@@ -208,8 +294,19 @@ class MyDatabase extends _$MyDatabase {
           .get();
 
   ///========
-  Future<List<StockItem>> showInsideItems([String? nama, int? sort]) {
+  Future<List<StockItem>> showInsideItems(
+      [String? nama, int? sort, bool? showHidden]) async {
+    showHidden = showHidden ?? false;
     var a = select(stockItems);
+    var b = select(hiddenItems);
+    var resB = await b.get();
+    var mapB = resB.map((e) => e.itemsId);
+    // .join([leftOuterJoin(hiddenItems, hiddenItems.itemsId.in(stockItems.id))]);
+    if (showHidden) {
+      a..where((tbl) => tbl.id.isIn(mapB));
+    } else {
+      a..where((tbl) => tbl.id.isNotIn(mapB));
+    }
     sort = sort ?? 0;
     List sortIndex = [
       (u) => OrderingTerm.asc(u.id),
@@ -318,5 +415,16 @@ class MyDatabase extends _$MyDatabase {
             dateAdd: Value(a.ditambahkan),
             price: Value(a.hargaBeli.value),
             qty: Value(a.pcs.value)));
+  }
+}
+
+class AvailData {
+  DateTime date;
+  int rowCount;
+  AvailData(this.date, this.rowCount);
+  @override
+  String toString() {
+    // TODO: implement toString
+    return [date.toString(), rowCount.toString()].toString();
   }
 }

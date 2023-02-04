@@ -168,8 +168,8 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
 
   @override
   InsertstockState? fromJson(Map<String, dynamic> json) {
-    print('you here?');
-    print('${json['state']['data']}');
+    // print('you here?');
+    // print('${json['state']['data']}');
     var prevData = (json['state']['data'] as List).map((e) {
       print('a');
       return ItemCards().fromJson(e);
@@ -178,6 +178,18 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     if (prevData.isEmpty) {
       add(Initiate());
     } else {
+      if (prevData.length == 1 &&
+          ItemCards()
+              .fromJson(json['state']['data'][0])
+              .namaBarang
+              .value
+              .isEmpty) {
+        return InsertstockState(data: [
+          ItemCards()
+              .fromJson(json['state']['data'][0])
+              .copywith(ditambahkan: DateTime.now())
+        ], isLoaded: true, isLoading: false, isSuccess: false);
+      }
       return InsertstockState(
           data: (json['state']['data'] as List)
               .map((e) => ItemCards().fromJson(e))

@@ -40,51 +40,57 @@ class _StatsPageState extends State<StatsPage> {
                   Text('Pembelian Kumulatif Bulan : '),
                   Padding(padding: EdgeInsets.all(4)),
                   Expanded(
-                      child: TextFormField(
-                    // enabled: false,
-                    controller: monthController,
-                    onTap: () {
-                      showMonthPicker(
-                        context: context,
-                        lastDate: DateTime.now(),
-                        initialDate: DateTime.now(),
-                      ).then((date) {
-                        if (date != null) {
-                          setState(() {
-                            var y = DateFormat('MMM y').format(date);
-                            monthController.text = y.toString();
-                            selectedDate = date;
-                          });
-                        }
-                      });
-                    },
-                  )),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton<int>(
-                    items: [
-                      DropdownMenuItem(
-                        child: Text('Harian'),
-                        value: 0,
-                      ),
-                      DropdownMenuItem(
-                        child: Text('Mingguan'),
-                        value: 1,
-                      ),
-                    ],
-                    value: dropdownValue,
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          dropdownValue = value;
+                    child: GestureDetector(
+                      onTap: () {
+                        showMonthPicker(
+                          context: context,
+                          lastDate: DateTime.now(),
+                          initialDate: selectedDate,
+                        ).then((date) {
+                          if (date != null) {
+                            setState(() {
+                              var y = DateFormat('MMM y').format(date);
+                              monthController.text = y.toString();
+                              selectedDate = date;
+                            });
+                          }
                         });
-                      }
-                    },
+                      },
+                      child: TextFormField(
+                        enabled: false,
+                        controller: monthController,
+                        // onTap: () {
+                        //   FocusScope.of(context).unfocus();
+                        // },
+                      ),
+                    ),
                   ),
                 ],
               ),
+              // Row(
+              //   children: [
+              //     DropdownButton<int>(
+              //       items: [
+              //         DropdownMenuItem(
+              //           child: Text('Harian'),
+              //           value: 0,
+              //         ),
+              //         DropdownMenuItem(
+              //           child: Text('Mingguan'),
+              //           value: 1,
+              //         ),
+              //       ],
+              //       value: dropdownValue,
+              //       onChanged: (value) {
+              //         if (value != null) {
+              //           setState(() {
+              //             dropdownValue = value;
+              //           });
+              //         }
+              //       },
+              //     ),
+              //   ],
+              // ),
               Text(
                 'Pembelian Terbesar:',
                 style: TextStyle(fontSize: 24),
@@ -92,9 +98,15 @@ class _StatsPageState extends State<StatsPage> {
               ),
               FutureBuilder<List<StockWithDetails>>(
                   future: RepositoryProvider.of<MyDatabase>(context)
-                      .showStockwithDetails(),
+                      .showStockwithDetails(
+                          startDate: DateTime(
+                              selectedDate.year, selectedDate.month, 1),
+                          endDate: DateTime(
+                                  selectedDate.year, selectedDate.month + 1)
+                              .subtract(Duration(days: 1))),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
+                      if (snapshot.data!.isEmpty) return Text('Error, No data');
                       var datas = snapshot.data;
                       Map telo = Map<dynamic, Map>();
                       for (var i = 0; i < datas!.length; i++) {
@@ -117,22 +129,33 @@ class _StatsPageState extends State<StatsPage> {
                           maxvaldate = value['date'];
                         }
                       });
+
                       String maxvalFormatted = NumberFormat.compactCurrency(
                               locale: 'ID_id', symbol: 'Rp.')
                           .format(maxval);
                       String maxvaldateFormatted =
-                          DateFormat('EEEE, d/m', 'ID_id').format(maxvaldate!);
+                          DateFormat('EEEE', 'ID_id').format(maxvaldate!);
 
                       return Container(
                         margin: EdgeInsets.all(8.0),
-                        height: 175,
-                        width: 125,
+                        height: 200,
+                        width: 150,
                         child: Card(
                             elevation: 8,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                  '${maxvaldateFormatted}\nsebesar $maxvalFormatted'),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    maxvaldateFormatted,
+                                    style: TextStyle(fontSize: 24),
+                                  ),
+                                  Text('tanggal ${maxvaldate!.day}'),
+                                  Expanded(child: Container()),
+                                  Text('sebesar $maxvalFormatted'),
+                                ],
+                              ),
                             )),
                       );
                     }
@@ -158,7 +181,8 @@ class _StatsPageState extends State<StatsPage> {
                                   .subtract(Duration(days: 1))),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          // print(snapshot.data);
+                          if (snapshot.data!.isEmpty)
+                            return Text('Error, No data');
                           return ChartWidget(datas: snapshot.data);
                           // return CircularProgressIndicator();
                         }
@@ -182,11 +206,25 @@ class ChartWidget extends StatefulWidget {
 }
 
 class ChartWidgetState extends State<ChartWidget> {
-  late List<_ChartData> data = [];
+  // late
   late TooltipBehavior _tooltip;
 
   @override
   void initState() {
+    // data = widget.datas==null?[
+    //   _ChartData('CHN', 12),
+    //   _ChartData('GER', 15),
+    //   _ChartData('RUS', 30),
+    //   _ChartData('BRZ', 6.4),
+    //   _ChartData('IND', 14)
+    // ]:widget.datas.map((e) => _ChartData(e.item., y));
+    _tooltip = TooltipBehavior(enable: true);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<_ChartData> data = [];
     Map<int, dynamic> telo = Map();
     // print(widget.datas);
     if (widget.datas != null) {
@@ -203,19 +241,7 @@ class ChartWidgetState extends State<ChartWidget> {
       data.add(_ChartData(key.toString(), value));
       // });
     });
-    // data = widget.datas==null?[
-    //   _ChartData('CHN', 12),
-    //   _ChartData('GER', 15),
-    //   _ChartData('RUS', 30),
-    //   _ChartData('BRZ', 6.4),
-    //   _ChartData('IND', 14)
-    // ]:widget.datas.map((e) => _ChartData(e.item., y));
-    _tooltip = TooltipBehavior(enable: true);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+    print(data);
     return SfCartesianChart(
         primaryXAxis: CategoryAxis(),
         // primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),

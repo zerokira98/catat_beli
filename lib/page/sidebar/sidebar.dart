@@ -3,6 +3,8 @@ import 'dart:io';
 // import 'package:catatbeli/msc/db_moor.dart';
 // import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:flutter/foundation.dart';
+import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/page/statistic_page/statistic_page.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,19 +57,22 @@ class _SideDrawerState extends State<SideDrawer> {
       ),
       Expanded(
         child: ListView(children: [
-          // ListTile(
-          //   trailing: Icon(Icons.history),
-          //   subtitle: Text('Dev deug'),
-          //   onTap: () async {
-          //     var a = await RepositoryProvider.of<MyDatabase>(context)
-          //         .showInsideStock(idBarang: 91);
-          //     print(a);
-          //     // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-          //     // Navigator.push(context,
-          //     //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
-          //   },
-          //   title: Text('dev debug '),
-          // ),
+          ListTile(
+            trailing: Icon(Icons.android),
+            subtitle: Text('Dev deug'),
+            onTap: () async {
+              var a = await RepositoryProvider.of<MyDatabase>(context)
+                  .availMonthwithCount(DateTime(2023));
+              print(a);
+              // for (var element in a) {
+              //   print(element);
+              // }
+              // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+              // Navigator.push(context,
+              //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
+            },
+            title: Text('dev debug '),
+          ),
           ListTile(
             trailing: Icon(Icons.history),
             subtitle: Text('Data Masuk Barang'),
@@ -80,12 +85,12 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           ListTile(
             trailing: Icon(Icons.edit),
-            subtitle: Text('Nama & barcode'),
+            subtitle: Text('Nama, barcode, dsb.'),
             onTap: () {
               Navigator.push(context,
                   CupertinoPageRoute(builder: (context) => ListOfItems()));
             },
-            title: Text('Ganti Nama Barang'),
+            title: Text('Edit Barang'),
           ),
           ListTile(
             trailing: Icon(Icons.edit),
@@ -134,8 +139,13 @@ class _SideDrawerState extends State<SideDrawer> {
                           '${DateTime.now().toString().substring(0, 10)}.db');
                   final filePath =
                       await FlutterFileDialog.saveFile(params: params);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('file saved at:$filePath')));
+                  if (filePath == null) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('cancelled')));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('file saved at:$filePath')));
+                  }
                 } else if (!Platform.isAndroid) {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('not implemented yet, sorry')));
@@ -147,13 +157,50 @@ class _SideDrawerState extends State<SideDrawer> {
           ListTile(
             trailing: Icon(Icons.ac_unit),
             onTap: () async {
+              List sqliteHead = [
+                '53',
+                '51',
+                '4c',
+                '69',
+                '74',
+                '65',
+                '20',
+                '66',
+                '6f',
+                '72',
+                '6d',
+                '61',
+                '74',
+                '20',
+                '33',
+                '00'
+              ];
+              List aeh =
+                  sqliteHead.map((e) => int.parse(e, radix: 16)).toList();
               if (Platform.isAndroid) {
-                final filePath = await FlutterFileDialog.pickFile();
-                if (filePath != null) {
-                  final importedFile = File(filePath);
-                  final dbFolder = await getApplicationDocumentsDirectory();
-                  final file = File(p.join(dbFolder.path, 'db.sqlite'));
-                  file.writeAsBytes(await importedFile.readAsBytes());
+                try {
+                  final filePath = await FlutterFileDialog.pickFile();
+                  if (filePath == null) {
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('cancelled:')));
+                  } else {
+                    File selectedFile = File(filePath);
+                    if (await selectedFile.exists()) {
+                      var bytes = await selectedFile.readAsBytes();
+                      if (listEquals(bytes.sublist(0, 16), aeh)) {
+                        final dbFolder =
+                            await getApplicationDocumentsDirectory();
+                        final file = File(p.join(dbFolder.path, 'db.sqlite'));
+                        file.writeAsBytes(await selectedFile.readAsBytes());
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('wrong file type')));
+                      }
+                    }
+                  }
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('cancelled:' + e.toString())));
                 }
               }
               if (Platform.isWindows) {
@@ -161,11 +208,17 @@ class _SideDrawerState extends State<SideDrawer> {
                   var dbFolder = await getApplicationDocumentsDirectory();
                   var a = await FilePicker.platform
                       .pickFiles(initialDirectory: dbFolder.path);
-                  print(a);
+
                   if (a != null && a.isSinglePick) {
                     final importedFile = File(a.files[0].path!);
-                    final file = File(p.join(dbFolder.path, 'db.sqlite'));
-                    file.writeAsBytes(await importedFile.readAsBytes());
+                    var huh = await importedFile.readAsBytes();
+                    if (listEquals(huh.sublist(0, 16), aeh)) {
+                      final file = File(p.join(dbFolder.path, 'db.sqlite'));
+                      file.writeAsBytes(await importedFile.readAsBytes());
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('wrong file type')));
+                    }
                   }
                 } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(

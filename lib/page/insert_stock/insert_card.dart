@@ -326,16 +326,7 @@ class _InsertProductCardState extends State<InsertProductCard>
               // margin: EdgeInsets.all(8.0),
               padding: EdgeInsets.all(6.0),
               decoration: BoxDecoration(
-                // color: Theme.of(context).brightness == Brightness.dark
-                //     ? Colors.black
-                //     : Colors.grey[200],
                 borderRadius: BorderRadius.circular(8.0),
-                // boxShadow: [
-                //   BoxShadow(
-                //       spreadRadius: 0.0,
-                //       blurRadius: 6.0,
-                //       color: Colors.grey[400]!)
-                // ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -349,13 +340,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                           child: TypeAheadFormField(
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            // autovalidate: ,
-                            // validator: (text) {
-                            //   if (text!.length <= 2) {
-                            //     return '3 or more character';
-                            //   }
-                            //   return null;
-                            // },
                             suggestionsBoxController: sbc,
                             textFieldConfiguration: TextFieldConfiguration(
                                 maxLines: 2,

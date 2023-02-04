@@ -30,7 +30,6 @@ main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: await getTemporaryDirectory());
-  // Bloc = NewBlocObserver();
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
 // ;
   // BlocOverrides.runZoned(

@@ -787,15 +787,211 @@ class TempatBelisCompanion extends UpdateCompanion<TempatBeli> {
   }
 }
 
+class $HiddenItemsTable extends HiddenItems
+    with TableInfo<$HiddenItemsTable, HiddenItem> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HiddenItemsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _itemsIdMeta =
+      const VerificationMeta('itemsId');
+  @override
+  late final GeneratedColumn<int> itemsId = GeneratedColumn<int>(
+      'items_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'UNIQUE REFERENCES stock_items (id)'));
+  @override
+  List<GeneratedColumn> get $columns => [id, itemsId];
+  @override
+  String get aliasedName => _alias ?? 'hidden_items';
+  @override
+  String get actualTableName => 'hidden_items';
+  @override
+  VerificationContext validateIntegrity(Insertable<HiddenItem> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('items_id')) {
+      context.handle(_itemsIdMeta,
+          itemsId.isAcceptableOrUnknown(data['items_id']!, _itemsIdMeta));
+    } else if (isInserting) {
+      context.missing(_itemsIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  HiddenItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HiddenItem(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      itemsId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}items_id'])!,
+    );
+  }
+
+  @override
+  $HiddenItemsTable createAlias(String alias) {
+    return $HiddenItemsTable(attachedDatabase, alias);
+  }
+}
+
+class HiddenItem extends DataClass implements Insertable<HiddenItem> {
+  final int id;
+  final int itemsId;
+  const HiddenItem({required this.id, required this.itemsId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['items_id'] = Variable<int>(itemsId);
+    return map;
+  }
+
+  HiddenItemsCompanion toCompanion(bool nullToAbsent) {
+    return HiddenItemsCompanion(
+      id: Value(id),
+      itemsId: Value(itemsId),
+    );
+  }
+
+  factory HiddenItem.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HiddenItem(
+      id: serializer.fromJson<int>(json['id']),
+      itemsId: serializer.fromJson<int>(json['itemsId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'itemsId': serializer.toJson<int>(itemsId),
+    };
+  }
+
+  HiddenItem copyWith({int? id, int? itemsId}) => HiddenItem(
+        id: id ?? this.id,
+        itemsId: itemsId ?? this.itemsId,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('HiddenItem(')
+          ..write('id: $id, ')
+          ..write('itemsId: $itemsId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, itemsId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HiddenItem &&
+          other.id == this.id &&
+          other.itemsId == this.itemsId);
+}
+
+class HiddenItemsCompanion extends UpdateCompanion<HiddenItem> {
+  final Value<int> id;
+  final Value<int> itemsId;
+  const HiddenItemsCompanion({
+    this.id = const Value.absent(),
+    this.itemsId = const Value.absent(),
+  });
+  HiddenItemsCompanion.insert({
+    this.id = const Value.absent(),
+    required int itemsId,
+  }) : itemsId = Value(itemsId);
+  static Insertable<HiddenItem> custom({
+    Expression<int>? id,
+    Expression<int>? itemsId,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (itemsId != null) 'items_id': itemsId,
+    });
+  }
+
+  HiddenItemsCompanion copyWith({Value<int>? id, Value<int>? itemsId}) {
+    return HiddenItemsCompanion(
+      id: id ?? this.id,
+      itemsId: itemsId ?? this.itemsId,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (itemsId.present) {
+      map['items_id'] = Variable<int>(itemsId.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HiddenItemsCompanion(')
+          ..write('id: $id, ')
+          ..write('itemsId: $itemsId')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MyDatabase extends GeneratedDatabase {
   _$MyDatabase(QueryExecutor e) : super(e);
   late final $StocksTable stocks = $StocksTable(this);
   late final $StockItemsTable stockItems = $StockItemsTable(this);
   late final $TempatBelisTable tempatBelis = $TempatBelisTable(this);
+  late final $HiddenItemsTable hiddenItems = $HiddenItemsTable(this);
+  Selectable<StockItem> showItemswithHide() {
+    return customSelect(
+        'SELECT * FROM stock_items WHERE stock_items.id NOT IN (SELECT items_id FROM hidden_items)',
+        variables: [],
+        readsFrom: {
+          stockItems,
+          hiddenItems,
+        }).asyncMap(stockItems.mapFromRow);
+  }
+
+  Selectable<StockItem> showItemsHiddenOnly() {
+    return customSelect(
+        'SELECT * FROM stock_items WHERE stock_items.id IN (SELECT items_id FROM hidden_items)',
+        variables: [],
+        readsFrom: {
+          stockItems,
+          hiddenItems,
+        }).asyncMap(stockItems.mapFromRow);
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [stocks, stockItems, tempatBelis];
+      [stocks, stockItems, tempatBelis, hiddenItems];
 }
