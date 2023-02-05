@@ -57,22 +57,22 @@ class _SideDrawerState extends State<SideDrawer> {
       ),
       Expanded(
         child: ListView(children: [
-          ListTile(
-            trailing: Icon(Icons.android),
-            subtitle: Text('Dev deug'),
-            onTap: () async {
-              var a = await RepositoryProvider.of<MyDatabase>(context)
-                  .availMonthwithCount(DateTime(2023));
-              print(a);
-              // for (var element in a) {
-              //   print(element);
-              // }
-              // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-              // Navigator.push(context,
-              //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
-            },
-            title: Text('dev debug '),
-          ),
+          // ListTile(
+          //   trailing: Icon(Icons.android),
+          //   subtitle: Text('Dev deug'),
+          //   onTap: () async {
+          //     var a = await RepositoryProvider.of<MyDatabase>(context)
+          //         .availMonthwithCount(DateTime(2023));
+          //     print(a);
+          //     // for (var element in a) {
+          //     //   print(element);
+          //     // }
+          //     // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+          //     // Navigator.push(context,
+          //     //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
+          //   },
+          //   title: Text('dev debug '),
+          // ),
           ListTile(
             trailing: Icon(Icons.history),
             subtitle: Text('Data Masuk Barang'),

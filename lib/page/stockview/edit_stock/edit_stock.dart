@@ -285,61 +285,24 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                           maxLines: 2,
                           minLines: 1,
                           decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              labelText: 'Nama item'),
+                            disabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color:
+                                        Theme.of(context).primaryColorLight)),
+                            border: OutlineInputBorder(),
+                            label: Text(
+                              'Nama item',
+                              style: TextStyle(
+                                  color: Theme.of(context).primaryColor),
+                            ),
+                            // labelText: 'Nama item',
+                          ),
                           validator: (text) {
                             if (text!.length <= 2) {
                               return '3 or more character';
                             }
                             return null;
                           },
-                          // suggestionsBoxController: sbc,
-                          // textFieldConfiguration: TextFieldConfiguration(
-                          //     controller: namec,
-                          //     onChanged: (v) {
-                          //       BlocProvider.of<InsertstockBloc>(context)
-                          //           .add(DataChange(widget.data.copywith(
-                          //         namaBarang: namec.text,
-                          //         productId: null,
-                          //       )));
-                          //     },
-                          //     style: DefaultTextStyle.of(context)
-                          //         .style
-                          //         .copyWith(fontStyle: FontStyle.italic),
-                          //     decoration: InputDecoration(
-                          //         border: OutlineInputBorder(),
-                          //         labelText: 'Nama item')),
-                          // suggestionsCallback: (pattern) async {
-                          //   List<StockItem> a = [];
-                          //   if (pattern.length >= 3) {
-                          //     a = await RepositoryProvider.of<MyDatabase>(
-                          //             context)
-                          //         .showInsideItems(pattern);
-                          //   }
-                          //   return a;
-                          // },
-                          // itemBuilder: (context, StockItem suggestion) {
-                          //   return ListTile(
-                          //     leading: Icon(Icons.shopping_cart),
-                          //     title: Text(suggestion.nama),
-                          //   );
-                          // },
-                          // onSuggestionSelected: (StockItem suggestion) async {
-                          //   var res1 =
-                          //       await RepositoryProvider.of<MyDatabase>(context)
-                          //           .showInsideStock(idBarang: (suggestion.id));
-                          //   var tempat =
-                          //       await RepositoryProvider.of<MyDatabase>(context)
-                          //           .tempatwithid(res1.last.idSupplier!);
-                          //   BlocProvider.of<InsertstockBloc>(context)
-                          //       .add(DataChange(widget.data.copywith(
-                          //     namaBarang: suggestion.nama,
-                          //     productId: suggestion.id,
-                          //     hargaBeli: res1.isNotEmpty ? res1.last.price : 0,
-                          //     tempatBeli: tempat.single.nama,
-                          //     // hargaJual: suggestion,
-                          //   )));
-                          // },
                         ),
                       ),
                     ],
@@ -419,11 +382,20 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                             },
                             keyboardType: TextInputType.datetime,
                             decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              labelText: 'Buy date',
-                              fillColor: Colors.white,
-                            ),
+                                // floatingLabelBehavior:
+                                //     FloatingLabelBehavior.always,
+
+                                disabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor)),
+                                // labelText: 'Buy date',
+                                label: Text(
+                                  'Buy date',
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                )
+                                // fillColor: Colors.white,
+                                ),
                           ),
                         ),
                       ),

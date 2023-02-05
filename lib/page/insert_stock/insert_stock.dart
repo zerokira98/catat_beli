@@ -31,27 +31,28 @@ class _InsertProductPageState extends State<InsertProductPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        bool dialog = await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Are you sure to exit?'),
-                content: Text('Your data on field would be lost.'),
-                actions: [
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context, true);
-                      },
-                      child: Text('Exit')),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context, false);
-                      },
-                      child: Text('Close message')),
-                ],
-              );
-            });
-        return dialog;
+        return true;
+        // bool dialog = await showDialog(
+        //     context: context,
+        //     builder: (context) {
+        //       return AlertDialog(
+        //         title: Text('Are you sure to exit?'),
+        //         content: Text('Your data on field would be lost.'),
+        //         actions: [
+        //           ElevatedButton(
+        //               onPressed: () {
+        //                 Navigator.pop(context, true);
+        //               },
+        //               child: Text('Exit')),
+        //           ElevatedButton(
+        //               onPressed: () {
+        //                 Navigator.pop(context, false);
+        //               },
+        //               child: Text('Close message')),
+        //         ],
+        //       );
+        //     });
+        // return dialog;
       },
       child: Scaffold(
           // resizeToAvoidBottomInset: false,

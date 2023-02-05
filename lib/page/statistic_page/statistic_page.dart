@@ -43,6 +43,7 @@ class _StatsPageState extends State<StatsPage> {
                     child: GestureDetector(
                       onTap: () {
                         showMonthPicker(
+                          dismissible: true,
                           context: context,
                           lastDate: DateTime.now(),
                           initialDate: selectedDate,

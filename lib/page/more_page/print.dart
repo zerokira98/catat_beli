@@ -43,7 +43,7 @@ class _PrintAlertState extends State<PrintAlert> {
     super.initState();
   }
 
-  convertBulanan(BuildContext context) async {
+  convertBulanan() async {
     var excel = Excel.createExcel();
     Directory a = await getApplicationDocumentsDirectory();
     List<AvailData> ea = [];
@@ -52,12 +52,10 @@ class _PrintAlertState extends State<PrintAlert> {
     if (period == Periodtime.yearly) {
       ea = await RepositoryProvider.of<MyDatabase>(context)
           .availMonthwithCount(DateTime(selectedDateYear));
-    } else {
-      // ea.add('single Monthly');
     }
     int loopcount = ea.length == 0 ? 1 : ea.length;
     for (var i = 0; i < loopcount; i++) {
-      List data = [];
+      List<StockWithDetails> data = [];
       ////////////////------------------
       ///
       Sheet sheet;
@@ -72,8 +70,7 @@ class _PrintAlertState extends State<PrintAlert> {
         data = await RepositoryProvider.of<MyDatabase>(context)
             .showStockwithDetails(
                 startDate: DateTime(selectedDateYear, ea[i].date.month, 1),
-                endDate: DateTime(selectedDateYear, 12, 31).add(Duration(
-                    hours: 23, minutes: 59, seconds: 59, milliseconds: 999)));
+                endDate: DateTime(selectedDateYear, ea[i].date.month + 1, 0));
         sheet = excel['${ea[i].date.month}' + ' ' + '${selectedDateYear}'];
       }
       num total = 0;
@@ -306,15 +303,16 @@ class _PrintAlertState extends State<PrintAlert> {
               child: Text('Open Directory')),
         TextButton(
             onPressed: () async {
-              switch (period) {
-                case Periodtime.monthly:
-                  convertBulanan(context);
-                  break;
-                case Periodtime.yearly:
-                  convertBulanan(context);
-                  break;
-                default:
-              }
+              convertBulanan();
+              // switch (period) {
+              //   case Periodtime.monthly:
+              //     convertBulanan(context);
+              //     break;
+              //   case Periodtime.yearly:
+              //     convertBulanan(context);
+              //     break;
+              //   default:
+              // }
             },
             child: Text('Print'))
       ],

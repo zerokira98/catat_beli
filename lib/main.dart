@@ -109,6 +109,8 @@ class App extends StatelessWidget {
                                     );
                                   });
                               snapshot.data!.setBool('firstStart', false);
+                              BlocProvider.of<InsertstockBloc>(context)
+                                  .add(Initiate());
                             });
                           }
                         }

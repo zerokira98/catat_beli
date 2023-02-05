@@ -216,8 +216,8 @@ class _StockviewCardState extends State<StockviewCard> {
                                 MaterialPageRoute(
                                   builder: (context) => StockEdit(widget.data),
                                 ));
-                            BlocProvider.of<StockviewBloc>(context)
-                                .add(InitiateView());
+                            // BlocProvider.of<StockviewBloc>(context)
+                            //     .add(InitiateView());
                             // showDialog(
                             //     context: context,
                             //     builder: (context) {
