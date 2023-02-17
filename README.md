@@ -1,5 +1,5 @@
-# kasir
+# Catat Beli
 
-Flutter project
-bisa run windows&android
-*prioritas android
+Flutter project \n
+bisa run windows&android \n
+*prioritas android \n

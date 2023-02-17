@@ -424,7 +424,6 @@ class AvailData {
   AvailData(this.date, this.rowCount);
   @override
   String toString() {
-    // TODO: implement toString
     return [date.toString(), rowCount.toString()].toString();
   }
 }

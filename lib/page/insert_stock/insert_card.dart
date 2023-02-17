@@ -21,7 +21,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       notec = TextEditingController(text: ''),
       barcodeC = TextEditingController(),
       qtyc = TextEditingController();
-  final _formkey = GlobalKey<FormState>();
+  // final _formkey = GlobalKey<FormState>();
   DateTime selectedDate = DateTime.now();
   bool noteVisible = false;
   FocusNode fsn1 = FocusNode();
@@ -83,9 +83,9 @@ class _InsertProductCardState extends State<InsertProductCard>
     String? namabarangError() {
       switch (widget.data.namaBarang.error) {
         case NamaBarangValidationError.empty:
-          return 'Empty';
+          return 'Kosong';
         case NamaBarangValidationError.atleast3:
-          return '3 or more char';
+          return 'Kurang panjang';
         default:
           return null;
       }
@@ -94,9 +94,9 @@ class _InsertProductCardState extends State<InsertProductCard>
     String? pcsError() {
       switch (widget.data.pcs.error) {
         case PcsValidationError.empty:
-          return "can't be a 0";
+          return "Nilai 0";
         case PcsValidationError.negative:
-          return "Negative value";
+          return "Nilai Negatif";
         default:
           return null;
       }
@@ -106,9 +106,9 @@ class _InsertProductCardState extends State<InsertProductCard>
       // return widget.data.hargaBeli.invalid ? 'invalid' : null;
       switch (widget.data.hargaBeli.error) {
         case HargabeliValidationError.empty:
-          return "Empty";
+          return "Kosong";
         case HargabeliValidationError.negative:
-          return "cant negative";
+          return "Nilai negatif";
         // case HargabeliValidationError.toosmall:
         //   return "sus, toosmall";
         default:
@@ -119,7 +119,7 @@ class _InsertProductCardState extends State<InsertProductCard>
     String? barcodeError() {
       switch (widget.data.barcode.error) {
         case BarcodeValidationError.negative:
-          return "Negative";
+          return "Nilai Negatif";
         default:
           return null;
       }
@@ -145,11 +145,7 @@ class _InsertProductCardState extends State<InsertProductCard>
     if (widget.data.barcode.value.toString() != barcodeC.text) {
       if (widget.data.barcode.value.toString() == '0') {
         barcodeC.text = '';
-      }
-      // else if (int.tryParse(barcodeC.text) == null) {
-      //   barcodeC.text = '';
-      // }
-      else {
+      } else {
         barcodeC.text = widget.data.barcode.value.toString();
       }
     }
@@ -162,6 +158,54 @@ class _InsertProductCardState extends State<InsertProductCard>
       notec.text = widget.data.note ?? '';
     }
     datec.text = dateFormat.format(widget.data.ditambahkan!);
+    Widget suffixBarcodeIcon = FutureBuilder<List>(
+        future: Platform.isAndroid || Platform.isIOS
+            ? availableCameras()
+            : Future.value([]),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return SizedBox();
+            } else {
+              return InkWell(
+                  canRequestFocus: false,
+                  onTap: () async {
+                    String barcodeScan =
+                        await FlutterBarcodeScanner.scanBarcode(
+                            '#ffffff', 'Batal', true, ScanMode.BARCODE);
+                    // print(barcodeScan);
+                    if (barcodeScan != '-1') {
+                      barcodeC.text = barcodeScan.trim();
+                      List<StockWithDetails> data =
+                          await RepositoryProvider.of<MyDatabase>(context)
+                              .showStockwithDetails(
+                                  startDate: DateTime(2020),
+                                  barcode: int.parse(barcodeC.text));
+                      if (data.isEmpty) {
+                        BlocProvider.of<InsertstockBloc>(context)
+                            .add(DataChange(widget.data.copywith(
+                          barcode: Barcode.dirty(
+                              int.tryParse(barcodeScan.trim()) ?? 0),
+                        )));
+                      } else {
+                        BlocProvider.of<InsertstockBloc>(context)
+                            .add(DataChange(widget.data.copywith(
+                          namaBarang: NamaBarang.dirty(data.last.item.nama),
+                          hargaBeli: Hargabeli.dirty(data.last.stock.price),
+                          productId: () => data.last.stock.id,
+                          tempatBeli:
+                              Tempatbeli.dirty(data.last.tempatBeli.nama),
+                          barcode: Barcode.dirty(
+                              int.tryParse(barcodeScan.trim()) ?? 0),
+                        )));
+                      }
+                    }
+                  },
+                  child: Icon(Icons.qr_code));
+            }
+          }
+          return SizedBox();
+        });
     Widget additionalBottom = Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: TextFormField(
@@ -316,7 +360,7 @@ class _InsertProductCardState extends State<InsertProductCard>
       ],
     );
     Widget theForm = Form(
-      key: _formkey,
+      // key: _formkey,
       child: Stack(
         children: [
           Card(
@@ -374,8 +418,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                                         context)
                                     .showInsideItems(pattern);
                               }
-                              // print('hello');
-                              // print(a);
                               return a;
                             },
                             itemBuilder: (context, StockItem suggestion) {
@@ -390,7 +432,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                               var res1 = await RepositoryProvider.of<
                                       MyDatabase>(context)
                                   .showInsideStock(idBarang: (suggestion.id));
-                              // print('heres');
                               var tempat =
                                   await RepositoryProvider.of<MyDatabase>(
                                           context)
@@ -425,7 +466,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 FocusScope.of(context).unfocus(),
                             autovalidateMode:
                                 AutovalidateMode.onUserInteraction,
-                            // validator: (text) {},
                             onChanged: (v) {
                               print('test');
                               BlocProvider.of<InsertstockBloc>(context)
@@ -440,7 +480,6 @@ class _InsertProductCardState extends State<InsertProductCard>
                                 errorText: hargabeliError(),
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
-                                // labelText: 'Harga beli ',
                                 label: AutoSizeText('Harga Beli', maxLines: 1),
                                 suffixIcon: InkWell(
                                     onTap: () {
@@ -459,19 +498,8 @@ class _InsertProductCardState extends State<InsertProductCard>
                           onEditingComplete: () =>
                               FocusScope.of(context).unfocus(),
                           controller: barcodeC,
-                          // autovalidateMode: AutovalidateMode.onUserInteraction,
-                          // validator: (a) {
-                          //   if (a != null && a.isNotEmpty) {
-                          //     if (int.tryParse(a) == null) {
-                          //       print('hey');
-                          //       return 'invalid barcode';
-                          //     }
-                          //   }
-                          //   return null;
-                          // },
                           onChanged: (a) {
                             if (int.tryParse(a) == null) {
-                              print('helo$a');
                               barcodeC.clear();
                               return;
                             }
@@ -485,46 +513,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                               labelText: 'barcode',
-                              suffixIcon: FutureBuilder<List>(
-                                  future: Platform.isAndroid || Platform.isIOS
-                                      ? availableCameras()
-                                      : Future.value([]),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      if (snapshot.data!.isEmpty) {
-                                        return SizedBox();
-                                      } else {
-                                        return InkWell(
-                                            canRequestFocus: false,
-                                            onTap: () async {
-                                              String barcodeScan =
-                                                  await FlutterBarcodeScanner
-                                                      .scanBarcode(
-                                                          '#ffffff',
-                                                          'Batal',
-                                                          true,
-                                                          ScanMode.BARCODE);
-                                              // print(barcodeScan);
-                                              if (barcodeScan != '-1') {
-                                                barcodeC.text =
-                                                    barcodeScan.trim();
-                                                BlocProvider.of<
-                                                            InsertstockBloc>(
-                                                        context)
-                                                    .add(DataChange(
-                                                        widget.data.copywith(
-                                                  barcode: Barcode.dirty(
-                                                      int.tryParse(barcodeScan
-                                                              .trim()) ??
-                                                          0),
-                                                )));
-                                              }
-                                            },
-                                            child: Icon(Icons.qr_code));
-                                      }
-                                    }
-                                    return SizedBox();
-                                  })),
+                              suffixIcon: suffixBarcodeIcon),
                         ),
                       ),
                       if (MediaQuery.of(context).orientation ==
@@ -559,7 +548,7 @@ class _InsertProductCardState extends State<InsertProductCard>
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.red.withOpacity(0.9),
+                  color: Colors.red.withOpacity(0.85),
                 ),
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(8.0),
@@ -580,13 +569,11 @@ class _InsertProductCardState extends State<InsertProductCard>
                 setState(() {
                   noteVisible = !noteVisible;
                 });
-                // BlocProvider.of<InsertstockBloc>(context)
-                //     .add(RemoveCard(widget.data.cardId!));
               },
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.brown.withOpacity(0.9),
+                  color: Colors.brown.withOpacity(0.85),
                 ),
                 alignment: Alignment.center,
                 padding: EdgeInsets.all(8.0),
@@ -609,6 +596,15 @@ class _InsertProductCardState extends State<InsertProductCard>
       open: widget.data.open,
       child: theForm,
     );
+  }
+}
+
+class SuffixBarcode extends StatelessWidget {
+  const SuffixBarcode({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }
 

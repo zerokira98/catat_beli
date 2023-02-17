@@ -6,8 +6,6 @@ part 'statistic_state.dart';
 
 class StatisticBloc extends Bloc<StatisticEvent, StatisticState> {
   StatisticBloc() : super(StatisticInitial()) {
-    on<StatisticEvent>((event, emit) {
-      // TODO: implement event handler
-    });
+    on<StatisticEvent>((event, emit) {});
   }
 }

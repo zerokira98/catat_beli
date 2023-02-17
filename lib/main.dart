@@ -1,7 +1,5 @@
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
-import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/msc/themedatas.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
@@ -9,7 +7,6 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
@@ -31,12 +28,6 @@ main() async {
   HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: await getTemporaryDirectory());
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
-// ;
-  // BlocOverrides.runZoned(
-  //   () => runApp(App()),
-  //   blocObserver: NewBlocObserver(),
-  // );
-  // runApp(App());
   if (Platform.isWindows) {
     doWhenWindowReady(() {
       appWindow.size = Size(480, 720);
@@ -83,12 +74,10 @@ class App extends StatelessWidget {
         ],
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
-            print(state);
             return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: state.themeData,
                 home: Scaffold(
-                  // drawer: SideDrawer(),
                   backgroundColor: Colors.transparent,
                   body: FutureBuilder<SharedPreferences>(
                       future: SharedPreferences.getInstance(),

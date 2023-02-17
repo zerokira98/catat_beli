@@ -189,6 +189,57 @@ class _StatsPageState extends State<StatsPage> {
                         }
                         return CircularProgressIndicator();
                       })),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Detail',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+              Container(
+                child: FutureBuilder<List<StockWithDetails>>(
+                    future: RepositoryProvider.of<MyDatabase>(context)
+                        .showStockwithDetails(
+                            startDate: DateTime(
+                                selectedDate.year, selectedDate.month, 1),
+                            endDate: DateTime(
+                                    selectedDate.year, selectedDate.month + 1)
+                                .subtract(Duration(days: 1))),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        var total = 0.0;
+
+                        if (snapshot.data!.isEmpty)
+                          return Text('Error, No data');
+                        for (var w in snapshot.data!) {
+                          total = total + (w.stock.price * w.stock.qty);
+                        }
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('Total belanja(jumlah*hargabeli)'),
+                                Text(NumberFormat.currency(locale: 'ID_id')
+                                    .format(total))
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text('Rata-rata per hari(total/31)'),
+                                Text(NumberFormat.currency(locale: 'ID_id')
+                                    .format(total / 31))
+                              ],
+                            ),
+                          ],
+                        );
+                        // return CircularProgressIndicator();
+                      }
+                      return CircularProgressIndicator();
+                    }),
+              )
               // Expanded(child: Center(child: Text('No Data'))),
             ],
           ),
@@ -242,7 +293,7 @@ class ChartWidgetState extends State<ChartWidget> {
       data.add(_ChartData(key.toString(), value));
       // });
     });
-    print(data);
+    // print(data);
     return SfCartesianChart(
         primaryXAxis: CategoryAxis(),
         // primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),

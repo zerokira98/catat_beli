@@ -36,10 +36,7 @@ class CustomWindow extends StatelessWidget {
       children: [
         WindowTitleBarBox(
             child: Container(
-          // color: Colors.blue,
           decoration: BoxDecoration(
-            // borderRadius:
-            //     BorderRadius.only(topLeft: Radius.circular(18.0)),
             gradient: LinearGradient(
                 colors: [
                   Colors.black,

@@ -3,7 +3,6 @@ import 'package:catatbeli/msc/themedatas.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'theme_state.dart';
@@ -22,7 +21,7 @@ class ThemeCubit extends Cubit<ThemeState> {
         orElse: () => FlexScheme.values[0]);
     if (b == null) {
       var c = await _sp.setString('themeMode', 'light');
-      var e = await _sp.setString('FlexScheme', scheme.name);
+      await _sp.setString('FlexScheme', scheme.name);
       if (c) {
         print('c' + c.toString());
       }
@@ -38,17 +37,20 @@ class ThemeCubit extends Cubit<ThemeState> {
   void changeColorScheme(FlexScheme scheme) async {
     // emit()
     var b = _sp.getString('themeMode');
-    var d = await _sp.setString('FlexScheme', scheme.name);
-    print(b);
-    if (b == null) {
-      _sp.setString('themeMode', 'light');
-      emit(ThemeState(themeData: themeDatas.lightTheme(scheme)));
-    } else if (b == 'light') {
-      // _sp.setString('themeMode', 'light');
-      emit(ThemeState(themeData: themeDatas.lightTheme(scheme)));
-    } else if (b == 'dark') {
-      // _sp.setString('themeMode', 'dark');
-      emit(ThemeState(themeData: themeDatas.darkTheme(scheme)));
+    await _sp.setString('FlexScheme', scheme.name);
+    // print(b);
+    switch (b) {
+      case null:
+        _sp.setString('themeMode', 'light');
+        emit(ThemeState(themeData: themeDatas.lightTheme(scheme)));
+        break;
+      case 'light':
+        emit(ThemeState(themeData: themeDatas.lightTheme(scheme)));
+        break;
+      case 'dark':
+        emit(ThemeState(themeData: themeDatas.darkTheme(scheme)));
+        break;
+      default:
     }
   }
 
@@ -58,11 +60,6 @@ class ThemeCubit extends Cubit<ThemeState> {
     FlexScheme scheme = FlexScheme.values.firstWhere(
         (element) => element.name == d,
         orElse: () => FlexScheme.values[0]);
-    // print(b);
-    // if (b == null) {
-    //   _sp.setString('themeMode', 'light');
-    //   emit(ThemeState(themeData: themeDatas.lightTheme()));
-    // } else
     if (b == 'dark') {
       _sp.setString('themeMode', 'light');
       emit(ThemeState(themeData: themeDatas.lightTheme(scheme)));

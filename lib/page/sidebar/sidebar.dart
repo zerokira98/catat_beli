@@ -1,7 +1,5 @@
 import 'dart:io';
 
-// import 'package:catatbeli/msc/db_moor.dart';
-// import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
 import 'package:flutter/foundation.dart';
 import 'package:catatbeli/msc/db_moor.dart';
