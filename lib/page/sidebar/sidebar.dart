@@ -59,8 +59,12 @@ class _SideDrawerState extends State<SideDrawer> {
           //   trailing: Icon(Icons.android),
           //   subtitle: Text('Dev deug'),
           //   onTap: () async {
+          //     var now = DateTime.now();
           //     var a = await RepositoryProvider.of<MyDatabase>(context)
-          //         .availMonthwithCount(DateTime(2023));
+          //         .maxdataStock(
+          //             startDate: DateTime(2023, 2, 0),
+          //             endDate: DateTime(2023, 3, 0)
+          //                 .add(Duration(hours: 23, minutes: 59)));
           //     print(a);
           //     // for (var element in a) {
           //     //   print(element);

@@ -35,6 +35,14 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       )),
       boughtPlace: event.filter.tempatBeli,
     );
+    // var test = await db.maxdataStock(
+    //     startDate: (event.filter.startDate),
+    //     endDate: (event.filter.endDate).add(Duration(
+    //       hours: 23,
+    //       minutes: 59,
+    //       seconds: 59,
+    //     )));
+    // print('test$test');
     int maxQ = all.length;
     // print('maxq = ' + maxQ.toString());
     var data = await db.showStockwithDetails(
@@ -130,15 +138,18 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     }
     var endDate = DateTime(curdate.year, curdate.month + 1, 0)
         .add(Duration(hours: 23, minutes: 59));
-    int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
 
-    // print('maxq = ' + maxQ.toString());
+    // int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
+    var maxQ =
+        (await db.showStockwithDetails(startDate: startDate, endDate: endDate))
+            .length;
+    print('maxq = ' + maxQ.toString());
     var a = await db.showStockwithDetails(
         limit: 20,
         page: (maxQ / 20).floor(),
         startDate: startDate,
         endDate: endDate);
-    // print(a);
+    print(a);
     emit(StockviewLoaded(
       message: event.message,
       filter: Filter(

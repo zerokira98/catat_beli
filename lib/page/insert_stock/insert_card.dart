@@ -27,6 +27,7 @@ class _InsertProductCardState extends State<InsertProductCard>
   FocusNode fsn1 = FocusNode();
   FocusNode fsn2 = FocusNode();
   DateFormat dateFormat = DateFormat('d/MM/y');
+  ModeHarga modeHarga = ModeHarga.pcs;
   @override
   void dispose() {
     // sbc.close();
@@ -217,146 +218,211 @@ class _InsertProductCardState extends State<InsertProductCard>
         },
       ),
     );
-    Widget bottom = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    Widget bottom = Column(
       children: [
-        Expanded(
-          flex: 3,
-          child: TextFormField(
-            onEditingComplete: () => FocusScope.of(context).unfocus(
-                disposition: UnfocusDisposition.previouslyFocusedChild),
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: (text) {
-              if (double.tryParse(qtyc.text.trim()) == 0) return 'cant be zero';
-              if (double.tryParse(qtyc.text.trim()) == null) {
-                return 'Invalid type';
-              }
-              if (text!.isNotEmpty &&
-                  !RegExp(r'^\d+(\.\d+)*$').hasMatch(text)) {
-                return 'must be a number';
-              } else if (text.isEmpty) {
-                return 'tidak boleh kosong';
-              }
-              return null;
-            },
-            controller: qtyc,
-            focusNode: fsn1,
-            onChanged: (v) {
-              // print(v);
-              // print('aaa');
-              var doublePcs = double.tryParse(qtyc.text.trim());
-              // print(doublePcs);
-              if (doublePcs != null)
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                    widget.data.copywith(pcs: Pcs.dirty(doublePcs))));
-              // FocusScope.of(context).
-            },
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              errorText: pcsError(),
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              label: AutoSizeText(
-                'jumlah unit',
-                maxLines: 1,
-              ),
-              // labelText: 'jumlah unit',
-            ),
-          ),
-        ),
-        Padding(padding: EdgeInsets.all(2)),
-        Expanded(
-            flex: 5,
-            child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () async {
-                  FocusScope.of(context).unfocus();
-                  final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      initialDatePickerMode: DatePickerMode.day,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2101));
-                  if (picked != null) {
-                    // datec.text = picked.toString().substring(0, 19);
-                    print(picked.toString());
-                    BlocProvider.of<InsertstockBloc>(context).add(
-                        DataChange(widget.data.copywith(ditambahkan: picked)));
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: TextFormField(
+                onEditingComplete: () => FocusScope.of(context).unfocus(
+                    disposition: UnfocusDisposition.previouslyFocusedChild),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (text) {
+                  if (double.tryParse(qtyc.text.trim()) == 0)
+                    return 'cant be zero';
+                  if (double.tryParse(qtyc.text.trim()) == null) {
+                    return 'Invalid type';
                   }
+                  if (text!.isNotEmpty &&
+                      !RegExp(r'^\d+(\.\d+)*$').hasMatch(text)) {
+                    return 'must be a number';
+                  } else if (text.isEmpty) {
+                    return 'tidak boleh kosong';
+                  }
+                  return null;
                 },
-                child: TextField(
-                  onEditingComplete: () => FocusScope.of(context).unfocus(),
-                  controller: datec,
-                  enabled: false,
-                  // style: TextStyle(fontSize: 14),
-                  onTap: () async {
-                    FocusScope.of(context).unfocus();
-                  },
-                  keyboardType: TextInputType.datetime,
-                  decoration: InputDecoration(
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    label: AutoSizeText(
-                      'Tanggal Beli',
-                      maxLines: 1,
-                    ),
-                    // labelText: 'Buy date',
-                    // fillColor: Colors.white,
+                controller: qtyc,
+                focusNode: fsn1,
+                onChanged: (v) {
+                  // print(v);
+                  // print('aaa');
+                  var doublePcs = double.tryParse(qtyc.text.trim());
+                  // print(doublePcs);
+                  if (doublePcs != null)
+                    BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                        widget.data.copywith(pcs: Pcs.dirty(doublePcs))));
+                  // FocusScope.of(context).
+                },
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  errorText: pcsError(),
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  label: AutoSizeText(
+                    'jumlah unit',
+                    maxLines: 1,
                   ),
+                  // labelText: 'jumlah unit',
                 ),
               ),
-            )),
-        Padding(padding: EdgeInsets.all(2)),
-        Expanded(
-          flex: 7,
-          child: TypeAheadFormField(
-              textFieldConfiguration: TextFieldConfiguration(
-                focusNode: fsn2,
-                onEditingComplete: () => FocusScope.of(context).unfocus(),
-                controller: placec,
-                onChanged: (v) {
-                  BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                      widget.data.copywith(
-                          tempatBeli: Tempatbeli.dirty(placec.text))));
-                },
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  suffixIcon: InkWell(
-                      onTap: () {
+            ),
+            Padding(padding: EdgeInsets.all(2)),
+            Expanded(
+                flex: 5,
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () async {
+                      FocusScope.of(context).unfocus();
+                      final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          initialDatePickerMode: DatePickerMode.day,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2101));
+                      if (picked != null) {
+                        // datec.text = picked.toString().substring(0, 19);
+                        print(picked.toString());
+                        BlocProvider.of<InsertstockBloc>(context).add(
+                            DataChange(
+                                widget.data.copywith(ditambahkan: picked)));
+                      }
+                    },
+                    child: TextField(
+                      onEditingComplete: () => FocusScope.of(context).unfocus(),
+                      controller: datec,
+                      enabled: false,
+                      // style: TextStyle(fontSize: 14),
+                      onTap: () async {
+                        FocusScope.of(context).unfocus();
+                      },
+                      keyboardType: TextInputType.datetime,
+                      decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.always,
+                        label: AutoSizeText(
+                          'Tanggal Beli',
+                          maxLines: 1,
+                        ),
+                        // labelText: 'Buy date',
+                        // fillColor: Colors.white,
+                      ),
+                    ),
+                  ),
+                )),
+            Padding(padding: EdgeInsets.all(2)),
+            Expanded(
+              flex: 7,
+              child: TypeAheadFormField(
+                  textFieldConfiguration: TextFieldConfiguration(
+                    focusNode: fsn2,
+                    onEditingComplete: () => FocusScope.of(context).unfocus(),
+                    controller: placec,
+                    onChanged: (v) {
+                      BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                          widget.data.copywith(
+                              tempatBeli: Tempatbeli.dirty(placec.text))));
+                    },
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      suffixIcon: InkWell(
+                          onTap: () {
+                            BlocProvider.of<InsertstockBloc>(context)
+                                .add(DataChange(widget.data.copywith(
+                              tempatBeli: Tempatbeli.pure(),
+                            )));
+                          },
+                          child: Icon(Icons.close_rounded)),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      labelStyle: TextStyle(overflow: TextOverflow.clip),
+                      labelText: 'Tempat Beli',
+                    ),
+                  ),
+                  onSuggestionSelected: (TempatBeli val) {
+                    BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                        widget.data
+                            .copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
+                  },
+                  itemBuilder: (context, TempatBeli datas) {
+                    return ListTile(
+                      title: Text(datas.nama),
+                    );
+                  },
+                  suggestionsCallback: (data) async {
+                    var vals = await RepositoryProvider.of<MyDatabase>(context)
+                        .datatempat(data);
+                    List<TempatBeli> newvals = [];
+                    if (vals.isNotEmpty) {
+                      vals.forEach((element) {
+                        newvals.add(element);
+                      });
+                      newvals.removeWhere((element) => element.nama == '');
+                      return newvals;
+                    }
+                    return newvals;
+                  }),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: Row(
+            children: [
+              InkWell(
+                  onTap: () {
+                    switch (widget.data.modeHarga) {
+                      case ModeHarga.pcs:
+                        // modeHarga = ModeHarga.total;
                         BlocProvider.of<InsertstockBloc>(context)
                             .add(DataChange(widget.data.copywith(
-                          tempatBeli: Tempatbeli.pure(),
+                          modeHarga: ModeHarga.total,
+                          hargaBeli: Hargabeli.dirty(
+                              (widget.data.hargaBeli.value *
+                                      widget.data.pcs.value)
+                                  .floor()),
                         )));
-                      },
-                      child: Icon(Icons.close_rounded)),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
-                  labelStyle: TextStyle(overflow: TextOverflow.clip),
-                  labelText: 'Tempat Beli',
-                ),
-              ),
-              onSuggestionSelected: (TempatBeli val) {
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(widget
-                    .data
-                    .copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
-              },
-              itemBuilder: (context, TempatBeli datas) {
-                return ListTile(
-                  title: Text(datas.nama),
-                );
-              },
-              suggestionsCallback: (data) async {
-                var vals = await RepositoryProvider.of<MyDatabase>(context)
-                    .datatempat(data);
-                List<TempatBeli> newvals = [];
-                if (vals.isNotEmpty) {
-                  vals.forEach((element) {
-                    newvals.add(element);
-                  });
-                  newvals.removeWhere((element) => element.nama == '');
-                  return newvals;
-                }
-                return newvals;
-              }),
-        ),
+                        break;
+                      case ModeHarga.total:
+                        // modeHarga = ModeHarga.pcs;
+
+                        BlocProvider.of<InsertstockBloc>(context)
+                            .add(DataChange(widget.data.copywith(
+                          modeHarga: ModeHarga.pcs,
+                          hargaBeli: Hargabeli.dirty(
+                              (widget.data.hargaBeli.value /
+                                      widget.data.pcs.value)
+                                  .floor()),
+                        )));
+                        break;
+                      default:
+                    }
+                  },
+                  child: Icon(
+                    Icons.swap_horizontal_circle,
+                    size: 18,
+                  )),
+              widget.data.modeHarga == ModeHarga.pcs
+                  ? Text(
+                      'Total :${NumberFormat.currency(
+                        locale: 'ID_id',
+                        symbol: 'Rp.',
+                        decimalDigits: 0,
+                      ).format(widget.data.hargaBeli.value * widget.data.pcs.value)}',
+                      textAlign: TextAlign.left,
+                      textScaleFactor: 0.8,
+                    )
+                  : Text(
+                      '1pcs :${NumberFormat.currency(
+                        locale: 'ID_id',
+                        symbol: 'Rp.',
+                        decimalDigits: 0,
+                      ).format(widget.data.hargaBeli.value / widget.data.pcs.value)}',
+                      textAlign: TextAlign.left,
+                      textScaleFactor: 0.8,
+                    )
+            ],
+          ),
+        )
       ],
     );
     Widget theForm = Form(
@@ -461,34 +527,42 @@ class _InsertProductCardState extends State<InsertProductCard>
                     children: [
                       Expanded(
                           flex: 4,
-                          child: TextFormField(
-                            onEditingComplete: () =>
-                                FocusScope.of(context).unfocus(),
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            onChanged: (v) {
-                              print('test');
-                              BlocProvider.of<InsertstockBloc>(context)
-                                  .add(DataChange(widget.data.copywith(
-                                hargaBeli: Hargabeli.dirty(
-                                    int.tryParse(hargaBeli.text) ?? 0),
-                              )));
-                            },
-                            controller: hargaBeli,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                                errorText: hargabeliError(),
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                label: AutoSizeText('Harga Beli', maxLines: 1),
-                                suffixIcon: InkWell(
-                                    onTap: () {
-                                      BlocProvider.of<InsertstockBloc>(context)
-                                          .add(DataChange(widget.data.copywith(
-                                        hargaBeli: Hargabeli.dirty(0),
-                                      )));
-                                    },
-                                    child: Icon(Icons.close_rounded))),
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                onEditingComplete: () =>
+                                    FocusScope.of(context).unfocus(),
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                onChanged: (v) {
+                                  print('test');
+                                  BlocProvider.of<InsertstockBloc>(context)
+                                      .add(DataChange(widget.data.copywith(
+                                    hargaBeli: Hargabeli.dirty(
+                                        int.tryParse(hargaBeli.text) ?? 0),
+                                  )));
+                                },
+                                controller: hargaBeli,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                    errorText: hargabeliError(),
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    label: AutoSizeText(
+                                        'Harga Beli ${modeHarga == ModeHarga.pcs ? "Pcs" : "Total"}',
+                                        maxLines: 1),
+                                    suffixIcon: InkWell(
+                                        onTap: () {
+                                          BlocProvider.of<InsertstockBloc>(
+                                                  context)
+                                              .add(DataChange(
+                                                  widget.data.copywith(
+                                            hargaBeli: Hargabeli.dirty(0),
+                                          )));
+                                        },
+                                        child: Icon(Icons.close_rounded))),
+                              ),
+                            ],
                           )),
                       Padding(padding: EdgeInsets.all(2)),
                       Expanded(
@@ -598,6 +672,8 @@ class _InsertProductCardState extends State<InsertProductCard>
     );
   }
 }
+
+enum ModeHarga { total, pcs }
 
 class SuffixBarcode extends StatelessWidget {
   const SuffixBarcode({super.key});

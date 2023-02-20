@@ -142,32 +142,75 @@ class MyDatabase extends _$MyDatabase {
     return (delete(stocks)..where((tbl) => tbl.id.equals(cardId))).go();
   }
 
-  ///============
-  Future<int> maxdataStock(
-      {required DateTime startDate, required DateTime endDate}) {
-    // var timenow = DateTime.now();
-    // startDate = startDate ?? DateTime(timenow.year, timenow.month, 1);
-    // endDate = endDate ??
-    //     DateTime(timenow.year, timenow.month + 1, 1)
-    //         .subtract(Duration(days: 1));
-    var a = selectOnly(stocks);
-    a.addColumns([stocks.id.count()]);
-    a.where(stocks.dateAdd.isBiggerOrEqualValue(startDate) &
-        stocks.dateAdd.isSmallerOrEqualValue(endDate));
+  // ///============
+  // Future<int> maxdataStock(
+  //     {required DateTime startDate, required DateTime endDate}) async {
+  //   // var timenow = DateTime.now();
+  //   // startDate = startDate ?? DateTime(timenow.year, timenow.month, 1);
+  //   // endDate = endDate ??
+  //   //     DateTime(timenow.year, timenow.month + 1, 1)
+  //   //         .subtract(Duration(days: 1));
+  //   var counts = stocks.id.count();
+  //   var a = selectOnly(stocks);
+  //   var c = select(stocks);
+  //   c.addColumns([counts]);
+  //   c.where(((tbl) =>
+  //       tbl.dateAdd.isBiggerOrEqualValue(startDate) &
+  //       tbl.dateAdd.isSmallerOrEqualValue(endDate)));
 
-    return a.map<int>((e) => e.read(stocks.id.count())!).getSingle();
-  }
+  //   c.orderBy([
+  //     (tbl) => OrderingTerm(expression: tbl.dateAdd, mode: OrderingMode.asc)
+  //   ]);
+  //   c.join([
+  //     leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
+  //     leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
+  //   ])
+  //     ..where(stockItems.nama.contains(''))
+  //     ..where(tempatBelis.nama.contains(''));
+
+  //   a.addColumns([counts]);
+  //   a.where(stocks.dateAdd.isBiggerOrEqualValue(startDate) &
+  //       stocks.dateAdd.isSmallerOrEqualValue(endDate));
+  //   var b = await c.get();
+  //   var d = await showStockwithDetails(startDate: startDate, endDate: endDate);
+  //   List bl = b.map((e) => e.id).toList();
+  //   List dl = d.map((e) => e.stock.id).toList();
+  //   var telo = bl.toSet().difference(dl.toSet()).toList();
+  //   var ea = (b.where((element) => telo.contains(element.id)).toList());
+  //   print('b:${b.length}');
+  //   print('d:${d.length}');
+  //   // (await a.get()).forEach(
+  //   //   (element) {
+  //   //     print(element.rawData.data);
+  //   //   },
+  //   // );
+  //   for (var eas in ea) {
+  //     print(eas);
+  //     var eaeo = await itemwithid(eas.idItem! - 1000);
+  //     print('ea$eaeo');
+  //   }
+  //   print('telo$telo');
+  //   return a.map<int>((e) => e.read(counts)!).getSingle();
+  // }
 
   ///=========
   Future<List<TempatBeli>> tempatwithid(int id) =>
       (select(tempatBelis)..where((tbl) => tbl.id.equals(id))).get();
+
+  ///=========
+  Future<List<StockItem>> itemwithid(int id) =>
+      (select(stockItems)..where((tbl) => tbl.id.equals(id))).get();
 
   ///====
   Future<List<StockWithDetails>> showStockwithDetails({
     int? idBarang,
     int? barcode,
     int? limit,
+
+    //page starts with 0
     int? page,
+
+    ///
     DateTime? startDate,
     DateTime? endDate,
     String? name,

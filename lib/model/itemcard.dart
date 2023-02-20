@@ -1,4 +1,5 @@
 import 'package:catatbeli/model/itemcard_formz.dart';
+import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 // import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
@@ -8,6 +9,7 @@ class ItemCards extends Equatable with FormzMixin {
   final NamaBarang namaBarang;
   final Hargabeli hargaBeli;
   final int? hargaJual;
+  final ModeHarga modeHarga;
   final Pcs pcs;
   final int? productId;
   final int? cardId; //~??????
@@ -23,6 +25,7 @@ class ItemCards extends Equatable with FormzMixin {
       this.hargaBeli = const Hargabeli.pure(),
       this.productId,
       this.hargaJual,
+      this.modeHarga = ModeHarga.pcs,
       this.pcs = const Pcs.pure(),
       this.created,
       this.note,
@@ -36,6 +39,7 @@ class ItemCards extends Equatable with FormzMixin {
       Hargabeli? hargaBeli,
       int? hargaJual,
       Pcs? pcs,
+      ModeHarga? modeHarga,
       Tempatbeli? tempatBeli,
       int? Function()? productId,
       bool? open,
@@ -47,6 +51,7 @@ class ItemCards extends Equatable with FormzMixin {
       int? id}) {
     return ItemCards(
         barcode: barcode ?? this.barcode,
+        modeHarga: modeHarga ?? this.modeHarga,
         open: open ?? this.open,
         created: created ?? this.created,
         namaBarang: namaBarang ?? this.namaBarang,
@@ -66,6 +71,7 @@ class ItemCards extends Equatable with FormzMixin {
         hargaBeli,
         hargaJual,
         pcs,
+        modeHarga,
         tempatBeli,
         cardId,
         note,
@@ -87,6 +93,7 @@ class ItemCards extends Equatable with FormzMixin {
       tempatBeli,
       cardId,
       open,
+      modeHarga,
       created,
       barcode,
       productId,
@@ -104,6 +111,7 @@ class ItemCards extends Equatable with FormzMixin {
         open: json['open'],
         namaBarang: NamaBarang.dirty(json['namaBarang']),
         created: true,
+        modeHarga: ModeHarga.values[json['modeHarga']],
         // formkey: formkey ?? this.formkey,
         productId: json['productId'],
         ditambahkan: DateTime.tryParse(json['ditambahkan'].toString()),
@@ -122,6 +130,7 @@ class ItemCards extends Equatable with FormzMixin {
       'barcode': this.barcode.value,
       'open': this.open,
       'created': true,
+      'modeHarga': this.modeHarga.index,
       'namaBarang': this.namaBarang.value,
       'productId': this.productId,
       'cardId': this.cardId,

@@ -4,6 +4,7 @@ import 'dart:async';
 
 // import 'package:bloc/bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
+import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
@@ -72,6 +73,10 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     List<ItemCards> data = (state)
         .data
         .map((e) => e.copywith(
+              hargaBeli: e.modeHarga == ModeHarga.total
+                  ? Hargabeli.dirty((e.hargaBeli.value / e.pcs.value).floor())
+                  : e.hargaBeli,
+              modeHarga: ModeHarga.pcs,
               namaBarang: NamaBarang.dirty(e.namaBarang.value.trim()),
               tempatBeli: Tempatbeli.dirty(e.tempatBeli.value.trim()),
             ))
