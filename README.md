@@ -1,5 +1,5 @@
 # Catat Beli
 
-Flutter project \n
-bisa run windows&android \n
-*prioritas android \n
+Flutter project<br />
+bisa run windows&android <br />
+*prioritas android <br />
