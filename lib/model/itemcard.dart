@@ -105,7 +105,7 @@ class ItemCards extends Equatable with FormzMixin {
   }
 
   ItemCards fromJson(Map<String, dynamic> json) {
-    print('ditambah' + json['ditambahkan'].toString());
+    // print('ditambah' + json['ditambahkan'].toString());
     return ItemCards(
         barcode: Barcode.dirty(json['barcode']),
         open: json['open'],
@@ -136,7 +136,7 @@ class ItemCards extends Equatable with FormzMixin {
       'cardId': this.cardId,
       'pcs': this.pcs.value,
       'hargaBeli': this.hargaBeli.value,
-      'hargaJual': this.hargaJual,
+      // 'hargaJual': this.hargaJual,
       'tempatBeli': this.tempatBeli.value,
       'ditambahkan': this.ditambahkan.toString(),
       'note': this.note,

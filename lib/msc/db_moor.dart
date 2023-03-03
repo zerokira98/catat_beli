@@ -375,7 +375,7 @@ class MyDatabase extends _$MyDatabase {
 
   ///========
   Future addItems(List<ItemCards> datas) async {
-    await transaction(() async {
+    return await transaction(() async {
       for (var data in datas) {
         int tempatId = 0;
         int? itemId = data.productId;

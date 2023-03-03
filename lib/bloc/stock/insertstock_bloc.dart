@@ -181,6 +181,17 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     }).toList();
     // print(prevData);
     if (prevData.isEmpty) {
+      //   List<ItemCards> data = [];
+      // print('telo');
+      return (InsertstockState(data: [
+        ItemCards(
+            ditambahkan: DateTime.now(),
+            created: false,
+            pcs: Pcs.dirty(1.0),
+            cardId: 1,
+            open: false)
+      ], isLoaded: false, isLoading: true, isSuccess: false));
+      // data.add();
       add(Initiate());
     } else {
       if (prevData.length == 1 &&
@@ -188,6 +199,7 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
               .fromJson(json['state']['data'][0])
               .namaBarang
               .value
+              .trim()
               .isEmpty) {
         return InsertstockState(data: [
           ItemCards()

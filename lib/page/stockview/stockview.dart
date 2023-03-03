@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/page/statistic_page/statistic_per_item.dart';
 import 'package:catatbeli/page/stockview/edit_stock/edit_stock.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
@@ -472,6 +474,32 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                                         curve: Curves.easeInOut);
                                   }),
                             ),
+                          ),
+
+                          ///go to stats per item
+                          Center(
+                            child: FutureBuilder<List<StockWithDetails>>(
+                                future:
+                                    RepositoryProvider.of<MyDatabase>(context)
+                                        .showStockwithDetails(
+                                            name: state.filter.nama,
+                                            startDate: state.filter.startDate,
+                                            endDate: state.filter.endDate),
+                                builder: (context, snap) {
+                                  if (snap.hasData) {
+                                    return IconButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      StatisticperPage(
+                                                          data: snap.data!)));
+                                        },
+                                        icon: Icon(Icons.bar_chart));
+                                  }
+                                  return SizedBox();
+                                }),
                           ),
 
                           ///Filter button

@@ -48,10 +48,11 @@ class _InsertProductCardState extends State<InsertProductCard>
   void initState() {
     // hargaBeli = ;
     if (mounted) {
-      print(widget.data.created);
       fsn1.addListener(fsn1Listener);
       fsn2.addListener(fsn2Listener);
       if (widget.data.created == false) {
+        print(widget.data.created);
+        print('huh');
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted)
             BlocProvider.of<InsertstockBloc>(context).add(
@@ -299,11 +300,14 @@ class _InsertProductCardState extends State<InsertProductCard>
                       },
                       keyboardType: TextInputType.datetime,
                       decoration: InputDecoration(
+                        disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor)),
                         floatingLabelBehavior: FloatingLabelBehavior.always,
-                        label: AutoSizeText(
-                          'Tanggal Beli',
-                          maxLines: 1,
-                        ),
+                        label: AutoSizeText('Tanggal Beli',
+                            maxLines: 1,
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor)),
                         // labelText: 'Buy date',
                         // fillColor: Colors.white,
                       ),
@@ -458,6 +462,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                     FocusScope.of(context).unfocus(),
                                 controller: namec,
                                 onChanged: (v) {
+                                  print("onchanged :(");
                                   var nv = v;
                                   if (namec.text.isNotEmpty &&
                                       namec.text.length >= 1) {
@@ -549,7 +554,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                                     floatingLabelBehavior:
                                         FloatingLabelBehavior.always,
                                     label: AutoSizeText(
-                                        'Harga Beli ${modeHarga == ModeHarga.pcs ? "Pcs" : "Total"}',
+                                        'Harga Beli ${widget.data.modeHarga == ModeHarga.pcs ? "Pcs" : "Total"}',
                                         maxLines: 1),
                                     suffixIcon: InkWell(
                                         onTap: () {

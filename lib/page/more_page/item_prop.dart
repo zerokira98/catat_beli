@@ -330,7 +330,7 @@ class _EditItemPageState extends State<EditItemPage>
   DateTime selectedDate = DateTime.now();
   @override
   void initState() {
-    var ishidden = RepositoryProvider.of<MyDatabase>(context)
+    RepositoryProvider.of<MyDatabase>(context)
         .viewHidden(widget.data.id)
         .then((value) {
       setState(() {

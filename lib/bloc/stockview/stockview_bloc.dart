@@ -143,13 +143,13 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     var maxQ =
         (await db.showStockwithDetails(startDate: startDate, endDate: endDate))
             .length;
-    print('maxq = ' + maxQ.toString());
+    // print('maxq = ' + maxQ.toString());
     var a = await db.showStockwithDetails(
         limit: 20,
         page: (maxQ / 20).floor(),
         startDate: startDate,
         endDate: endDate);
-    print(a);
+    // print(a);
     emit(StockviewLoaded(
       message: event.message,
       filter: Filter(
