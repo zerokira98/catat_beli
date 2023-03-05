@@ -194,7 +194,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                             .add(DataChange(widget.data.copywith(
                           namaBarang: NamaBarang.dirty(data.last.item.nama),
                           hargaBeli: Hargabeli.dirty(data.last.stock.price),
-                          productId: () => data.last.stock.id,
+                          productId: () => data.last.item.id,
                           tempatBeli:
                               Tempatbeli.dirty(data.last.tempatBeli.nama),
                           barcode: Barcode.dirty(

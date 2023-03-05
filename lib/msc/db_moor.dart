@@ -15,10 +15,9 @@ class Stocks extends Table {
   RealColumn get qty => real().withDefault(Constant(1.0))();
   DateTimeColumn get dateAdd => dateTime().nullable()();
   TextColumn get note => text().nullable()();
-  IntColumn get idItem =>
-      integer().nullable().customConstraint('REFERENCES stockitems(id)')();
+  IntColumn get idItem => integer().nullable().references(StockItems, #id)();
   IntColumn get idSupplier =>
-      integer().nullable().customConstraint('REFERENCES tempatbelis(id)')();
+      integer().nullable().references(TempatBelis, #id)();
 }
 
 class StockItems extends Table {
@@ -62,17 +61,15 @@ LazyDatabase _openConnection() {
   });
 }
 
-@DriftDatabase(tables: [
-  Stocks,
-  StockItems,
-  TempatBelis,
-  HiddenItems
-], queries: {
-  'showItemswithHide':
-      'SELECT * FROM stock_items WHERE stock_items.nama=:id stock_items.id NOT IN (SELECT items_id FROM hidden_items);',
-  'showItemsHiddenOnly':
-      'SELECT * FROM stock_items WHERE stock_items.id IN (SELECT items_id FROM hidden_items);'
-})
+@DriftDatabase(
+  tables: [Stocks, StockItems, TempatBelis, HiddenItems],
+//  queries: {
+//   'showItemswithHide':
+//       'SELECT * FROM stock_items WHERE stock_items.nama=:id stock_items.id NOT IN (SELECT items_id FROM hidden_items);',
+//   'showItemsHiddenOnly':
+//       'SELECT * FROM stock_items WHERE stock_items.id IN (SELECT items_id FROM hidden_items);'
+// },
+)
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
