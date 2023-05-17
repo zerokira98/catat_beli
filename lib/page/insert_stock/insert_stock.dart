@@ -149,6 +149,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
         body: BlocListener<InsertstockBloc, InsertstockState>(
           listener: (context, state) {
             if (state.isLoaded) {
+              if (state.data.isEmpty) {
+                BlocProvider.of<InsertstockBloc>(context).add(Initiate());
+              }
               if (state.isSuccess != null) {
                 if (state.isSuccess!) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(

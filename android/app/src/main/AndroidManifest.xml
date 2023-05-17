@@ -1,7 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zerokira98.catatbeli">
-   <application
-        android:label="catatbeli"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application
+        android:label="kasir"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

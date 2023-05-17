@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StatisticperPage extends StatefulWidget {
-  List<StockWithDetails> data;
+  final List<StockWithDetails> data;
   StatisticperPage({super.key, required this.data});
 
   @override

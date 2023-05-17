@@ -8,7 +8,7 @@ import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
-import 'package:formz/formz.dart';
+// import 'package:formz/formz.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -86,8 +86,8 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     //             (BlocProvider.of<StockBloc>(context).state as StockLoaded);
 
     bool valids = data.isNotEmpty
-        ? data.every((ItemCards element) =>
-            element.status == FormzStatus.valid) //true if always true
+        ? data
+            .every((ItemCards element) => element.isValid) //true if always true
         : false;
     if (valids) {
       emit(InsertstockState(data: data, isLoaded: true, isLoading: true));
@@ -165,9 +165,10 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
 
     if ((state).data.isEmpty) {
       // yield InsertstockInitial();
-      await Future.delayed(Duration(milliseconds: 100));
+      // await Future.delayed(Duration(milliseconds: 100));
 
-      add(Initiate());
+      /// initiate on listener
+      // add(Initiate());
     }
   }
 
@@ -183,16 +184,10 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     if (prevData.isEmpty) {
       //   List<ItemCards> data = [];
       // print('telo');
-      return (InsertstockState(data: [
-        ItemCards(
-            ditambahkan: DateTime.now(),
-            created: false,
-            pcs: Pcs.dirty(1.0),
-            cardId: 1,
-            open: false)
-      ], isLoaded: false, isLoading: true, isSuccess: false));
+      return (InsertstockState(
+          data: [], isLoaded: false, isLoading: true, isSuccess: false));
       // data.add();
-      add(Initiate());
+      // add(Initiate());
     } else {
       if (prevData.length == 1 &&
           ItemCards()

@@ -2,7 +2,7 @@ import 'package:catatbeli/msc/db_moor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StatsPage extends StatefulWidget {
