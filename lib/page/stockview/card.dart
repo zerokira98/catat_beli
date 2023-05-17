@@ -29,18 +29,17 @@ class _StockviewCardState extends State<StockviewCard> {
     // return Container();
     return GestureDetector(
       onTap: () {
-        if (widget.data.note != null) {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return Dialog(
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Text(widget.data.note!),
-                  ),
-                );
-              });
-        }
+        var note = widget.data.note ?? '';
+        showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Text('${widget.data.namaBarang.value}\nNote: $note'),
+                ),
+              );
+            });
       },
       onHorizontalDragStart: (details) {
         setState(() {
@@ -284,7 +283,7 @@ class _StockviewCardState extends State<StockviewCard> {
                       widget.data.namaBarang.value.toString(),
                       minFontSize: 12,
                       style: TextStyle(height: 0),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     )),
                     Container(
@@ -294,7 +293,6 @@ class _StockviewCardState extends State<StockviewCard> {
                       ),
                     ),
                     // Expanded(child: Container()),
-                    Text('Total : ${widget.data.pcs.value}'),
                   ],
                 ),
                 subtitle: Column(
@@ -312,10 +310,13 @@ class _StockviewCardState extends State<StockviewCard> {
                           ),
                         ),
                         Expanded(
-                          flex: 2,
-                          child: Text(
-                              'Tgl : ${df.format(widget.data.ditambahkan!)}'),
-                        ),
+                            flex: 2,
+                            child: Text('Total : ${widget.data.pcs.value}')),
+                        // Expanded(
+                        //   flex: 2,
+                        //   child: Text(
+                        //       'Tgl : ${df.format(widget.data.ditambahkan!)}'),
+                        // ),
                         // Expanded(
                         //   child: Container(),
                         // ),
