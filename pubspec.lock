@@ -57,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  barcode_scan2:
+    dependency: "direct main"
+    description:
+      name: barcode_scan2
+      sha256: "0b0625d27841a21e36e896195d86b2aada335e3c486f63647cce701495718e16"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.4"
   bitsdojo_window:
     dependency: "direct main"
     description:
@@ -406,14 +414,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_barcode_scanner:
-    dependency: "direct main"
-    description:
-      name: flutter_barcode_scanner
-      sha256: a4ba37daf9933f451a5e812c753ddd045d6354e4a3280342d895b07fecaab3fa
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -820,6 +820,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
+  protobuf:
+    dependency: transitive
+    description:
+      name: protobuf
+      sha256: "01dd9bd0fa02548bf2ceee13545d4a0ec6046459d847b6b061d8a27237108a08"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   provider:
     dependency: transitive
     description:

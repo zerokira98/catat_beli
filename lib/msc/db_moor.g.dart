@@ -446,6 +446,14 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(0));
+  static const VerificationMeta _discountMeta =
+      const VerificationMeta('discount');
+  @override
+  late final GeneratedColumn<int> discount = GeneratedColumn<int>(
+      'discount', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: Constant(0));
   static const VerificationMeta _qtyMeta = const VerificationMeta('qty');
   @override
   late final GeneratedColumn<double> qty = GeneratedColumn<double>(
@@ -483,7 +491,7 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
           GeneratedColumn.constraintIsAlways('REFERENCES tempat_belis (id)'));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, price, qty, dateAdd, note, idItem, idSupplier];
+      [id, price, discount, qty, dateAdd, note, idItem, idSupplier];
   @override
   String get aliasedName => _alias ?? 'stocks';
   @override
@@ -499,6 +507,10 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
     if (data.containsKey('price')) {
       context.handle(
           _priceMeta, price.isAcceptableOrUnknown(data['price']!, _priceMeta));
+    }
+    if (data.containsKey('discount')) {
+      context.handle(_discountMeta,
+          discount.isAcceptableOrUnknown(data['discount']!, _discountMeta));
     }
     if (data.containsKey('qty')) {
       context.handle(
@@ -535,6 +547,8 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       price: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}price'])!,
+      discount: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}discount'])!,
       qty: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}qty'])!,
       dateAdd: attachedDatabase.typeMapping
@@ -557,6 +571,7 @@ class $StocksTable extends Stocks with TableInfo<$StocksTable, Stock> {
 class Stock extends DataClass implements Insertable<Stock> {
   final int id;
   final int price;
+  final int discount;
   final double qty;
   final DateTime? dateAdd;
   final String? note;
@@ -565,6 +580,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   const Stock(
       {required this.id,
       required this.price,
+      required this.discount,
       required this.qty,
       this.dateAdd,
       this.note,
@@ -575,6 +591,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['price'] = Variable<int>(price);
+    map['discount'] = Variable<int>(discount);
     map['qty'] = Variable<double>(qty);
     if (!nullToAbsent || dateAdd != null) {
       map['date_add'] = Variable<DateTime>(dateAdd);
@@ -595,6 +612,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return StocksCompanion(
       id: Value(id),
       price: Value(price),
+      discount: Value(discount),
       qty: Value(qty),
       dateAdd: dateAdd == null && nullToAbsent
           ? const Value.absent()
@@ -614,6 +632,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return Stock(
       id: serializer.fromJson<int>(json['id']),
       price: serializer.fromJson<int>(json['price']),
+      discount: serializer.fromJson<int>(json['discount']),
       qty: serializer.fromJson<double>(json['qty']),
       dateAdd: serializer.fromJson<DateTime?>(json['dateAdd']),
       note: serializer.fromJson<String?>(json['note']),
@@ -627,6 +646,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'price': serializer.toJson<int>(price),
+      'discount': serializer.toJson<int>(discount),
       'qty': serializer.toJson<double>(qty),
       'dateAdd': serializer.toJson<DateTime?>(dateAdd),
       'note': serializer.toJson<String?>(note),
@@ -638,6 +658,7 @@ class Stock extends DataClass implements Insertable<Stock> {
   Stock copyWith(
           {int? id,
           int? price,
+          int? discount,
           double? qty,
           Value<DateTime?> dateAdd = const Value.absent(),
           Value<String?> note = const Value.absent(),
@@ -646,6 +667,7 @@ class Stock extends DataClass implements Insertable<Stock> {
       Stock(
         id: id ?? this.id,
         price: price ?? this.price,
+        discount: discount ?? this.discount,
         qty: qty ?? this.qty,
         dateAdd: dateAdd.present ? dateAdd.value : this.dateAdd,
         note: note.present ? note.value : this.note,
@@ -657,6 +679,7 @@ class Stock extends DataClass implements Insertable<Stock> {
     return (StringBuffer('Stock(')
           ..write('id: $id, ')
           ..write('price: $price, ')
+          ..write('discount: $discount, ')
           ..write('qty: $qty, ')
           ..write('dateAdd: $dateAdd, ')
           ..write('note: $note, ')
@@ -668,13 +691,14 @@ class Stock extends DataClass implements Insertable<Stock> {
 
   @override
   int get hashCode =>
-      Object.hash(id, price, qty, dateAdd, note, idItem, idSupplier);
+      Object.hash(id, price, discount, qty, dateAdd, note, idItem, idSupplier);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Stock &&
           other.id == this.id &&
           other.price == this.price &&
+          other.discount == this.discount &&
           other.qty == this.qty &&
           other.dateAdd == this.dateAdd &&
           other.note == this.note &&
@@ -685,6 +709,7 @@ class Stock extends DataClass implements Insertable<Stock> {
 class StocksCompanion extends UpdateCompanion<Stock> {
   final Value<int> id;
   final Value<int> price;
+  final Value<int> discount;
   final Value<double> qty;
   final Value<DateTime?> dateAdd;
   final Value<String?> note;
@@ -693,6 +718,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   const StocksCompanion({
     this.id = const Value.absent(),
     this.price = const Value.absent(),
+    this.discount = const Value.absent(),
     this.qty = const Value.absent(),
     this.dateAdd = const Value.absent(),
     this.note = const Value.absent(),
@@ -702,6 +728,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   StocksCompanion.insert({
     this.id = const Value.absent(),
     this.price = const Value.absent(),
+    this.discount = const Value.absent(),
     this.qty = const Value.absent(),
     this.dateAdd = const Value.absent(),
     this.note = const Value.absent(),
@@ -711,6 +738,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   static Insertable<Stock> custom({
     Expression<int>? id,
     Expression<int>? price,
+    Expression<int>? discount,
     Expression<double>? qty,
     Expression<DateTime>? dateAdd,
     Expression<String>? note,
@@ -720,6 +748,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (price != null) 'price': price,
+      if (discount != null) 'discount': discount,
       if (qty != null) 'qty': qty,
       if (dateAdd != null) 'date_add': dateAdd,
       if (note != null) 'note': note,
@@ -731,6 +760,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
   StocksCompanion copyWith(
       {Value<int>? id,
       Value<int>? price,
+      Value<int>? discount,
       Value<double>? qty,
       Value<DateTime?>? dateAdd,
       Value<String?>? note,
@@ -739,6 +769,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     return StocksCompanion(
       id: id ?? this.id,
       price: price ?? this.price,
+      discount: discount ?? this.discount,
       qty: qty ?? this.qty,
       dateAdd: dateAdd ?? this.dateAdd,
       note: note ?? this.note,
@@ -755,6 +786,9 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     }
     if (price.present) {
       map['price'] = Variable<int>(price.value);
+    }
+    if (discount.present) {
+      map['discount'] = Variable<int>(discount.value);
     }
     if (qty.present) {
       map['qty'] = Variable<double>(qty.value);
@@ -779,6 +813,7 @@ class StocksCompanion extends UpdateCompanion<Stock> {
     return (StringBuffer('StocksCompanion(')
           ..write('id: $id, ')
           ..write('price: $price, ')
+          ..write('discount: $discount, ')
           ..write('qty: $qty, ')
           ..write('dateAdd: $dateAdd, ')
           ..write('note: $note, ')

@@ -172,36 +172,38 @@ class _InsertProductCardState extends State<InsertProductCard>
               return InkWell(
                   canRequestFocus: false,
                   onTap: () async {
-                    String barcodeScan =
-                        await FlutterBarcodeScanner.scanBarcode(
-                            '#ffffff', 'Batal', true, ScanMode.BARCODE);
-                    // print(barcodeScan);
-                    if (barcodeScan != '-1') {
-                      barcodeC.text = barcodeScan.trim();
-                      List<StockWithDetails> data =
-                          await RepositoryProvider.of<MyDatabase>(context)
-                              .showStockwithDetails(
-                                  startDate: DateTime(2020),
-                                  barcode: int.parse(barcodeC.text));
-                      if (data.isEmpty) {
-                        BlocProvider.of<InsertstockBloc>(context)
-                            .add(DataChange(widget.data.copywith(
-                          barcode: Barcode.dirty(
-                              int.tryParse(barcodeScan.trim()) ?? 0),
-                        )));
-                      } else {
-                        BlocProvider.of<InsertstockBloc>(context)
-                            .add(DataChange(widget.data.copywith(
-                          namaBarang: NamaBarang.dirty(data.last.item.nama),
-                          hargaBeli: Hargabeli.dirty(data.last.stock.price),
-                          productId: () => data.last.item.id,
-                          tempatBeli:
-                              Tempatbeli.dirty(data.last.tempatBeli.nama),
-                          barcode: Barcode.dirty(
-                              int.tryParse(barcodeScan.trim()) ?? 0),
-                        )));
+                    try {
+                      var barcodeScan = await BarcodeScanner.scan();
+                      // print(barcodeScan);
+                      if (barcodeScan != '-1') {
+                        barcodeC.text = barcodeScan.rawContent.trim();
+                        List<StockWithDetails> data =
+                            await RepositoryProvider.of<MyDatabase>(context)
+                                .showStockwithDetails(
+                                    startDate: DateTime(2020),
+                                    barcode: int.parse(barcodeC.text));
+                        if (data.isEmpty) {
+                          BlocProvider.of<InsertstockBloc>(context)
+                              .add(DataChange(widget.data.copywith(
+                            barcode: Barcode.dirty(
+                                int.tryParse(barcodeScan.rawContent.trim()) ??
+                                    0),
+                          )));
+                        } else {
+                          BlocProvider.of<InsertstockBloc>(context)
+                              .add(DataChange(widget.data.copywith(
+                            namaBarang: NamaBarang.dirty(data.last.item.nama),
+                            hargaBeli: Hargabeli.dirty(data.last.stock.price),
+                            productId: () => data.last.item.id,
+                            tempatBeli:
+                                Tempatbeli.dirty(data.last.tempatBeli.nama),
+                            barcode: Barcode.dirty(
+                                int.tryParse(barcodeScan.rawContent.trim()) ??
+                                    0),
+                          )));
+                        }
                       }
-                    }
+                    } catch (e) {}
                   },
                   child: Icon(Icons.qr_code));
             }

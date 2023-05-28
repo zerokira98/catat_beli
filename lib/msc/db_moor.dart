@@ -12,6 +12,7 @@ part 'db_moor.g.dart';
 class Stocks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get price => integer().withDefault(Constant(0))();
+  IntColumn get discount => integer().withDefault(Constant(0))();
   RealColumn get qty => real().withDefault(Constant(1.0))();
   DateTimeColumn get dateAdd => dateTime().nullable()();
   TextColumn get note => text().nullable()();
@@ -73,7 +74,7 @@ LazyDatabase _openConnection() {
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
@@ -88,6 +89,9 @@ class MyDatabase extends _$MyDatabase {
           }
           if (from < 4) {
             await m.createTable(hiddenItems);
+          }
+          if (from < 5) {
+            await m.addColumn(stocks, stocks.discount);
           }
         },
         beforeOpen: (d) async {
