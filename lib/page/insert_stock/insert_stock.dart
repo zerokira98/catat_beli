@@ -8,7 +8,7 @@ import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
