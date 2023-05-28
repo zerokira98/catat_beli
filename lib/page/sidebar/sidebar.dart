@@ -149,8 +149,9 @@ class _SideDrawerState extends State<SideDrawer> {
                         SnackBar(content: Text('file saved at:$filePath')));
                   }
                 } else if (!Platform.isAndroid) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('not implemented yet, sorry')));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text('not implemented yet, sorry')));
                 }
               }
             },

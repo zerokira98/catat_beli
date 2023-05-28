@@ -50,7 +50,7 @@ dependencies:
   auto_size_text: ^3.0.0
   excel: ^2.0.1
   formz: ^0.6.0
-  flex_color_scheme: ^7.1.0
+  flex_color_scheme: ^7.1.2
   google_fonts: ^4.0.0
   month_picker_dialog: ^2.0.0
   syncfusion_flutter_charts: ^21.2.4
