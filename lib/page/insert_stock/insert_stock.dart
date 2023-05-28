@@ -17,6 +17,7 @@ import 'package:catatbeli/msc/db_moor.dart';
 import 'package:intl/intl.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
+part 'insert_fields.dart';
 
 class InsertProductPage extends StatefulWidget {
   @override

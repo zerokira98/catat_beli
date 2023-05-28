@@ -29,6 +29,21 @@ class Hargabeli extends FormzInput<int, HargabeliValidationError> {
   }
 }
 
+enum DiscountValidationError { empty, negative, toosmall }
+
+class Discount extends FormzInput<int, HargabeliValidationError> {
+  const Discount.pure() : super.pure(0);
+  const Discount.dirty([super.value = 0]) : super.dirty();
+
+  @override
+  HargabeliValidationError? validator(int value) {
+    // if (value == 0) return HargabeliValidationError.empty;
+    if (value < 0) return HargabeliValidationError.negative;
+    // if (value < 99) return HargabeliValidationError.toosmall;
+    return null;
+  }
+}
+
 enum TempatbeliValidationError { empty, mustnumber }
 
 class Tempatbeli extends FormzInput<String, TempatbeliValidationError> {

@@ -9,6 +9,7 @@ class ItemCards extends Equatable with FormzMixin {
   final NamaBarang namaBarang;
   final Hargabeli hargaBeli;
   final int? hargaJual;
+  final Discount discount;
   final ModeHarga modeHarga;
   final Pcs pcs;
   final int? productId;
@@ -23,6 +24,7 @@ class ItemCards extends Equatable with FormzMixin {
   const ItemCards(
       {this.namaBarang = const NamaBarang.pure(),
       this.hargaBeli = const Hargabeli.pure(),
+      this.discount = const Discount.pure(),
       this.productId,
       this.hargaJual,
       this.modeHarga = ModeHarga.pcs,
@@ -36,6 +38,7 @@ class ItemCards extends Equatable with FormzMixin {
       this.cardId});
   ItemCards copywith(
       {NamaBarang? namaBarang,
+      Discount? discount,
       Hargabeli? hargaBeli,
       int? hargaJual,
       Pcs? pcs,
@@ -50,6 +53,7 @@ class ItemCards extends Equatable with FormzMixin {
       DateTime? ditambahkan,
       int? id}) {
     return ItemCards(
+        discount: discount ?? this.discount,
         barcode: barcode ?? this.barcode,
         modeHarga: modeHarga ?? this.modeHarga,
         open: open ?? this.open,
@@ -76,6 +80,7 @@ class ItemCards extends Equatable with FormzMixin {
         cardId,
         note,
         open,
+        discount,
         // created,
         barcode,
         productId,
@@ -98,6 +103,7 @@ class ItemCards extends Equatable with FormzMixin {
       barcode,
       productId,
       ditambahkan,
+      discount,
     ].toString();
     // return 'open : $open';
     // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
@@ -109,6 +115,7 @@ class ItemCards extends Equatable with FormzMixin {
     return ItemCards(
         barcode: Barcode.dirty(json['barcode']),
         open: json['open'],
+        discount: Discount.dirty(json['discount']),
         namaBarang: NamaBarang.dirty(json['namaBarang']),
         created: true,
         modeHarga: ModeHarga.values[json['modeHarga']],
@@ -128,6 +135,7 @@ class ItemCards extends Equatable with FormzMixin {
   Map<String, dynamic>? toJson() {
     return {
       'barcode': this.barcode.value,
+      'discount': this.discount.value,
       'open': this.open,
       'created': true,
       'modeHarga': this.modeHarga.index,
@@ -143,23 +151,7 @@ class ItemCards extends Equatable with FormzMixin {
     };
   }
 
-  static ItemCards fromMap(Map data) {
-    return ItemCards(
-      barcode: data['BARCODE'],
-      // open: data[''],
-      namaBarang: data['NAMA'],
-      // formkey: formkey ?? this.formkey,
-      productId: data['ID'],
-      // ditambahkan: DateTime.parse(data['ADD_DATE']),
-      // hargaBeli: data['HARGA_BELI'],
-      hargaJual: data['HARGA_JUAL'],
-      pcs: data['JUMLAH'],
-      // tempatBeli: data['SUPPLIER'],
-      // id: data['id']
-    );
-  }
-
   @override
   List<FormzInput> get inputs =>
-      [namaBarang, hargaBeli, pcs, tempatBeli, barcode];
+      [namaBarang, hargaBeli, pcs, tempatBeli, barcode, discount];
 }

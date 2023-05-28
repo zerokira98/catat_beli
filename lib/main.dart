@@ -76,8 +76,8 @@ class App extends StatelessWidget {
           builder: (context, state) {
             return MaterialApp(
                 debugShowCheckedModeBanner: false,
-                // theme: state.themeData,
-                theme: ThemeData(useMaterial3: true),
+                theme: state.themeData,
+                // theme: ThemeData(useMaterial3: true),
                 home: Scaffold(
                   backgroundColor: Colors.transparent,
                   body: FutureBuilder<SharedPreferences>(

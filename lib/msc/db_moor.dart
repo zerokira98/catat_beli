@@ -408,6 +408,7 @@ class MyDatabase extends _$MyDatabase {
         }
         await into(stocks).insert(StocksCompanion(
           idItem: Value(itemId),
+          discount: Value(data.discount.value),
           note: Value(data.note),
           idSupplier: Value(tempatId),
           price: Value(data.hargaBeli.value),
@@ -416,21 +417,6 @@ class MyDatabase extends _$MyDatabase {
         ));
       }
     });
-
-    // var namaitem = 'Rokok Surya 12';
-    // int? barcode;
-    // var a = await (select(stockItems)
-    //       ..where((tbl) => tbl.nama.equals(namaitem)))
-    //     .get();
-    // print(a);
-    // if (a.isEmpty) {
-    //   into(stockItems).insert(StockItemsCompanion(
-    //       nama: Value(namaitem),
-    //       barcode: barcode == null ? Value.absent() : Value(barcode)));
-    // }else{
-
-    // }
-    // into(stocks).insert(StocksCompanion())
   }
 
   // Future tempatinsert() async {

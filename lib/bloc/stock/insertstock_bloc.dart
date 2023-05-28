@@ -76,6 +76,7 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
               hargaBeli: e.modeHarga == ModeHarga.total
                   ? Hargabeli.dirty((e.hargaBeli.value / e.pcs.value).floor())
                   : e.hargaBeli,
+              discount: Discount.dirty(e.discount.value),
               modeHarga: ModeHarga.pcs,
               namaBarang: NamaBarang.dirty(e.namaBarang.value.trim()),
               tempatBeli: Tempatbeli.dirty(e.tempatBeli.value.trim()),
