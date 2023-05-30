@@ -118,35 +118,6 @@ class _InsertProductCardState extends State<InsertProductCard>
           TextSelection.fromPosition(TextPosition(offset: discc.text.length));
     }
     datec.text = dateFormat.format(widget.data.ditambahkan!);
-
-    Widget additionalBottom = Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: TextFormField(
-        controller: notec,
-        decoration: InputDecoration(label: Text('Note')),
-        onChanged: (v) {
-          BlocProvider.of<InsertstockBloc>(context)
-              .add(DataChange((widget.data.copywith(note: v))));
-        },
-      ),
-    );
-    Widget additionalBottom2 = Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: TextFormField(
-        controller: discc,
-        validator: (value) {
-          if (int.tryParse(value ?? '') == null) return 'invalid format';
-          return null;
-        },
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(label: Text('Discount')),
-        onChanged: (v) {
-          BlocProvider.of<InsertstockBloc>(context).add(DataChange((widget.data
-              .copywith(
-                  discount: Discount.dirty(int.tryParse(discc.text) ?? 0)))));
-        },
-      ),
-    );
     Widget bottom = Column(
       children: [
         Row(
@@ -215,13 +186,13 @@ class _InsertProductCardState extends State<InsertProductCard>
                       duration: Duration(milliseconds: 260),
                       reverseDuration: Duration(milliseconds: 260),
                       open: noteVisible,
-                      child: additionalBottom),
+                      child: NoteField(notec: notec, data: widget.data)),
                   AnimatedClipRect(
                       horizontalAnimation: false,
                       duration: Duration(milliseconds: 260),
                       reverseDuration: Duration(milliseconds: 260),
                       open: discountVisible,
-                      child: additionalBottom2),
+                      child: DiscountField(discc: discc, data: widget.data)),
                 ],
               ),
             ),
@@ -248,8 +219,6 @@ class _InsertProductCardState extends State<InsertProductCard>
     );
   }
 }
-
-enum ModeHarga { total, pcs }
 
 class AnimatedClipRect extends StatefulWidget {
   @override

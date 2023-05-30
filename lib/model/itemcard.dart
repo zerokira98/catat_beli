@@ -5,11 +5,16 @@ import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 // import 'itemcard_formz.dart';
 
+enum DiscountMode { total, perPcs }
+
+enum ModeHarga { total, pcs }
+
 class ItemCards extends Equatable with FormzMixin {
   final NamaBarang namaBarang;
   final Hargabeli hargaBeli;
   final int? hargaJual;
   final Discount discount;
+  final DiscountMode discountMode;
   final ModeHarga modeHarga;
   final Pcs pcs;
   final int? productId;
@@ -28,6 +33,7 @@ class ItemCards extends Equatable with FormzMixin {
       this.productId,
       this.hargaJual,
       this.modeHarga = ModeHarga.pcs,
+      this.discountMode = DiscountMode.total,
       this.pcs = const Pcs.pure(),
       this.created,
       this.note,
@@ -43,6 +49,7 @@ class ItemCards extends Equatable with FormzMixin {
       int? hargaJual,
       Pcs? pcs,
       ModeHarga? modeHarga,
+      DiscountMode? discountMode,
       Tempatbeli? tempatBeli,
       int? Function()? productId,
       bool? open,
@@ -56,6 +63,7 @@ class ItemCards extends Equatable with FormzMixin {
         discount: discount ?? this.discount,
         barcode: barcode ?? this.barcode,
         modeHarga: modeHarga ?? this.modeHarga,
+        discountMode: discountMode ?? this.discountMode,
         open: open ?? this.open,
         created: created ?? this.created,
         namaBarang: namaBarang ?? this.namaBarang,
@@ -76,6 +84,7 @@ class ItemCards extends Equatable with FormzMixin {
         hargaJual,
         pcs,
         modeHarga,
+        discountMode,
         tempatBeli,
         cardId,
         note,
@@ -119,6 +128,7 @@ class ItemCards extends Equatable with FormzMixin {
         namaBarang: NamaBarang.dirty(json['namaBarang']),
         created: true,
         modeHarga: ModeHarga.values[json['modeHarga']],
+        discountMode: DiscountMode.values[json['discountMode']],
         // formkey: formkey ?? this.formkey,
         productId: json['productId'],
         ditambahkan: DateTime.tryParse(json['ditambahkan'].toString()),
@@ -139,6 +149,7 @@ class ItemCards extends Equatable with FormzMixin {
       'open': this.open,
       'created': true,
       'modeHarga': this.modeHarga.index,
+      'discountMode': this.discountMode.index,
       'namaBarang': this.namaBarang.value,
       'productId': this.productId,
       'cardId': this.cardId,

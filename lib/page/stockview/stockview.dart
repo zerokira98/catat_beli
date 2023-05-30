@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:catatbeli/msc/db_moor.dart';
-import 'package:catatbeli/page/statistic_page/statistic_per_item.dart';
 import 'package:catatbeli/page/stockview/edit_stock/edit_stock.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';

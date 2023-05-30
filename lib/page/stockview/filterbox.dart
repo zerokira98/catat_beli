@@ -107,6 +107,8 @@ class FilterBox extends StatelessWidget {
                                       .subtract(Duration(days: 365)),
                                 )));
                               },
+                              style: ButtonStyle(
+                                  elevation: MaterialStatePropertyAll(1.0)),
                               child: Text('1Year'))
                         ],
                       ),

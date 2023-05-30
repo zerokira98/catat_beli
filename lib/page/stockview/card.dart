@@ -23,8 +23,17 @@ class _StockviewCardState extends State<StockviewCard> {
         numFormat.format(widget.data.pcs.value * widget.data.hargaBeli.value);
     return GestureDetector(
       onTap: () {
-        var note = widget.data.note ?? '';
+        var note = widget.data.note ?? '-';
         var discount = widget.data.discount.value;
+        var harga = widget.data.hargaBeli.value - discount;
+        var pcs = widget.data.pcs.value;
+        var theStr = '''${widget.data.namaBarang.value}
+pcs($pcs)
+Note: $note
+Discount: ${numFormat.format(discount)}
+Harga disesuaikan: 
+Per pcs : ${numFormat.format(harga)}
+Total : ${numFormat.format(harga * pcs)}''';
         showDialog(
             context: context,
             builder: (context) {
@@ -32,7 +41,10 @@ class _StockviewCardState extends State<StockviewCard> {
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: Text(
-                      '${widget.data.namaBarang.value}\nNote: $note\nDiscount: $discount'),
+                    theStr,
+                    style: TextStyle(),
+                    textAlign: TextAlign.left,
+                  ),
                 ),
               );
             });
@@ -265,7 +277,10 @@ class _StockviewCardState extends State<StockviewCard> {
                     )),
                     Container(
                       child: Text(
-                        widget.data.note == null ? '' : '*',
+                        (widget.data.note != null) |
+                                (widget.data.discount.value != 0)
+                            ? '*'
+                            : '',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),

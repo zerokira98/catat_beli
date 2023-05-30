@@ -6,6 +6,7 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
+// import 'package:drift/drift.dart' as d;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
@@ -17,7 +18,7 @@ import 'package:catatbeli/msc/db_moor.dart';
 import 'package:intl/intl.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
-part 'insert_fields.dart';
+part 'insert_components.dart';
 
 class InsertProductPage extends StatefulWidget {
   @override

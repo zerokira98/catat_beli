@@ -220,14 +220,10 @@ class QtyField extends StatelessWidget {
       controller: qtyc,
       focusNode: fsn1,
       onChanged: (v) {
-        // print(v);
-        // print('aaa');
         var doublePcs = double.tryParse(qtyc.text.trim());
-        // print(doublePcs);
         if (doublePcs != null)
           BlocProvider.of<InsertstockBloc>(context)
               .add(DataChange(data.copywith(pcs: Pcs.dirty(doublePcs))));
-        // FocusScope.of(context).
       },
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
@@ -359,10 +355,39 @@ class TempatBeliField extends StatelessWidget {
 class ModeHargaButton extends StatelessWidget {
   final ItemCards data;
 
-  const ModeHargaButton({super.key, required this.data});
-
+  ModeHargaButton({super.key, required this.data});
+  var basicFormat = NumberFormat("#,###", "en_US");
+  static var numFormat = NumberFormat.currency(
+    locale: 'ID_id',
+    symbol: 'Rp.',
+    decimalDigits: 0,
+  );
   @override
   Widget build(BuildContext context) {
+    String calculation() {
+      num total = 0;
+      num disco = 0;
+      switch (data.modeHarga) {
+        case ModeHarga.pcs:
+          total = data.hargaBeli.value * data.pcs.value;
+          if (data.discountMode == DiscountMode.perPcs) {
+            disco = (data.discount.value * data.pcs.value);
+          } else if (data.discountMode == DiscountMode.total) {
+            disco = (data.discount.value);
+          }
+          break;
+        case ModeHarga.total:
+          total = data.hargaBeli.value / data.pcs.value;
+          if (data.discountMode == DiscountMode.perPcs) {
+            disco = (data.discount.value * data.pcs.value);
+          } else if (data.discountMode == DiscountMode.total) {
+            disco = (data.discount.value);
+          }
+          break;
+      }
+      return 'Total :${numFormat.format(total)} - ${basicFormat.format(disco)} = ${numFormat.format(total - disco)}';
+    }
+
     return Row(
       children: [
         InkWell(
@@ -391,25 +416,7 @@ class ModeHargaButton extends StatelessWidget {
               Icons.swap_horizontal_circle,
               size: 18,
             )),
-        data.modeHarga == ModeHarga.pcs
-            ? Text(
-                'Total :${NumberFormat.currency(
-                  locale: 'ID_id',
-                  symbol: 'Rp.',
-                  decimalDigits: 0,
-                ).format(data.hargaBeli.value * data.pcs.value)}',
-                textAlign: TextAlign.left,
-                textScaleFactor: 0.8,
-              )
-            : Text(
-                '1pcs :${NumberFormat.currency(
-                  locale: 'ID_id',
-                  symbol: 'Rp.',
-                  decimalDigits: 0,
-                ).format(data.hargaBeli.value / data.pcs.value)}',
-                textAlign: TextAlign.left,
-                textScaleFactor: 0.8,
-              )
+        Text(calculation())
       ],
     );
   }
@@ -530,7 +537,7 @@ class _FloatingOptionsState extends State<FloatingOptions> {
           open: openOption,
           child: Column(
             children: [
-              Padding(padding: EdgeInsets.all(4)),
+              Padding(padding: EdgeInsets.all(2)),
               InkWell(
                 canRequestFocus: false,
                 onTap: () {
@@ -551,7 +558,7 @@ class _FloatingOptionsState extends State<FloatingOptions> {
                   ),
                 ),
               ),
-              Padding(padding: EdgeInsets.all(4)),
+              Padding(padding: EdgeInsets.all(2)),
               InkWell(
                 canRequestFocus: false,
                 onTap: () {
@@ -571,7 +578,7 @@ class _FloatingOptionsState extends State<FloatingOptions> {
                   ),
                 ),
               ),
-              Padding(padding: EdgeInsets.all(4)),
+              Padding(padding: EdgeInsets.all(2)),
               InkWell(
                 canRequestFocus: false,
                 onTap: () {
@@ -595,6 +602,86 @@ class _FloatingOptionsState extends State<FloatingOptions> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class DiscountField extends StatefulWidget {
+  final TextEditingController discc;
+  final ItemCards data;
+
+  const DiscountField({super.key, required this.discc, required this.data});
+
+  @override
+  State<DiscountField> createState() => _DiscountFieldState();
+}
+
+class _DiscountFieldState extends State<DiscountField> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: TextFormField(
+        controller: widget.discc,
+        validator: (value) {
+          if (int.tryParse(value ?? '') == null) return 'invalid format';
+          return null;
+        },
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+            label: widget.data.discountMode.index % 2 == 0
+                ? Text('Total Discount')
+                : Text('Discount per pcs'),
+            suffixIcon: IconButton(
+              onPressed: () {
+                // setState(() {
+                //   discMode = DiscountMode.values[(discMode.index + 1) % 2];
+                // });
+                switch (widget.data.discountMode) {
+                  case DiscountMode.perPcs:
+                    BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                      widget.data.copywith(discountMode: DiscountMode.total),
+                    ));
+                    break;
+                  case DiscountMode.total:
+                    BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                      widget.data.copywith(discountMode: DiscountMode.perPcs),
+                    ));
+                    break;
+
+                  default:
+                }
+              },
+              icon: Icon(Icons.change_circle_outlined),
+            )),
+        onChanged: (v) {
+          BlocProvider.of<InsertstockBloc>(context).add(DataChange((widget.data
+              .copywith(
+                  discount:
+                      Discount.dirty(int.tryParse(widget.discc.text) ?? 0)))));
+        },
+      ),
+    );
+  }
+}
+
+class NoteField extends StatelessWidget {
+  final TextEditingController notec;
+  final ItemCards data;
+  const NoteField({super.key, required this.notec, required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: TextFormField(
+        controller: notec,
+        decoration: InputDecoration(label: Text('Note')),
+        onChanged: (v) {
+          BlocProvider.of<InsertstockBloc>(context)
+              .add(DataChange((data.copywith(note: v))));
+        },
+      ),
     );
   }
 }
