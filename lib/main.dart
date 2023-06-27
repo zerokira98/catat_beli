@@ -75,9 +75,9 @@ class App extends StatelessWidget {
         child: BlocBuilder<ThemeCubit, ThemeState>(
           builder: (context, state) {
             return MaterialApp(
+                title: 'Catat Beli',
                 debugShowCheckedModeBanner: false,
-                // theme: state.themeData,
-                theme: ThemeData(useMaterial3: true),
+                theme: state.themeData,
                 home: Scaffold(
                   backgroundColor: Colors.transparent,
                   body: FutureBuilder<SharedPreferences>(

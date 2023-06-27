@@ -18,25 +18,33 @@ class _StockviewCardState extends State<StockviewCard> {
   double opacityval = 1.0;
   @override
   Widget build(BuildContext context) {
-    // var telo = widget.data.note;
-    // print('note:$telo');
     var hargaBeli = numFormat.format(widget.data.hargaBeli.value);
-    // var hargaJual = numFormat.format(widget.data.hargaJual);
-    // print(widget.data.pcs);
     var totalBeli =
         numFormat.format(widget.data.pcs.value * widget.data.hargaBeli.value);
-    // print('tempat:' + (widget.data.tempatBeli ?? ''));
-    // return Container();
     return GestureDetector(
       onTap: () {
-        var note = widget.data.note ?? '';
+        var note = widget.data.note ?? '-';
+        var discount = widget.data.discount.value;
+        var harga = widget.data.hargaBeli.value - discount;
+        var pcs = widget.data.pcs.value;
+        var theStr = '''${widget.data.namaBarang.value}
+pcs($pcs)
+Note: $note
+Discount: ${numFormat.format(discount)}
+Harga disesuaikan: 
+Per pcs : ${numFormat.format(harga)}
+Total : ${numFormat.format(harga * pcs)}''';
         showDialog(
             context: context,
             builder: (context) {
               return Dialog(
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
-                  child: Text('${widget.data.namaBarang.value}\nNote: $note'),
+                  child: Text(
+                    theStr,
+                    style: TextStyle(),
+                    textAlign: TextAlign.left,
+                  ),
                 ),
               );
             });
@@ -104,8 +112,6 @@ class _StockviewCardState extends State<StockviewCard> {
               child: ListTile(
                 isThreeLine: true,
                 dense: true,
-                // shape: RoundedRectangleBorder( ),
-                // tileColor: Colors.white,
                 title: Text(''),
                 subtitle: Column(
                   children: [
@@ -190,8 +196,6 @@ class _StockviewCardState extends State<StockviewCard> {
                         Colors.green,
                         Colors.green,
                         Colors.green,
-                        Colors.green,
-                        Colors.red,
                         Colors.red,
                         Colors.red,
                         Colors.red,
@@ -215,21 +219,6 @@ class _StockviewCardState extends State<StockviewCard> {
                                 MaterialPageRoute(
                                   builder: (context) => StockEdit(widget.data),
                                 ));
-                            // BlocProvider.of<StockviewBloc>(context)
-                            //     .add(InitiateView());
-                            // showDialog(
-                            //     context: context,
-                            //     builder: (context) {
-                            //       return Dialog(
-                            //         child: Padding(
-                            //           padding: const EdgeInsets.all(18.0),
-                            //           child: Text(
-                            //             'Future Feature!',
-                            //             textScaleFactor: 2.0,
-                            //           ),
-                            //         ),
-                            //       );
-                            //     });
                           },
                           child: Icon(
                             Icons.edit,
@@ -282,13 +271,16 @@ class _StockviewCardState extends State<StockviewCard> {
                         child: AutoSizeText(
                       widget.data.namaBarang.value.toString(),
                       minFontSize: 12,
-                      style: TextStyle(height: 0),
+                      // style: TextStyle(height: 0),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     )),
                     Container(
                       child: Text(
-                        widget.data.note == null ? '' : '*',
+                        (widget.data.note != null) |
+                                (widget.data.discount.value != 0)
+                            ? '*'
+                            : '',
                         style: TextStyle(color: Colors.red),
                       ),
                     ),

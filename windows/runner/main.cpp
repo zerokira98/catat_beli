@@ -33,7 +33,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(&run_loop, project);
   Win32Window::Point origin(0, 0);
   Win32Window::Size size(1366, 768);
-  if (!window.CreateAndShow(L"kasir", origin, size)) {
+  if (!window.CreateAndShow(L"Catat Beli", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

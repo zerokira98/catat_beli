@@ -12,6 +12,7 @@ part 'db_moor.g.dart';
 class Stocks extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get price => integer().withDefault(Constant(0))();
+  IntColumn get discount => integer().withDefault(Constant(0))();
   RealColumn get qty => real().withDefault(Constant(1.0))();
   DateTimeColumn get dateAdd => dateTime().nullable()();
   TextColumn get note => text().nullable()();
@@ -73,7 +74,7 @@ LazyDatabase _openConnection() {
 class MyDatabase extends _$MyDatabase {
   MyDatabase() : super(_openConnection());
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (Migrator m) {
@@ -88,6 +89,9 @@ class MyDatabase extends _$MyDatabase {
           }
           if (from < 4) {
             await m.createTable(hiddenItems);
+          }
+          if (from < 5) {
+            await m.addColumn(stocks, stocks.discount);
           }
         },
         beforeOpen: (d) async {
@@ -198,7 +202,7 @@ class MyDatabase extends _$MyDatabase {
   Future<List<StockItem>> itemwithid(int id) =>
       (select(stockItems)..where((tbl) => tbl.id.equals(id))).get();
 
-  ///====
+  ///==== startDate(inclusion),endDate(exclution?)
   Future<List<StockWithDetails>> showStockwithDetails({
     int? idBarang,
     int? barcode,
@@ -404,6 +408,7 @@ class MyDatabase extends _$MyDatabase {
         }
         await into(stocks).insert(StocksCompanion(
           idItem: Value(itemId),
+          discount: Value(data.discount.value),
           note: Value(data.note),
           idSupplier: Value(tempatId),
           price: Value(data.hargaBeli.value),
@@ -412,21 +417,6 @@ class MyDatabase extends _$MyDatabase {
         ));
       }
     });
-
-    // var namaitem = 'Rokok Surya 12';
-    // int? barcode;
-    // var a = await (select(stockItems)
-    //       ..where((tbl) => tbl.nama.equals(namaitem)))
-    //     .get();
-    // print(a);
-    // if (a.isEmpty) {
-    //   into(stockItems).insert(StockItemsCompanion(
-    //       nama: Value(namaitem),
-    //       barcode: barcode == null ? Value.absent() : Value(barcode)));
-    // }else{
-
-    // }
-    // into(stocks).insert(StocksCompanion())
   }
 
   // Future tempatinsert() async {

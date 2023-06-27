@@ -142,8 +142,9 @@ class _SideDrawerState extends State<SideDrawer> {
                   final filePath =
                       await FlutterFileDialog.saveFile(params: params);
                   if (filePath == null) {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(SnackBar(content: Text('cancelled')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content: Text('cancelled')));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('file saved at:$filePath')));

@@ -1,14 +1,19 @@
 import 'package:catatbeli/model/itemcard_formz.dart';
-import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 // import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 // import 'itemcard_formz.dart';
 
+enum DiscountMode { total, perPcs }
+
+enum ModeHarga { total, pcs }
+
 class ItemCards extends Equatable with FormzMixin {
   final NamaBarang namaBarang;
   final Hargabeli hargaBeli;
   final int? hargaJual;
+  final Discount discount;
+  final DiscountMode discountMode;
   final ModeHarga modeHarga;
   final Pcs pcs;
   final int? productId;
@@ -23,9 +28,11 @@ class ItemCards extends Equatable with FormzMixin {
   const ItemCards(
       {this.namaBarang = const NamaBarang.pure(),
       this.hargaBeli = const Hargabeli.pure(),
+      this.discount = const Discount.pure(),
       this.productId,
       this.hargaJual,
       this.modeHarga = ModeHarga.pcs,
+      this.discountMode = DiscountMode.total,
       this.pcs = const Pcs.pure(),
       this.created,
       this.note,
@@ -36,10 +43,12 @@ class ItemCards extends Equatable with FormzMixin {
       this.cardId});
   ItemCards copywith(
       {NamaBarang? namaBarang,
+      Discount? discount,
       Hargabeli? hargaBeli,
       int? hargaJual,
       Pcs? pcs,
       ModeHarga? modeHarga,
+      DiscountMode? discountMode,
       Tempatbeli? tempatBeli,
       int? Function()? productId,
       bool? open,
@@ -50,8 +59,10 @@ class ItemCards extends Equatable with FormzMixin {
       DateTime? ditambahkan,
       int? id}) {
     return ItemCards(
+        discount: discount ?? this.discount,
         barcode: barcode ?? this.barcode,
         modeHarga: modeHarga ?? this.modeHarga,
+        discountMode: discountMode ?? this.discountMode,
         open: open ?? this.open,
         created: created ?? this.created,
         namaBarang: namaBarang ?? this.namaBarang,
@@ -72,10 +83,12 @@ class ItemCards extends Equatable with FormzMixin {
         hargaJual,
         pcs,
         modeHarga,
+        discountMode,
         tempatBeli,
         cardId,
         note,
         open,
+        discount,
         // created,
         barcode,
         productId,
@@ -98,6 +111,7 @@ class ItemCards extends Equatable with FormzMixin {
       barcode,
       productId,
       ditambahkan,
+      discount,
     ].toString();
     // return 'open : $open';
     // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
@@ -109,9 +123,11 @@ class ItemCards extends Equatable with FormzMixin {
     return ItemCards(
         barcode: Barcode.dirty(json['barcode']),
         open: json['open'],
+        discount: Discount.dirty(json['discount']),
         namaBarang: NamaBarang.dirty(json['namaBarang']),
         created: true,
         modeHarga: ModeHarga.values[json['modeHarga']],
+        discountMode: DiscountMode.values[json['discountMode']],
         // formkey: formkey ?? this.formkey,
         productId: json['productId'],
         ditambahkan: DateTime.tryParse(json['ditambahkan'].toString()),
@@ -128,9 +144,11 @@ class ItemCards extends Equatable with FormzMixin {
   Map<String, dynamic>? toJson() {
     return {
       'barcode': this.barcode.value,
+      'discount': this.discount.value,
       'open': this.open,
       'created': true,
       'modeHarga': this.modeHarga.index,
+      'discountMode': this.discountMode.index,
       'namaBarang': this.namaBarang.value,
       'productId': this.productId,
       'cardId': this.cardId,
@@ -143,23 +161,7 @@ class ItemCards extends Equatable with FormzMixin {
     };
   }
 
-  static ItemCards fromMap(Map data) {
-    return ItemCards(
-      barcode: data['BARCODE'],
-      // open: data[''],
-      namaBarang: data['NAMA'],
-      // formkey: formkey ?? this.formkey,
-      productId: data['ID'],
-      // ditambahkan: DateTime.parse(data['ADD_DATE']),
-      // hargaBeli: data['HARGA_BELI'],
-      hargaJual: data['HARGA_JUAL'],
-      pcs: data['JUMLAH'],
-      // tempatBeli: data['SUPPLIER'],
-      // id: data['id']
-    );
-  }
-
   @override
   List<FormzInput> get inputs =>
-      [namaBarang, hargaBeli, pcs, tempatBeli, barcode];
+      [namaBarang, hargaBeli, pcs, tempatBeli, barcode, discount];
 }

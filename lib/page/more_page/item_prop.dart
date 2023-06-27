@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 // import 'package:kasir/model/itemcard.dart';
@@ -514,16 +514,15 @@ class _EditItemPageState extends State<EditItemPage>
                                         labelText: 'barcode',
                                         suffixIcon: InkWell(
                                             onTap: () async {
-                                              String barcodeScan =
-                                                  await FlutterBarcodeScanner
-                                                      .scanBarcode(
-                                                          '#ffffff',
-                                                          'Cancel',
-                                                          false,
-                                                          ScanMode.BARCODE);
-                                              print(barcodeScan);
-                                              if (barcodeScan == -1) return;
-                                              barcodeC.text = barcodeScan;
+                                              try {
+                                                var barcodeScan =
+                                                    await BarcodeScanner.scan(
+                                                        options: ScanOptions());
+                                                barcodeC.text =
+                                                    barcodeScan.rawContent;
+                                              } catch (e) {}
+                                              // print(barcodeScan.type==ResultType.Error);
+                                              // if (barcodeScan == -1) return;
                                             },
                                             child: Icon(Icons.qr_code))),
                                   ),

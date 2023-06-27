@@ -67,6 +67,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
             note: e.stock.note,
             ditambahkan: e.stock.dateAdd,
             namaBarang: NamaBarang.dirty(e.item.nama),
+            discount: Discount.dirty(e.stock.discount),
             cardId: e.stock.id,
             pcs: Pcs.dirty(e.stock.qty),
             productId: e.item.id,
@@ -118,6 +119,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
             note: e.stock.note,
             ditambahkan: e.stock.dateAdd,
             namaBarang: NamaBarang.dirty(e.item.nama),
+            discount: Discount.dirty(e.stock.discount),
             cardId: e.stock.id,
             pcs: Pcs.dirty(e.stock.qty),
             productId: e.item.id,
@@ -163,6 +165,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
                 ditambahkan: e.stock.dateAdd,
                 namaBarang: NamaBarang.dirty(e.item.nama),
                 cardId: e.stock.id,
+                discount: Discount.dirty(e.stock.discount),
                 pcs: Pcs.dirty(e.stock.qty),
                 productId: e.item.id,
                 tempatBeli: Tempatbeli.dirty(e.tempatBeli.nama),
@@ -184,81 +187,4 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
           message: '[${event.data.namaBarang}] Deleted Sucsessfully'));
     }
   }
-
-  // @override
-  // Stream<StockviewState> mapEventToState(
-  //   StockviewEvent event,
-  // ) async* {
-  //   if (event is FilterChange) {
-  //     yield StockviewLoading();
-  //     int maxQ = await db.maxdataStock(
-  //       startDate: DateTime.parse(event.filter.startDate),
-  //       endDate: DateTime.parse(event.filter.endDate),
-  //     );
-  //     // print('maxq = ' + maxQ.toString());
-  //     var data = await db.showStockwithDetails(
-  //       name: event.filter.nama,
-  //       limit: 20,
-  //       page: event.filter.currentPage,
-  //       startDate: DateTime.parse(event.filter.startDate),
-  //       endDate: DateTime.parse(event.filter.endDate),
-  //       boughtPlace: event.filter.tempatBeli,
-  //     );
-  //     // print(data);
-  //     yield StockviewLoaded(
-  //         filter: event.filter.copyWith(maxRow: maxQ),
-  //         datas: data
-  //             .map((e) => ItemCards(
-  //                   ditambahkan: e.stock.dateAdd,
-  //                   namaBarang: e.item.nama,
-  //                   cardId: e.stock.id,
-  //                   pcs: e.stock.qty,
-  //                   productId: e.item.id,
-  //                   tempatBeli: e.tempatBeli.nama,
-  //                   hargaBeli: e.stock.price,
-  //                 ))
-  //             .toList());
-  //   }
-  //   if (event is InitiateView) {
-  //     yield StockviewLoading();
-  //     var curdate = DateTime.now();
-  //     var startDate = DateTime(curdate.year, curdate.month, 1);
-  //     // var startDate = curdate.subtract(Duration(days: curdate.day + 1));
-  //     // var endDate = curdate.add(Duration(days: 30));
-  //     var endDate = DateTime(curdate.year, curdate.month + 1, 0);
-  //     int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
-
-  //     // print('maxq = ' + maxQ.toString());
-  //     var a = await db.showStockwithDetails(limit: 20, page: 0);
-  //     // print('passed here');
-  //     yield StockviewLoaded(
-  //       message: event.message,
-  //       filter: Filter(
-  //           currentPage: 0,
-  //           maxRow: maxQ,
-  //           startDate: startDate.toString(),
-  //           endDate: endDate.toString()),
-  //       datas: a
-  //           .map((e) => ItemCards(
-  //                 ditambahkan: e.stock.dateAdd,
-  //                 namaBarang: e.item.nama,
-  //                 cardId: e.stock.id,
-  //                 pcs: e.stock.qty,
-  //                 productId: e.item.id,
-  //                 tempatBeli: e.tempatBeli.nama,
-  //                 hargaBeli: e.stock.price,
-  //               ))
-  //           .toList(),
-  //     );
-  //   }
-  //   if (event is DeleteEntry) {
-  //     yield StockviewLoading();
-  //     // var a = await db.deleteStock(event.data.cardId!);
-  //     // if (a != 0) {
-  //     //   print(a);
-  //     //   yield StockviewInitial();
-  //     //   add(InitiateView(message: 'Deleted Sucsessfully'));
-  //     // }
-  //   }
-  // }
 }

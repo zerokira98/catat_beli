@@ -4,7 +4,6 @@ import 'dart:async';
 
 // import 'package:bloc/bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
-import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
@@ -76,6 +75,10 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
               hargaBeli: e.modeHarga == ModeHarga.total
                   ? Hargabeli.dirty((e.hargaBeli.value / e.pcs.value).floor())
                   : e.hargaBeli,
+              discount: e.discountMode == DiscountMode.total
+                  ? Discount.dirty((e.discount.value / e.pcs.value).floor())
+                  : e.discount,
+              discountMode: DiscountMode.perPcs,
               modeHarga: ModeHarga.pcs,
               namaBarang: NamaBarang.dirty(e.namaBarang.value.trim()),
               tempatBeli: Tempatbeli.dirty(e.tempatBeli.value.trim()),
@@ -112,12 +115,14 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         });
       }
     } else {
+      var whereErr = data.indexWhere((element) => element.isNotValid);
+
       emit(InsertstockState(
           data: data,
           isLoaded: true,
           isLoading: false,
           isSuccess: false,
-          msg: 'There is invalid data'));
+          msg: 'There is invalid data. \nNomor: ${whereErr + 1}'));
       await Future.delayed(Duration(seconds: 10), () {
         if (state.isLoaded) {
           emit((state).clearMsg());

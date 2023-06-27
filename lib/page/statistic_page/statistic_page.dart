@@ -1,4 +1,6 @@
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/page/stockview/stockview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -42,6 +44,11 @@ class _StatsPageState extends State<StatsPage> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
+                        // showDatePicker(
+                        //     context: context,
+                        //     initialDate: initialDate,
+                        //     firstDate: firstDate,
+                        //     lastDate: lastDate,);
                         showMonthPicker(
                           dismissible: true,
                           context: context,
@@ -60,6 +67,13 @@ class _StatsPageState extends State<StatsPage> {
                       child: TextFormField(
                         enabled: false,
                         controller: monthController,
+                        style: TextStyle(
+                            color:
+                                Theme.of(context).textTheme.labelMedium!.color),
+                        decoration: InputDecoration(
+                            disabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColor))),
                         // onTap: () {
                         //   FocusScope.of(context).unfocus();
                         // },
@@ -119,6 +133,9 @@ class _StatsPageState extends State<StatsPage> {
                         }
                         telo[a.day]['val'] = telo[a.day]['val'] +
                             (datas[i].stock.price * datas[i].stock.qty);
+                        if (a.day == 2) {
+                          print(datas[i].item);
+                        }
                       }
                       // Map result = {'date'};
                       var maxval = 0.0;
@@ -141,23 +158,43 @@ class _StatsPageState extends State<StatsPage> {
                         margin: EdgeInsets.all(8.0),
                         height: 200,
                         width: 150,
-                        child: Card(
-                            elevation: 8,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    maxvaldateFormatted,
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  Text('tanggal ${maxvaldate!.day}'),
-                                  Expanded(child: Container()),
-                                  Text('sebesar $maxvalFormatted'),
-                                ],
-                              ),
-                            )),
+                        child: InkWell(
+                          onTap: () {
+                            BlocProvider.of<StockviewBloc>(context)
+                                .add(FilterChange(Filter(
+                              currentPage: 0,
+                              maxPage: 0,
+                              startDate: DateTime(maxvaldate!.year,
+                                  maxvaldate!.month, maxvaldate!.day),
+                              endDate: DateTime(maxvaldate!.year,
+                                      maxvaldate!.month, maxvaldate!.day)
+                                  .add(Duration(days: 1))
+                                  .subtract(Duration(milliseconds: 1)),
+                            )));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ListOfStockItems(),
+                                ));
+                          },
+                          child: Card(
+                              elevation: 8,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      maxvaldateFormatted,
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    Text('tanggal ${maxvaldate!.day}'),
+                                    Expanded(child: Container()),
+                                    Text('sebesar $maxvalFormatted'),
+                                  ],
+                                ),
+                              )),
+                        ),
                       );
                     }
                     return CircularProgressIndicator();

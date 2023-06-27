@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -6,9 +7,10 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
+// import 'package:drift/drift.dart' as d;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
@@ -17,6 +19,7 @@ import 'package:catatbeli/msc/db_moor.dart';
 import 'package:intl/intl.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
+part 'insert_components.dart';
 
 class InsertProductPage extends StatefulWidget {
   @override
@@ -121,7 +124,8 @@ class _InsertProductPageState extends State<InsertProductPage> {
           child: Container(
             child: Row(
               children: [
-                IconButton(
+                ElevatedButton.icon(
+                    label: Text('Search'),
                     onPressed: () {
                       BlocProvider.of<StockviewBloc>(context)
                           .add(InitiateView(search: true));
@@ -133,13 +137,14 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                   )));
                     },
                     icon: Icon(Icons.search)),
-                Padding(padding: EdgeInsets.only(right: 8)),
-                IconButton(
+                Padding(padding: EdgeInsets.only(right: 4)),
+                ElevatedButton.icon(
+                  label: Text('Clear all'),
                   onPressed: () {
                     BlocProvider.of<InsertstockBloc>(context).add(Initiate());
                   },
                   icon: Icon(Icons.delete_sweep),
-                  tooltip: 'Hapus Semua',
+                  // tooltip: 'Hapus Semua',
                 ),
                 Padding(padding: EdgeInsets.all(4)),
               ],
