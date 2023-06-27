@@ -118,30 +118,45 @@ class FilterBox extends StatelessWidget {
                             //     firstDate: DateTime.now(), lastDate: DateTime.now()),
                             InkWell(
                           onTap: () async {
-                            var selectedDate = await showDatePicker(
+                            var selectedDate = await showDateRangePicker(
                                 context: context,
-                                initialDate:
-                                    (BlocProvider.of<StockviewBloc>(context)
-                                            .state as StockviewLoaded)
-                                        .filter
-                                        .startDate,
+                                initialDateRange: DateTimeRange(
+                                    start:
+                                        (BlocProvider.of<StockviewBloc>(context)
+                                                .state as StockviewLoaded)
+                                            .filter
+                                            .startDate,
+                                    end:
+                                        (BlocProvider.of<StockviewBloc>(context)
+                                                .state as StockviewLoaded)
+                                            .filter
+                                            .endDate),
                                 firstDate: DateTime.now()
-                                    .subtract(Duration(days: 365)),
+                                    .subtract(Duration(days: 365 * 2)),
                                 lastDate:
                                     DateTime.now().add(Duration(days: 365)));
                             if (selectedDate != null) {
                               // dateFrom.text =
                               //     selectedDate.toString().substring(0, 10);
                               BlocProvider.of<StockviewBloc>(context).add(
-                                  FilterChange(state.filter
-                                      .copyWith(startDate: selectedDate)));
+                                  FilterChange(state.filter.copyWith(
+                                      startDate: selectedDate.start,
+                                      endDate: selectedDate.end
+                                          .add(Duration(days: 1))
+                                          .subtract(
+                                              Duration(milliseconds: 1)))));
                             }
                             // dateFromFull = selectedDate.toString();
                           },
                           child: TextField(
                             enabled: false,
                             controller: dateFrom,
-                            decoration: InputDecoration(labelText: 'From'),
+                            decoration: InputDecoration(
+                              labelText: 'From',
+                              disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor)),
+                            ),
                           ),
                         ),
                       ),
@@ -149,30 +164,47 @@ class FilterBox extends StatelessWidget {
                       Expanded(
                         child: InkWell(
                           onTap: () async {
-                            var selectedDate = await showDatePicker(
+                            var selectedDate = await showDateRangePicker(
                                 context: context,
-                                initialDate:
-                                    (BlocProvider.of<StockviewBloc>(context)
-                                            .state as StockviewLoaded)
-                                        .filter
-                                        .endDate,
+                                initialDateRange: DateTimeRange(
+                                    start:
+                                        (BlocProvider.of<StockviewBloc>(context)
+                                                .state as StockviewLoaded)
+                                            .filter
+                                            .startDate,
+                                    end:
+                                        (BlocProvider.of<StockviewBloc>(context)
+                                                .state as StockviewLoaded)
+                                            .filter
+                                            .endDate),
                                 firstDate: DateTime.now()
-                                    .subtract(Duration(days: 365)),
+                                    .subtract(Duration(days: 365 * 2)),
                                 lastDate:
                                     DateTime.now().add(Duration(days: 365)));
                             if (selectedDate != null) {
                               // dateTo.text =
                               //     selectedDate.toString().substring(0, 10);
-                              BlocProvider.of<StockviewBloc>(context).add(
-                                  FilterChange(state.filter
-                                      .copyWith(endDate: selectedDate)));
+                              BlocProvider.of<StockviewBloc>(context)
+                                  .add(FilterChange(
+                                state.filter.copyWith(
+                                  startDate: selectedDate.start,
+                                  endDate: selectedDate.end
+                                      .add(Duration(days: 1))
+                                      .subtract(Duration(milliseconds: 1)),
+                                ),
+                              ));
                             }
                             // dateToFull = selectedDate.toString();
                           },
                           child: TextField(
                             controller: dateTo,
                             enabled: false,
-                            decoration: InputDecoration(labelText: 'To'),
+                            decoration: InputDecoration(
+                              labelText: 'To',
+                              disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor)),
+                            ),
                           ),
                         ),
                       )

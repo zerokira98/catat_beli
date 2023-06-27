@@ -202,7 +202,7 @@ class MyDatabase extends _$MyDatabase {
   Future<List<StockItem>> itemwithid(int id) =>
       (select(stockItems)..where((tbl) => tbl.id.equals(id))).get();
 
-  ///====
+  ///==== startDate(inclusion),endDate(exclution?)
   Future<List<StockWithDetails>> showStockwithDetails({
     int? idBarang,
     int? barcode,

@@ -4,7 +4,6 @@ import 'dart:async';
 
 // import 'package:bloc/bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
-import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
@@ -116,12 +115,14 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         });
       }
     } else {
+      var whereErr = data.indexWhere((element) => element.isNotValid);
+
       emit(InsertstockState(
           data: data,
           isLoaded: true,
           isLoading: false,
           isSuccess: false,
-          msg: 'There is invalid data'));
+          msg: 'There is invalid data. \nNomor: ${whereErr + 1}'));
       await Future.delayed(Duration(seconds: 10), () {
         if (state.isLoaded) {
           emit((state).clearMsg());

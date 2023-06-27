@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -123,7 +124,8 @@ class _InsertProductPageState extends State<InsertProductPage> {
           child: Container(
             child: Row(
               children: [
-                IconButton(
+                ElevatedButton.icon(
+                    label: Text('Search'),
                     onPressed: () {
                       BlocProvider.of<StockviewBloc>(context)
                           .add(InitiateView(search: true));
@@ -135,13 +137,14 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                   )));
                     },
                     icon: Icon(Icons.search)),
-                Padding(padding: EdgeInsets.only(right: 8)),
-                IconButton(
+                Padding(padding: EdgeInsets.only(right: 4)),
+                ElevatedButton.icon(
+                  label: Text('Clear all'),
                   onPressed: () {
                     BlocProvider.of<InsertstockBloc>(context).add(Initiate());
                   },
                   icon: Icon(Icons.delete_sweep),
-                  tooltip: 'Hapus Semua',
+                  // tooltip: 'Hapus Semua',
                 ),
                 Padding(padding: EdgeInsets.all(4)),
               ],

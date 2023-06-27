@@ -119,15 +119,18 @@ class NamaBarangField extends StatelessWidget {
               suggestionsBoxController: sbc,
               textFieldConfiguration: TextFieldConfiguration(
                   maxLines: 2,
+                  enableSuggestions: false,
                   minLines: 1,
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                   controller: namec,
                   onChanged: (v) {
-                    print("onchanged :(");
                     var nv = v;
                     if (namec.text.isNotEmpty && namec.text.length >= 1) {
-                      nv =
-                          namec.text[0].toUpperCase() + namec.text.substring(1);
+                      if (namec.text[0] != namec.text[0].toUpperCase()) {
+                        print('here');
+                        nv = namec.text[0].toUpperCase() +
+                            namec.text.substring(1);
+                      }
                     }
                     BlocProvider.of<InsertstockBloc>(context)
                         .add(DataChange(data.copywith(
@@ -270,6 +273,9 @@ class TanggalBeliField extends StatelessWidget {
           onEditingComplete: () => FocusScope.of(context).unfocus(),
           controller: datec,
           enabled: false,
+
+          style:
+              TextStyle(color: Theme.of(context).textTheme.labelMedium!.color),
           // style: TextStyle(fontSize: 14),
           onTap: () async {
             FocusScope.of(context).unfocus();
@@ -356,8 +362,8 @@ class ModeHargaButton extends StatelessWidget {
   final ItemCards data;
 
   ModeHargaButton({super.key, required this.data});
-  var basicFormat = NumberFormat("#,###", "en_US");
-  static var numFormat = NumberFormat.currency(
+  final basicFormat = NumberFormat("#,###", "en_US");
+  final numFormat = NumberFormat.currency(
     locale: 'ID_id',
     symbol: 'Rp.',
     decimalDigits: 0,
@@ -502,29 +508,55 @@ class FloatingOptions extends StatefulWidget {
 
 class _FloatingOptionsState extends State<FloatingOptions> {
   bool openOption = false;
+  Timer? _timer;
+
+  void _schedule() {
+    _timer = Timer(Duration(seconds: 5), () {
+      if (openOption) {
+        setState(() {
+          openOption = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Timer a = Timer(Duration(seconds: 4),);
     return Column(
       children: [
-        InkWell(
-          canRequestFocus: false,
-          onTap: () {
-            FocusScope.of(context).unfocus();
-            setState(() {
-              openOption = !openOption;
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Colors.lightBlue.withOpacity(0.85),
-            ),
-            alignment: Alignment.center,
-            padding: EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.more_vert,
-              color: Colors.white,
+        AnimatedClipRect(
+          duration: Duration(milliseconds: 250),
+          curve: Curves.easeIn,
+          reverseCurve: Curves.easeIn,
+          open: !openOption,
+          child: InkWell(
+            canRequestFocus: false,
+            onTap: () {
+              FocusScope.of(context).unfocus();
+              _timer?.cancel();
+              _schedule();
+              setState(() {
+                openOption = !openOption;
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                color: Colors.lightBlue.withOpacity(0.85),
+              ),
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.more_vert,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
