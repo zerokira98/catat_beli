@@ -448,15 +448,22 @@ class SuffixBarcode extends StatelessWidget {
                   canRequestFocus: false,
                   onTap: () async {
                     try {
-                      var barcodeScan = await BarcodeScanner.scan();
+                      var barcodeScan = await BarcodeScanner.scan(
+                          options: ScanOptions(
+                              autoEnableFlash: true,
+                              restrictFormat: BarcodeFormat.values
+                                  .where((e) => e != BarcodeFormat.qr)
+                                  .toList()));
                       // print(barcodeScan);
                       if (barcodeScan != '-1') {
                         barcodeC.text = barcodeScan.rawContent.trim();
                         List<StockWithDetails> data =
                             await RepositoryProvider.of<MyDatabase>(context)
                                 .showStockwithDetails(
-                                    startDate: DateTime(2020),
-                                    barcode: int.parse(barcodeC.text));
+                          filter: Filter(
+                              startDate: DateTime(2020),
+                              barcode: int.parse(barcodeC.text)),
+                        );
                         if (data.isEmpty) {
                           BlocProvider.of<InsertstockBloc>(context)
                               .add(DataChange(this.data.copywith(

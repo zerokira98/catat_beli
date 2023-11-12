@@ -303,8 +303,7 @@ class BottomBar extends StatelessWidget {
                                 ],
                               ),
                               backgroundColor: Colors.black26,
-                              // shape:
-                              //     CircleBorder(side: BorderSide.none),
+                              shape: RoundedRectangleBorder(),
                             );
                           }),
                     ),

@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/page/statistic_page/statistic_per_item.dart';
 import 'package:catatbeli/page/stockview/edit_stock/edit_stock.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/services.dart';
@@ -69,6 +71,26 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
     Widget body = Scaffold(
       // key: ,
       appBar: AppBar(
+        actions: [
+          BlocBuilder<StockviewBloc, StockviewState>(
+            builder: (context, state) {
+              if (state is StockviewLoaded) {
+                return IconButton(
+                    onPressed: () async {
+                      var db = await RepositoryProvider.of<MyDatabase>(context)
+                          .showStockwithDetails(filter: state.filter);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StatisticperPage(data: db),
+                          ));
+                    },
+                    icon: Icon(Icons.bar_chart_rounded));
+              }
+              return SizedBox();
+            },
+          )
+        ],
         // backgroundColor: Colors.grey[800],
         title: BlocBuilder<StockviewBloc, StockviewState>(
             builder: (context, state) {
@@ -123,53 +145,75 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                             ],
                           );
                         } else {
-                          widget = ListView.builder(
-                            key: UniqueKey(),
-                            controller: _scontrol,
-                            padding: EdgeInsets.only(bottom: 42),
-                            itemBuilder: (context, i) {
-                              ItemCards data = state.datas[i];
-                              return Column(
-                                children: [
-                                  ///---- date separator
-                                  if ((i >= 1 &&
-                                          data.ditambahkan
-                                                  .toString()
-                                                  .substring(0, 10) !=
-                                              state.datas[i - 1].ditambahkan
-                                                  .toString()
-                                                  .substring(0, 10)) ||
-                                      i == 0)
-                                    Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              padding: EdgeInsets.all(8.0),
-                                              margin:
-                                                  EdgeInsets.only(bottom: 8.0),
-                                              color: Theme.of(context)
-                                                  .primaryColorDark,
-                                              child: Text(
-                                                DateFormat('EEEE, d MMMM y',
-                                                        'id_ID')
-                                                    .format(data.ditambahkan!)
-                                                    .toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          )
-                                        ]),
-
-                                  ///------end of date seperator
-                                  StockviewCard(
-                                      data, Key(data.cardId.toString())),
-                                ],
-                              );
+                          widget = RefreshIndicator(
+                            onRefresh: () async {
+                              var block =
+                                  BlocProvider.of<StockviewBloc>(context)
+                                      .stream
+                                      .first;
+                              print((block as StockviewLoaded).filter);
+                              BlocProvider.of<StockviewBloc>(context)
+                                  .add(Refresh());
+                              await block;
                             },
-                            itemCount: state.datas.length,
+                            child: ListView.builder(
+                              key: UniqueKey(),
+                              controller: _scontrol,
+                              padding: EdgeInsets.only(bottom: 42),
+                              itemBuilder: (context, i) {
+                                ItemCards data = state.datas[i];
+                                return Column(
+                                  children: [
+                                    ///---- date separator
+                                    if ((i >= 1 &&
+                                            data.ditambahkan
+                                                    .toString()
+                                                    .substring(0, 10) !=
+                                                state.datas[i - 1].ditambahkan
+                                                    .toString()
+                                                    .substring(0, 10)) ||
+                                        i == 0)
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                padding: EdgeInsets.all(8.0),
+                                                margin: EdgeInsets.only(
+                                                    bottom: 8.0, top: 8),
+                                                decoration: BoxDecoration(
+                                                    gradient:
+                                                        LinearGradient(colors: [
+                                                  Theme.of(context)
+                                                      .primaryColorDark,
+                                                  Theme.of(context)
+                                                      .primaryColorDark,
+                                                  Theme.of(context)
+                                                      .primaryColorDark
+                                                      .withOpacity(0.45)
+                                                ])),
+                                                // color: ,
+                                                child: Text(
+                                                  DateFormat('EEEE, d MMMM y',
+                                                          'id_ID')
+                                                      .format(data.ditambahkan!)
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            )
+                                          ]),
+
+                                    ///------end of date seperator
+                                    StockviewCard(
+                                        data, Key(data.cardId.toString())),
+                                  ],
+                                );
+                              },
+                              itemCount: state.datas.length,
+                            ),
                           );
                         }
                         return AnimatedSwitcher(

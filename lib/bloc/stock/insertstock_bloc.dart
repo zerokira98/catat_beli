@@ -1,14 +1,8 @@
 import 'dart:async';
-// import 'dart:convert';
-// import 'dart:html';
-
-// import 'package:bloc/bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
-// import 'package:formz/formz.dart';
-// import 'package:flutter/cupertino.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'insertstock_event.dart';
@@ -23,20 +17,20 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
           isLoading: true,
         )) {
     on<Initiate>(_initiate);
+    on<ClearAll>(_clearDatas);
     on<DataChange>(_dataChange);
     on<SendtoDB>(_sendToDB);
     on<AddCard>(_addCard);
     on<RemoveCard>(_removeCard);
   }
-  void _initiate(Initiate event, Emitter<InsertstockState> emit) async {
-    // if (!event.refresh) {
+  void _clearDatas(ClearAll event, Emitter<InsertstockState> emit) async {
     List<ItemCards> data = [];
-    print('telo');
     emit(InsertstockState(
         data: data,
         isLoaded: false,
         isLoading: true,
-        isSuccess: event.success));
+        beforeState: event.beforeState,
+        msg: 'Cleared '));
     data.add(ItemCards(
         ditambahkan: DateTime.now(),
         created: false,
@@ -45,10 +39,36 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         open: false));
     await Future.delayed(Duration(milliseconds: 300));
     emit(InsertstockState(
-        data: data,
-        isLoaded: true,
-        isLoading: false,
-        isSuccess: event.success));
+      data: data,
+      isLoaded: true,
+      isLoading: false,
+    ));
+  }
+
+  void _initiate(Initiate event, Emitter<InsertstockState> emit) async {
+    // if (!event.refresh) {
+    List<ItemCards> data = [];
+    if (event.fromstate != null) {
+      emit(event.fromstate!);
+    } else {
+      emit(InsertstockState(
+          data: data,
+          isLoaded: false,
+          isLoading: true,
+          isSuccess: event.success));
+      data.add(ItemCards(
+          ditambahkan: DateTime.now(),
+          created: false,
+          pcs: Pcs.dirty(1.0),
+          cardId: 1,
+          open: false));
+      await Future.delayed(Duration(milliseconds: 300));
+      emit(InsertstockState(
+          data: data,
+          isLoaded: true,
+          isLoading: false,
+          isSuccess: event.success));
+    }
     // }
   }
 

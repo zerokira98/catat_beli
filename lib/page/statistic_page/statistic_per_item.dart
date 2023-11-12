@@ -186,7 +186,7 @@ class ChartWidgetperItemState extends State<ChartWidgetperItem> {
                   data.x +
                   ' [' +
                   data.date.day.toString() +
-                  ' ' +
+                  '/' +
                   data.date.month.toString() +
                   ']',
               yValueMapper: (_ChartData data, _) => data.y,

@@ -114,11 +114,13 @@ class _StatsPageState extends State<StatsPage> {
               FutureBuilder<List<StockWithDetails>>(
                   future: RepositoryProvider.of<MyDatabase>(context)
                       .showStockwithDetails(
-                          startDate: DateTime(
-                              selectedDate.year, selectedDate.month, 1),
-                          endDate: DateTime(
-                                  selectedDate.year, selectedDate.month + 1)
-                              .subtract(Duration(days: 1))),
+                    filter: Filter(
+                        startDate:
+                            DateTime(selectedDate.year, selectedDate.month, 1),
+                        endDate:
+                            DateTime(selectedDate.year, selectedDate.month + 1)
+                                .subtract(Duration(days: 1))),
+                  ),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       if (snapshot.data!.isEmpty) return Text('Error, No data');
@@ -212,11 +214,13 @@ class _StatsPageState extends State<StatsPage> {
                   child: FutureBuilder<List<StockWithDetails>>(
                       future: RepositoryProvider.of<MyDatabase>(context)
                           .showStockwithDetails(
-                              startDate: DateTime(
-                                  selectedDate.year, selectedDate.month, 1),
-                              endDate: DateTime(
-                                      selectedDate.year, selectedDate.month + 1)
-                                  .subtract(Duration(days: 1))),
+                        filter: Filter(
+                            startDate: DateTime(
+                                selectedDate.year, selectedDate.month, 1),
+                            endDate: DateTime(
+                                    selectedDate.year, selectedDate.month + 1)
+                                .subtract(Duration(days: 1))),
+                      ),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           if (snapshot.data!.isEmpty)
@@ -238,11 +242,13 @@ class _StatsPageState extends State<StatsPage> {
                 child: FutureBuilder<List<StockWithDetails>>(
                     future: RepositoryProvider.of<MyDatabase>(context)
                         .showStockwithDetails(
-                            startDate: DateTime(
-                                selectedDate.year, selectedDate.month, 1),
-                            endDate: DateTime(
-                                    selectedDate.year, selectedDate.month + 1)
-                                .subtract(Duration(days: 1))),
+                      filter: Filter(
+                          startDate: DateTime(
+                              selectedDate.year, selectedDate.month, 1),
+                          endDate: DateTime(
+                                  selectedDate.year, selectedDate.month + 1)
+                              .subtract(Duration(days: 1))),
+                    ),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         var total = 0.0;

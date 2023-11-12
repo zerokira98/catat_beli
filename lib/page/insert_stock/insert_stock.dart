@@ -7,6 +7,7 @@ import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 // import 'package:drift/drift.dart' as d;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -56,8 +57,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
                         .add(SendtoDB(state.data));
                   },
                   child: Container(
+                      margin: EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColorLight,
+                        color: Theme.of(context).primaryColorLight.lighten(),
                         boxShadow: [BoxShadow(blurRadius: 2.0)],
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -73,11 +75,6 @@ class _InsertProductPageState extends State<InsertProductPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                                Icon(
-                                  Icons.upload_file,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
                                 Text(
                                   'Submit',
                                   textScaleFactor: 1.2,
@@ -141,7 +138,9 @@ class _InsertProductPageState extends State<InsertProductPage> {
                 ElevatedButton.icon(
                   label: Text('Clear all'),
                   onPressed: () {
-                    BlocProvider.of<InsertstockBloc>(context).add(Initiate());
+                    var state = BlocProvider.of<InsertstockBloc>(context).state;
+                    BlocProvider.of<InsertstockBloc>(context)
+                        .add(ClearAll(beforeState: state));
                   },
                   icon: Icon(Icons.delete_sweep),
                   // tooltip: 'Hapus Semua',
@@ -170,6 +169,23 @@ class _InsertProductPageState extends State<InsertProductPage> {
                     ));
                 }
               }
+            }
+            if (state.msg != null) {
+              if (state.msg!.contains('Cleared')) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text('Cleared'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      BlocProvider.of<InsertstockBloc>(context)
+                          .add(Initiate(fromstate: state.beforeState));
+                      print(state.beforeState);
+                    },
+                  ),
+                ));
+              }
+              print(state.msg);
             }
           },
           child: Container(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:drift/native.dart';
 import 'package:drift/drift.dart';
@@ -205,31 +206,32 @@ class MyDatabase extends _$MyDatabase {
   ///==== startDate(inclusion),endDate(exclution?)
   Future<List<StockWithDetails>> showStockwithDetails({
     int? idBarang,
-    int? barcode,
+    // int? barcode,
     int? limit,
 
-    //page starts with 0
-    int? page,
+    // //page starts with 0
+    // int? page,
 
-    ///
-    DateTime? startDate,
-    DateTime? endDate,
-    String? name,
-    String? boughtPlace,
+    // ///
+    // DateTime? startDate,
+    // DateTime? endDate,
+    // String? name,
+    // String? boughtPlace,
+    required Filter filter,
   }) async {
     ///----------Declare default variables
-    boughtPlace = boughtPlace ?? '';
-    name = name ?? '';
-    var timenow = DateTime.now();
-    startDate = startDate ?? DateTime(timenow.year, 1, 1);
-    endDate = endDate ?? DateTime(timenow.year, timenow.month + 1, 0);
+    // boughtPlace = boughtPlace ?? '';
+    // name = name ?? '';
+    // var timenow = DateTime.now();
+    // startDate = startDate ?? DateTime(timenow.year, 1, 1);
+    // endDate = endDate ?? DateTime(timenow.year, timenow.month + 1, 0);
 
     /// Return variable
     ///
     List<TypedResult> a;
 
     // int max = await ;
-    var query;
+    JoinedSelectStatement query;
     if (idBarang == null) {
       query = (select(stocks)
             ..orderBy([
@@ -237,8 +239,8 @@ class MyDatabase extends _$MyDatabase {
                   OrderingTerm(expression: tbl.dateAdd, mode: OrderingMode.asc)
             ])
             ..where((tbl) =>
-                tbl.dateAdd.isBiggerOrEqualValue(startDate!) &
-                stocks.dateAdd.isSmallerOrEqualValue(endDate!)))
+                tbl.dateAdd.isBiggerOrEqualValue(filter.startDate) &
+                stocks.dateAdd.isSmallerOrEqualValue(filter.endDate)))
           .join([
         leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
@@ -246,37 +248,48 @@ class MyDatabase extends _$MyDatabase {
       if (limit != null) {
         query.limit(
           limit,
-          offset: page! * limit,
+          offset: filter.currentPage* limit,
         );
       }
     } else {
       query = (select(stocks)
             ..where((tbl) =>
-                tbl.dateAdd.isBiggerOrEqualValue(startDate!) &
-                stocks.dateAdd.isSmallerOrEqualValue(endDate!)))
+                tbl.dateAdd.isBiggerOrEqualValue(filter.startDate) &
+                stocks.dateAdd.isSmallerOrEqualValue(filter.endDate)))
           .join([
         leftOuterJoin(stockItems, stocks.idItem.equalsExp(stockItems.id)),
         leftOuterJoin(tempatBelis, stocks.idSupplier.equalsExp(tempatBelis.id)),
       ]);
+
       query.where(stocks.idItem.equals(idBarang));
       if (limit != null) {
         query.limit(
           limit,
-          offset: page! * limit,
+          offset: filter.currentPage* limit,
         );
       }
       // a = await b.get();
 
       //  a= (select(stocks)..where((tbl) => tbl.idItem.equals(idBarang))).get();
     }
-    query.where(stockItems.nama.contains(name));
-    query.where(tempatBelis.nama.contains(boughtPlace));
+
+    if (filter.nama.split(' ').length > 1) {
+      var namaArr = filter.nama.split(' ');
+      for (var val in namaArr) {
+        query..where(stockItems.nama.contains(val));
+      }
+    } else {
+      query..where(stockItems.nama.contains(filter.nama));
+    }
+    // query.where(stockItems.nama.contains(name));
+    query.where(tempatBelis.nama.contains(filter.tempatBeli));
     // query.orderBy([
     //   ($StocksTable tbl) => OrderingTerm.asc(tbl.dateAdd),
     //   ($StockItemsTable tbl) => OrderingTerm.asc(tbl.nama),
     //   ($TempatBelisTable tbl) => OrderingTerm.asc(tbl.nama)
     // ]);
-    if (barcode != null) query.where(stockItems.barcode.equals(barcode));
+    if (filter.barcode != null)
+      query.where(stockItems.barcode.equals(filter.barcode!));
     a = await query.get();
     return a
         .map((e) => StockWithDetails(

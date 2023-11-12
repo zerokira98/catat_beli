@@ -193,12 +193,12 @@ Total : ${numFormat.format(harga * pcs)}''';
                   color: Colors.black,
                   gradient: LinearGradient(
                       colors: [
-                        Colors.green,
-                        Colors.green,
-                        Colors.green,
-                        Colors.red,
-                        Colors.red,
-                        Colors.red,
+                        Colors.green.shade700,
+                        Colors.green.shade800,
+                        Colors.green.shade800,
+                        Colors.red.shade800,
+                        Colors.red.shade800,
+                        Colors.red.shade800,
                       ],
                       // stops: [],
                       begin: Alignment.topCenter,
