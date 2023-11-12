@@ -11,10 +11,20 @@ class FilterBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<StockviewBloc, StockviewState>(
+      // buildWhen: (p, c) {
+      //   if (p is StockviewLoaded && c is StockviewLoaded) {
+      //     if (p.filter.nama != c.filter.nama) {
+      //       return false;
+      //     }
+      //   }
+      //   return true;
+      // },
       builder: (context, state) {
         if (state is StockviewLoaded) {
-          namaBarang.text = state.filter.nama ?? '';
-          tempatBeliController.text = state.filter.tempatBeli ?? '';
+          if (namaBarang.text != state.filter.nama) {
+            namaBarang.text = state.filter.nama;
+          }
+          tempatBeliController.text = state.filter.tempatBeli;
           dateFrom.text = format.format((state.filter.startDate));
           dateTo.text = format.format((state.filter.endDate));
           // state.filter.startDate.substring(0, 10);
@@ -61,6 +71,17 @@ class FilterBox extends StatelessWidget {
                       child: TextField(
                         controller: namaBarang,
                         autofocus: true,
+                        onEditingComplete: () {
+                          BlocProvider.of<StockviewBloc>(context)
+                              .add(FilterChange(state.filter.copyWith(
+                            barcode: int.tryParse(barcodeController.text),
+                            nama: namaBarang.text,
+                            // currentPage: 0,
+                            tempatBeli: tempatBeliController.text,
+                            // startDate: dateFrom.text,
+                            // endDate: dateTo.text,
+                          )));
+                        },
                         decoration: InputDecoration(
                           labelText: 'Nama barang',
                         ),

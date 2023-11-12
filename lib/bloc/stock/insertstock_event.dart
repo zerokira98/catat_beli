@@ -9,8 +9,13 @@ abstract class InsertstockEvent extends Equatable {
 
 class Initiate extends InsertstockEvent {
   final bool? success;
-  final bool refresh;
-  Initiate({this.success, refresh}) : this.refresh = refresh ?? false;
+  final InsertstockState? fromstate;
+  Initiate({this.success, refresh, this.fromstate});
+}
+
+class ClearAll extends InsertstockEvent {
+  final InsertstockState beforeState;
+  ClearAll({required this.beforeState});
 }
 
 class SendtoDB extends InsertstockEvent {

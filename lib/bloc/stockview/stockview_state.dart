@@ -23,8 +23,8 @@ class StockviewLoaded extends StockviewState {
 }
 
 class Filter extends Equatable {
-  final String? nama;
-  final String? tempatBeli;
+  final String nama;
+  final String tempatBeli;
   final int? barcode;
 
   ///curent page starts from 0
@@ -37,13 +37,19 @@ class Filter extends Equatable {
   final DateTime startDate;
   final DateTime endDate;
   Filter(
-      {this.nama,
-      this.tempatBeli,
+      {String? nama,
+      String? tempatBeli,
       this.barcode,
-      required this.currentPage,
-      required this.maxPage,
+      int? currentPage,
+      int? maxPage,
       required this.startDate,
-      required this.endDate});
+      DateTime? endDate})
+      : nama = nama ?? '',
+        tempatBeli = tempatBeli ?? '',
+        currentPage = currentPage ?? -1,
+        maxPage = maxPage ?? -1,
+        endDate = endDate ??
+            DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
   Filter copyWith({
     String? nama,
     String? tempatBeli,

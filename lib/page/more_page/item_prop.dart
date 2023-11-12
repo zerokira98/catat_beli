@@ -11,13 +11,16 @@ import 'package:intl/intl.dart';
 final numFormat = new NumberFormat("#,##0.00", "en_US");
 
 class ListOfItems extends StatefulWidget {
+  final String? initQuery;
+
+  const ListOfItems({super.key, this.initQuery});
   @override
   _ListOfItemsState createState() => _ListOfItemsState();
 }
 
 class _ListOfItemsState extends State<ListOfItems> {
   late ScrollController sc;
-  TextEditingController namaC = TextEditingController();
+  late TextEditingController namaC;
   List changes = [];
   int optionVal = 2;
   bool showHiddenOnly = false;
@@ -43,6 +46,7 @@ class _ListOfItemsState extends State<ListOfItems> {
   @override
   void initState() {
     sc = ScrollController();
+    namaC = TextEditingController(text: widget.initQuery ?? '');
     getData = RepositoryProvider.of<MyDatabase>(context)
         .showInsideItems(null, optionVal);
     super.initState();

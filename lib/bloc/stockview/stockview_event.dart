@@ -30,3 +30,8 @@ class PageChange extends StockviewEvent {
   final Filter filter;
   PageChange(this.filter);
 }
+
+class Refresh extends StockviewEvent {
+  // final Filter filter;
+  // PageChange(this.filter);
+}

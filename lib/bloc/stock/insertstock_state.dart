@@ -6,11 +6,13 @@ class InsertstockState extends Equatable {
   final bool isLoading;
   final List<ItemCards> data;
   final String? msg;
+  final InsertstockState? beforeState;
   InsertstockState({
     required this.data,
     required this.isLoaded,
     required this.isLoading,
     this.msg,
+    this.beforeState,
     this.isSuccess,
   });
 

@@ -16,43 +16,59 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
     on<PageChange>(_pageChange);
     on<InitiateView>(_initiateView);
     on<DeleteEntry>(_deleteEntry);
+    on<Refresh>(_refresh);
+  }
+  FutureOr<void> _refresh(
+    Refresh event,
+    Emitter<StockviewState> emit,
+  ) async {
+    if (state is StockviewLoaded) {
+      var statea = (state as StockviewLoaded);
+      var all = await db.showStockwithDetails(filter: statea.filter, limit: 20);
+      emit(StockviewLoaded(
+          filter: statea.filter,
+          datas: all.map((e) {
+            // print('e${e.stock.note}');
+            return ItemCards(
+              note: e.stock.note,
+              ditambahkan: e.stock.dateAdd,
+              namaBarang: NamaBarang.dirty(e.item.nama),
+              discount: Discount.dirty(e.stock.discount),
+              cardId: e.stock.id,
+              pcs: Pcs.dirty(e.stock.qty),
+              productId: e.item.id,
+              tempatBeli: Tempatbeli.dirty(e.tempatBeli.nama),
+              hargaBeli: Hargabeli.dirty(e.stock.price),
+            );
+          }).toList()));
+    }
   }
 
   FutureOr<void> _pageChange(
     PageChange event,
     Emitter<StockviewState> emit,
   ) async {
+    var maxpage = (state as StockviewLoaded).filter.maxPage;
     emit(StockviewLoading());
     var all = await db.showStockwithDetails(
-      barcode: event.filter.barcode,
-      name: event.filter.nama,
-      page: event.filter.currentPage,
-      startDate: (event.filter.startDate),
-      endDate: (event.filter.endDate).add(Duration(
-        hours: 23,
-        minutes: 59,
-        seconds: 59,
-      )),
-      boughtPlace: event.filter.tempatBeli,
+      filter: Filter(
+        nama: event.filter.nama,
+        currentPage: event.filter.currentPage,
+        maxPage: maxpage,
+        startDate: event.filter.startDate,
+        tempatBeli: event.filter.tempatBeli,
+        endDate: event.filter.endDate.add(Duration(
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        )),
+      ),
     );
-    // var test = await db.maxdataStock(
-    //     startDate: (event.filter.startDate),
-    //     endDate: (event.filter.endDate).add(Duration(
-    //       hours: 23,
-    //       minutes: 59,
-    //       seconds: 59,
-    //     )));
-    // print('test$test');
     int maxQ = all.length;
     // print('maxq = ' + maxQ.toString());
     var data = await db.showStockwithDetails(
-      barcode: event.filter.barcode,
-      name: event.filter.nama,
+      filter: event.filter,
       limit: 20,
-      page: event.filter.currentPage,
-      startDate: (event.filter.startDate),
-      endDate: (event.filter.endDate),
-      boughtPlace: event.filter.tempatBeli,
     );
     print(maxQ);
     // print((maxQ / 20).floor());
@@ -79,19 +95,17 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
 
   FutureOr<void> _filterChange(
       FilterChange event, Emitter<StockviewState> emit) async {
+    print('object');
     emit(StockviewLoading());
     //null limit
     var all = await db.showStockwithDetails(
-      barcode: event.filter.barcode,
-      name: event.filter.nama,
-      page: event.filter.currentPage,
-      startDate: (event.filter.startDate),
-      endDate: (event.filter.endDate).add(Duration(
-        hours: 23,
-        minutes: 59,
-        seconds: 59,
-      )),
-      boughtPlace: event.filter.tempatBeli,
+      filter: event.filter.copyWith(
+        endDate: event.filter.endDate.add(Duration(
+          hours: 23,
+          minutes: 59,
+          seconds: 59,
+        )),
+      ),
     );
     int maxQ = all.length;
     int pagefinal = ((maxQ / 20) % 1 == 0)
@@ -99,17 +113,12 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
         : ((maxQ / 20).floor());
     // print('maxq = ' + maxQ.toString());
     var data = await db.showStockwithDetails(
-      barcode: event.filter.barcode,
-      name: event.filter.nama,
+      filter: event.filter.copyWith(currentPage: pagefinal),
       limit: 20,
-      page: pagefinal,
-      startDate: (event.filter.startDate),
-      endDate: (event.filter.endDate),
-      boughtPlace: event.filter.tempatBeli,
     );
     // print(maxQ);
     // print((maxQ / 20).floor());
-    // print(data);
+    print(data);
     emit(StockviewLoaded(
         filter: event.filter
             .copyWith(maxPage: (maxQ / 20).floor(), currentPage: pagefinal),
@@ -142,15 +151,23 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
         .add(Duration(hours: 23, minutes: 59));
 
     // int maxQ = await db.maxdataStock(startDate: startDate, endDate: endDate);
-    var maxQ =
-        (await db.showStockwithDetails(startDate: startDate, endDate: endDate))
-            .length;
+    var maxQ = (await db.showStockwithDetails(
+      filter: Filter(
+          currentPage: 0, maxPage: 0, startDate: startDate, endDate: endDate),
+    ))
+        .length;
     // print('maxq = ' + maxQ.toString());
     var a = await db.showStockwithDetails(
-        limit: 20,
-        page: (maxQ / 20).floor(),
-        startDate: startDate,
-        endDate: endDate);
+      limit: 20,
+      filter: Filter(
+          currentPage: (maxQ / 20).floor(),
+          maxPage: 0,
+          startDate: startDate,
+          endDate: endDate),
+      // page: (maxQ / 20).floor(),
+      // startDate: startDate,
+      // endDate: endDate
+    );
     // print(a);
     emit(StockviewLoaded(
       message: event.message,

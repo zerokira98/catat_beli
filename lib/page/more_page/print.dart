@@ -1,6 +1,7 @@
 import 'dart:io';
 
 // import 'package:csv/csv.dart';
+import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
@@ -62,15 +63,19 @@ class _PrintAlertState extends State<PrintAlert> {
       if (ea.isEmpty) {
         data = await RepositoryProvider.of<MyDatabase>(context)
             .showStockwithDetails(
-                startDate: DateTime(selectedDateYear, multivalue + 1, 1),
-                endDate: DateTime(selectedDateYear, multivalue + 2, 0)
-                    .add(Duration(hours: 23, minutes: 59, seconds: 59)));
+          filter: Filter(
+              startDate: DateTime(selectedDateYear, multivalue + 1, 1),
+              endDate: DateTime(selectedDateYear, multivalue + 2, 0)
+                  .add(Duration(hours: 23, minutes: 59, seconds: 59))),
+        );
         sheet = excel['${dataBulan[multivalue]}' + ' ' + '${selectedDateYear}'];
       } else {
         data = await RepositoryProvider.of<MyDatabase>(context)
             .showStockwithDetails(
-                startDate: DateTime(selectedDateYear, ea[i].date.month, 1),
-                endDate: DateTime(selectedDateYear, ea[i].date.month + 1, 0));
+          filter: Filter(
+              startDate: DateTime(selectedDateYear, ea[i].date.month, 1),
+              endDate: DateTime(selectedDateYear, ea[i].date.month + 1, 0)),
+        );
         sheet = excel['${ea[i].date.month}' + ' ' + '${selectedDateYear}'];
       }
       num total = 0;

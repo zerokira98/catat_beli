@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/msc/db_moor.dart';
+import 'package:catatbeli/page/more_page/item_prop.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -277,32 +278,44 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                   child: Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          // autovalidate: ,
-                          enabled: false,
-                          controller: nameC,
-                          maxLines: 2,
-                          minLines: 1,
-                          decoration: InputDecoration(
-                            disabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color:
-                                        Theme.of(context).primaryColorLight)),
-                            border: OutlineInputBorder(),
-                            label: Text(
-                              'Nama item',
-                              style: TextStyle(
-                                  color: Theme.of(context).primaryColor),
-                            ),
-                            // labelText: 'Nama item',
-                          ),
-                          validator: (text) {
-                            if (text!.length <= 2) {
-                              return '3 or more character';
-                            }
-                            return null;
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ListOfItems(
+                                    initQuery: nameC.text,
+                                  ),
+                                ));
                           },
+                          child: TextFormField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            // autovalidate: ,
+                            enabled: false,
+                            controller: nameC,
+                            maxLines: 2,
+                            minLines: 1,
+                            decoration: InputDecoration(
+                              disabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color:
+                                          Theme.of(context).primaryColorLight)),
+                              border: OutlineInputBorder(),
+                              label: Text(
+                                'Nama item',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                              // labelText: 'Nama item',
+                            ),
+                            validator: (text) {
+                              if (text!.length <= 2) {
+                                return '3 or more character';
+                              }
+                              return null;
+                            },
+                          ),
                         ),
                       ),
                     ],
