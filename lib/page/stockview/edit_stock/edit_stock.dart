@@ -198,32 +198,34 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                   ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Not Configured yet')));
                 },
-                child: TypeAheadFormField(
-                    enabled: false,
-                    textFieldConfiguration: TextFieldConfiguration(
-                      enabled: false,
-                      controller: placeC,
-                      onChanged: (v) {
-                        BlocProvider.of<EditstockCubit>(context).update(
-                            (widget.data.copywith(
-                                tempatBeli: Tempatbeli.dirty(placeC.text))));
-                      },
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        suffixIcon: InkWell(
-                            onTap: () {
-                              BlocProvider.of<EditstockCubit>(context)
-                                  .update((widget.data.copywith(
-                                tempatBeli: Tempatbeli.pure(),
-                              )));
-                            },
-                            child: Icon(Icons.close_rounded)),
-                        floatingLabelBehavior: FloatingLabelBehavior.always,
-                        labelStyle: TextStyle(overflow: TextOverflow.clip),
-                        labelText: 'Tempat Beli',
-                      ),
-                    ),
-                    onSuggestionSelected: (TempatBeli val) {
+                child: TypeAheadField(
+                    controller: placeC,
+                    builder: (context, controller, focusNode) => TextField(
+                          enabled: false,
+                          focusNode: focusNode,
+                          controller: controller,
+                          onChanged: (v) {
+                            BlocProvider.of<EditstockCubit>(context).update(
+                                (widget.data.copywith(
+                                    tempatBeli:
+                                        Tempatbeli.dirty(placeC.text))));
+                          },
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            suffixIcon: InkWell(
+                                onTap: () {
+                                  BlocProvider.of<EditstockCubit>(context)
+                                      .update((widget.data.copywith(
+                                    tempatBeli: Tempatbeli.pure(),
+                                  )));
+                                },
+                                child: Icon(Icons.close_rounded)),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                            labelStyle: TextStyle(overflow: TextOverflow.clip),
+                            labelText: 'Tempat Beli',
+                          ),
+                        ),
+                    onSelected: (TempatBeli val) {
                       BlocProvider.of<EditstockCubit>(context).update((widget
                           .data
                           .copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
@@ -378,7 +380,7 @@ class _EditCardState extends State<EditCard> with TickerProviderStateMixin {
                                 context: context,
                                 initialDate: selectedDate,
                                 initialDatePickerMode: DatePickerMode.day,
-                                firstDate: DateTime(2020),
+                                firstDate: DateTime(2018),
                                 lastDate: DateTime(2101));
                             if (picked != null) {
                               dateC.text = a.format(picked);

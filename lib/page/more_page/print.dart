@@ -84,47 +84,58 @@ class _PrintAlertState extends State<PrintAlert> {
         //Date Separator
         if (i == 0) {
           var y = DateFormat('EEEE, d/M/y').format(data[i].stock.dateAdd!);
-          sheet.appendRow([y]);
+          sheet.appendRow([TextCellValue(y)]);
           // print(sheet.maxRows - 1);
           sheet.merge(
               CellIndex.indexByColumnRow(
                   columnIndex: 0, rowIndex: sheet.maxRows - 1),
               CellIndex.indexByColumnRow(
                   columnIndex: 5, rowIndex: sheet.maxRows - 1),
-              customValue: y);
+              customValue: TextCellValue(y));
           sheet
-              .cell(CellIndex.indexByColumnRow(
-                  columnIndex: 0, rowIndex: sheet.maxRows - 1))
-              .cellStyle = CellStyle(backgroundColorHex: '#faf487');
+                  .cell(CellIndex.indexByColumnRow(
+                      columnIndex: 0, rowIndex: sheet.maxRows - 1))
+                  .cellStyle =
+              CellStyle(
+                  backgroundColorHex: ExcelColor.fromHexString('#faf487'));
         } else if (data[i].stock.dateAdd!.toString().substring(0, 10) !=
             data[i - 1].stock.dateAdd!.toString().substring(0, 10)) {
           var y = DateFormat('EEEE, d/M/y').format(data[i].stock.dateAdd!);
-          sheet.appendRow(
-              ['', '', '', 'total hari ini :', numFormat.format(totalHarian)]);
+          //This might cause problem
+          sheet.appendRow([
+            null,
+            null,
+            null,
+            TextCellValue('total hari ini :'),
+            TextCellValue(numFormat.format(totalHarian))
+          ]);
           sheet
               .cell(CellIndex.indexByColumnRow(
                   columnIndex: 4, rowIndex: sheet.maxRows - 1))
               .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
           totalHarian = 0;
-          sheet.appendRow([y]);
+          sheet.appendRow([TextCellValue(y)]);
           sheet.merge(
               CellIndex.indexByColumnRow(
                   columnIndex: 0, rowIndex: sheet.maxRows - 1),
               CellIndex.indexByColumnRow(
                   columnIndex: 5, rowIndex: sheet.maxRows - 1),
-              customValue: y);
+              customValue: TextCellValue(y));
           sheet
-              .cell(CellIndex.indexByColumnRow(
-                  columnIndex: 0, rowIndex: sheet.maxRows - 1))
-              .cellStyle = CellStyle(backgroundColorHex: '#faf487');
+                  .cell(CellIndex.indexByColumnRow(
+                      columnIndex: 0, rowIndex: sheet.maxRows - 1))
+                  .cellStyle =
+              CellStyle(
+                  backgroundColorHex: ExcelColor.fromHexString('#faf487'));
         }
         sheet.appendRow([
-          data[i].stock.dateAdd!.toString().substring(0, 10),
-          data[i].item.nama,
-          numFormat.format((data[i].stock.price)),
-          data[i].stock.qty,
-          numFormat.format(data[i].stock.qty * data[i].stock.price),
-          data[i].tempatBeli.nama,
+          TextCellValue(data[i].stock.dateAdd!.toString().substring(0, 10)),
+          TextCellValue(data[i].item.nama),
+          TextCellValue(numFormat.format((data[i].stock.price))),
+          DoubleCellValue(data[i].stock.qty),
+          TextCellValue(
+              numFormat.format(data[i].stock.qty * data[i].stock.price)),
+          TextCellValue(data[i].tempatBeli.nama),
         ]);
         total += (data[i].stock.qty * data[i].stock.price);
         totalHarian += (data[i].stock.qty * data[i].stock.price);
@@ -137,8 +148,13 @@ class _PrintAlertState extends State<PrintAlert> {
                 columnIndex: 4, rowIndex: sheet.maxRows - 1))
             .cellStyle = CellStyle(horizontalAlign: HorizontalAlign.Right);
         if (i == data.length - 1) {
-          sheet.appendRow(
-              ['', '', '', 'total hari ini :', numFormat.format(totalHarian)]);
+          sheet.appendRow([
+            null,
+            null,
+            null,
+            TextCellValue('total hari ini :'),
+            TextCellValue(numFormat.format(totalHarian))
+          ]);
           sheet
               .cell(CellIndex.indexByColumnRow(
                   columnIndex: 4, rowIndex: sheet.maxRows - 1))
@@ -146,11 +162,11 @@ class _PrintAlertState extends State<PrintAlert> {
         }
       }
       sheet.cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: 0))
-        ..value = 'Total bulan ini'
+        ..value = TextCellValue('Total bulan ini')
         ..cellStyle = CellStyle(textWrapping: TextWrapping.Clip);
       sheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: 0))
-          .value = numFormat.format(total);
+          .value = TextCellValue(numFormat.format(total));
     }
     // for (var element in sheet.rows) {
     //   print(element);
@@ -286,7 +302,7 @@ class _PrintAlertState extends State<PrintAlert> {
                         },
                         child: Text(
                           'file saved at:\n${snapshot.data!.path}\\Backup_${dataBulan[multivalue]}${selectedDateYear}.xlsx',
-                          textScaleFactor: 0.79,
+                          textScaler: TextScaler.linear(0.8),
                           style: TextStyle(color: Colors.blue),
                         ),
                       );

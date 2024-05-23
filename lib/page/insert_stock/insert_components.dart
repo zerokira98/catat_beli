@@ -91,7 +91,7 @@ class HargaBeliField extends StatelessWidget {
 }
 
 class NamaBarangField extends StatelessWidget {
-  final SuggestionsBoxController sbc;
+  final SuggestionsController<StockItem> sbc;
   final TextEditingController namec;
   final ItemCards data;
   const NamaBarangField(
@@ -114,15 +114,34 @@ class NamaBarangField extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: TypeAheadFormField(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              suggestionsBoxController: sbc,
-              textFieldConfiguration: TextFieldConfiguration(
+            child: TypeAheadField<StockItem>(
+              onSelected: (StockItem suggestion) async {
+                var res1 = await RepositoryProvider.of<MyDatabase>(context)
+                    .showInsideStock(idBarang: (suggestion.id));
+                var tempat = await RepositoryProvider.of<MyDatabase>(context)
+                    .tempatwithid(res1.last.idSupplier!);
+                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                    data.copywith(
+                        namaBarang: NamaBarang.dirty(suggestion.nama),
+                        productId: () => suggestion.id,
+                        hargaBeli: Hargabeli.dirty(
+                            res1.isNotEmpty ? res1.last.price : 0),
+                        tempatBeli: Tempatbeli.dirty(tempat.single.nama),
+                        barcode: Barcode.dirty(suggestion.barcode ?? 0),
+                        discount: Discount.pure()
+                        // hargaJual: suggestion,
+                        )));
+              },
+              // autovalidateMode: AutovalidateMode.onUserInteraction,
+              controller: namec,
+              suggestionsController: sbc,
+              builder: (context, controller, focusNode) => TextField(
                   maxLines: 2,
+                  focusNode: focusNode,
                   enableSuggestions: false,
                   minLines: 1,
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
-                  controller: namec,
+                  controller: controller,
                   onChanged: (v) {
                     var nv = v;
                     if (namec.text.isNotEmpty && namec.text.length >= 1) {
@@ -160,23 +179,23 @@ class NamaBarangField extends StatelessWidget {
                   title: Text(suggestion.nama),
                 );
               },
-              onSuggestionSelected: (StockItem suggestion) async {
-                var res1 = await RepositoryProvider.of<MyDatabase>(context)
-                    .showInsideStock(idBarang: (suggestion.id));
-                var tempat = await RepositoryProvider.of<MyDatabase>(context)
-                    .tempatwithid(res1.last.idSupplier!);
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                    data.copywith(
-                        namaBarang: NamaBarang.dirty(suggestion.nama),
-                        productId: () => suggestion.id,
-                        hargaBeli: Hargabeli.dirty(
-                            res1.isNotEmpty ? res1.last.price : 0),
-                        tempatBeli: Tempatbeli.dirty(tempat.single.nama),
-                        barcode: Barcode.dirty(suggestion.barcode ?? 0),
-                        discount: Discount.pure()
-                        // hargaJual: suggestion,
-                        )));
-              },
+              // onSuggestionSelected: (StockItem suggestion) async {
+              //   var res1 = await RepositoryProvider.of<MyDatabase>(context)
+              //       .showInsideStock(idBarang: (suggestion.id));
+              //   var tempat = await RepositoryProvider.of<MyDatabase>(context)
+              //       .tempatwithid(res1.last.idSupplier!);
+              //   BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+              //       data.copywith(
+              //           namaBarang: NamaBarang.dirty(suggestion.nama),
+              //           productId: () => suggestion.id,
+              //           hargaBeli: Hargabeli.dirty(
+              //               res1.isNotEmpty ? res1.last.price : 0),
+              //           tempatBeli: Tempatbeli.dirty(tempat.single.nama),
+              //           barcode: Barcode.dirty(suggestion.barcode ?? 0),
+              //           discount: Discount.pure()
+              //           // hargaJual: suggestion,
+              //           )));
+              // },
             ),
           ),
         ],
@@ -260,7 +279,7 @@ class TanggalBeliField extends StatelessWidget {
               context: context,
               initialDate: selectedDate,
               initialDatePickerMode: DatePickerMode.day,
-              firstDate: DateTime(2020),
+              firstDate: DateTime(2019),
               lastDate: DateTime(2101));
           if (picked != null) {
             // datec.text = picked.toString().substring(0, 19);
@@ -309,31 +328,33 @@ class TempatBeliField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TypeAheadFormField(
-        textFieldConfiguration: TextFieldConfiguration(
-          focusNode: fsn2,
-          onEditingComplete: () => FocusScope.of(context).unfocus(),
-          controller: placec,
-          onChanged: (v) {
-            BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                data.copywith(tempatBeli: Tempatbeli.dirty(placec.text))));
-          },
-          keyboardType: TextInputType.text,
-          decoration: InputDecoration(
-            suffixIcon: InkWell(
-                onTap: () {
-                  BlocProvider.of<InsertstockBloc>(context)
-                      .add(DataChange(data.copywith(
-                    tempatBeli: Tempatbeli.pure(),
-                  )));
-                },
-                child: Icon(Icons.close_rounded)),
-            floatingLabelBehavior: FloatingLabelBehavior.always,
-            labelStyle: TextStyle(overflow: TextOverflow.clip),
-            labelText: 'Tempat Beli',
-          ),
-        ),
-        onSuggestionSelected: (TempatBeli val) {
+    return TypeAheadField(
+        controller: placec,
+        focusNode: fsn2,
+        builder: (context, controller, focusNode) => TextField(
+              focusNode: focusNode,
+              onEditingComplete: () => FocusScope.of(context).unfocus(),
+              controller: controller,
+              onChanged: (v) {
+                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                    data.copywith(tempatBeli: Tempatbeli.dirty(placec.text))));
+              },
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                suffixIcon: InkWell(
+                    onTap: () {
+                      BlocProvider.of<InsertstockBloc>(context)
+                          .add(DataChange(data.copywith(
+                        tempatBeli: Tempatbeli.pure(),
+                      )));
+                    },
+                    child: Icon(Icons.close_rounded)),
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                labelStyle: TextStyle(overflow: TextOverflow.clip),
+                labelText: 'Tempat Beli',
+              ),
+            ),
+        onSelected: (TempatBeli val) {
           BlocProvider.of<InsertstockBloc>(context).add(DataChange(
               data.copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
         },

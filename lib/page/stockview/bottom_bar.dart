@@ -179,15 +179,15 @@ class BottomBar extends StatelessWidget {
                           children: [
                             Text(
                               (state.filter.currentPage + 1).toString(),
-                              textScaleFactor: 1.4,
+                              textScaler: TextScaler.linear(1.4),
                             ),
                             Text(
                               '/',
-                              textScaleFactor: 1.4,
+                              textScaler: TextScaler.linear(1.4),
                             ),
                             Text(
                               (state.filter.maxPage + 1).toString(),
-                              textScaleFactor: 1.4,
+                              textScaler: TextScaler.linear(1.4),
                             ),
                           ],
                         ),

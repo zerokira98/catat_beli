@@ -45,7 +45,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 Expanded(
                     child: Text(
                   'Pencatatan Pembelian',
-                  textScaleFactor: 1.35,
+                  textScaler: TextScaler.linear(1.35),
                   style: TextStyle(color: Colors.white),
                 )),
               ],

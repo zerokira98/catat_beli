@@ -13,7 +13,7 @@ class InsertProductCard extends StatefulWidget {
 
 class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
-  SuggestionsBoxController sbc = SuggestionsBoxController();
+  SuggestionsController<StockItem> sbc = SuggestionsController();
   TextEditingController hargaBeli = TextEditingController();
   TextEditingController namec = TextEditingController(),
       datec = TextEditingController(),

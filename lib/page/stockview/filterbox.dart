@@ -51,7 +51,7 @@ class FilterBox extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Text(
                               'Filter',
-                              textScaleFactor: 1.75,
+                              textScaler: TextScaler.linear(1.75),
                               textAlign: TextAlign.left,
                             ),
                           ),
@@ -152,8 +152,7 @@ class FilterBox extends StatelessWidget {
                                                 .state as StockviewLoaded)
                                             .filter
                                             .endDate),
-                                firstDate: DateTime.now()
-                                    .subtract(Duration(days: 365 * 2)),
+                                firstDate: DateTime(2018),
                                 lastDate:
                                     DateTime.now().add(Duration(days: 365)));
                             if (selectedDate != null) {
@@ -198,8 +197,7 @@ class FilterBox extends StatelessWidget {
                                                 .state as StockviewLoaded)
                                             .filter
                                             .endDate),
-                                firstDate: DateTime.now()
-                                    .subtract(Duration(days: 365 * 2)),
+                                firstDate: DateTime(2018),
                                 lastDate:
                                     DateTime.now().add(Duration(days: 365)));
                             if (selectedDate != null) {

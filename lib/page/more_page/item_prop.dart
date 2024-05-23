@@ -150,7 +150,7 @@ class _ListOfItemsState extends State<ListOfItems> {
                                     children: [
                                       Text(
                                         'Filter',
-                                        textScaleFactor: 1.8,
+                                        textScaler: TextScaler.linear(1.8),
                                       ),
                                       Row(
                                         children: [
@@ -248,7 +248,7 @@ class _ListOfItemsState extends State<ListOfItems> {
                                   children: [
                                     Text(
                                       'Filter',
-                                      textScaleFactor: 1.8,
+                                      textScaler: TextScaler.linear(1.8),
                                     ),
                                     Row(
                                       children: [
@@ -321,7 +321,7 @@ class EditItemPage extends StatefulWidget {
 
 class _EditItemPageState extends State<EditItemPage>
     with TickerProviderStateMixin {
-  SuggestionsBoxController sbc = SuggestionsBoxController();
+  SuggestionsController sbc = SuggestionsController();
 
   TextEditingController namec = TextEditingController(),
       hargaJual = TextEditingController(),

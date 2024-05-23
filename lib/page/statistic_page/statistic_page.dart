@@ -109,7 +109,8 @@ class _StatsPageState extends State<StatsPage> {
               Text(
                 'Pembelian Terbesar:',
                 style: TextStyle(fontSize: 24),
-                // textScaleFactor: 1.25,
+                //
+                textScaler: TextScaler.linear(1.25),
               ),
               FutureBuilder<List<StockWithDetails>>(
                   future: RepositoryProvider.of<MyDatabase>(context)
@@ -341,13 +342,14 @@ class ChartWidgetState extends State<ChartWidget> {
         primaryXAxis: CategoryAxis(),
         // primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),
         tooltipBehavior: _tooltip,
-        series: <ChartSeries<_ChartData, String>>[
-          AreaSeries<_ChartData, String>(
-              dataSource: data,
-              xValueMapper: (_ChartData data, _) => data.x,
-              yValueMapper: (_ChartData data, _) => data.y,
-              // name: 'Gold',
-              color: Theme.of(context).primaryColor)
+        series: [
+          AreaSeries(
+            dataSource: data,
+            xValueMapper: (data, _) => data.x,
+            yValueMapper: (data, _) => data.y,
+            // name: 'Gold',
+            // color: Theme.of(context).primaryColor)
+          )
         ]);
   }
 }

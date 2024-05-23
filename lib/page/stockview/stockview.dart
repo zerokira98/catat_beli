@@ -114,7 +114,7 @@ class _ListOfStockItemsState extends State<ListOfStockItems> {
                               .filter
                               .endDate))
                           .toString(),
-                  textScaleFactor: 0.65,
+                  textScaler: TextScaler.linear(0.65),
                 )
               ],
             );

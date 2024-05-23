@@ -179,7 +179,7 @@ class ChartWidgetperItemState extends State<ChartWidgetperItem> {
         primaryXAxis: CategoryAxis(),
         // primaryYAxis: NumericAxis(minimum: 0, maximum: 40, interval: 10),
         tooltipBehavior: _tooltip,
-        series: <ChartSeries<_ChartData, String>>[
+        series: [
           AreaSeries<_ChartData, String>(
               dataSource: data,
               xValueMapper: (_ChartData data, _) =>

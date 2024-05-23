@@ -77,7 +77,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                               children: [
                                 Text(
                                   'Submit',
-                                  textScaleFactor: 1.2,
+                                  textScaler: TextScaler.linear(1.2),
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w500),
