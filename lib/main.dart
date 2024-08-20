@@ -24,6 +24,8 @@ main() async {
     final db = sql.sqlite3.openInMemory();
     db.dispose();
   }
+
+  Bloc.observer = SimpleBlocObserver();
   WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: await getTemporaryDirectory());
@@ -115,5 +117,13 @@ class App extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SimpleBlocObserver extends BlocObserver {
+  @override
+  void onChange(BlocBase bloc, Change change) {
+    super.onChange(bloc, change);
+    print('${bloc.runtimeType}');
   }
 }

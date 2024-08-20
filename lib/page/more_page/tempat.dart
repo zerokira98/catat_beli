@@ -35,6 +35,7 @@ class _TempatEditState extends State<TempatEdit> {
                             setState(() {});
                           },
                           title: Text('${snap.data![i].nama}'),
+                          subtitle: Text(snap.data![i].alamat ?? ''),
                         )
                       : Container();
                 },

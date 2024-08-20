@@ -35,7 +35,7 @@ class FilterBox extends StatelessWidget {
             decoration: BoxDecoration(
                 color: Theme.of(context).brightness == Brightness.light
                     ? Colors.white
-                    : Theme.of(context).colorScheme.background,
+                    : Theme.of(context).colorScheme.onSecondary,
                 border: Border.all(color: Colors.grey[50]!),
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(18.0))),
@@ -129,7 +129,7 @@ class FilterBox extends StatelessWidget {
                                 )));
                               },
                               style: ButtonStyle(
-                                  elevation: MaterialStatePropertyAll(1.0)),
+                                  elevation: WidgetStatePropertyAll(2.0)),
                               child: Text('1Year'))
                         ],
                       ),

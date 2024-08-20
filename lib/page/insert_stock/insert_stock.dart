@@ -5,6 +5,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
 import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
+import 'package:catatbeli/page/more_page/item_prop.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -17,7 +18,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart'; 
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
 part 'insert_components.dart';
@@ -162,12 +163,23 @@ class _InsertProductPageState extends State<InsertProductPage> {
                     backgroundColor: Colors.green,
                     content: const Text('Berhasil'),
                   ));
+
+                  BlocProvider.of<StockviewBloc>(context).add(InitiateView());
+                  Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => ListOfStockItems(),
+                      ));
                 } else {
                   if (state.msg != null && state.msg!.isNotEmpty)
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('Terjadi kesalahan:${state.msg!}'),
                     ));
                 }
+              }
+            } else {
+              if (state.data.isEmpty) {
+                BlocProvider.of<InsertstockBloc>(context).add(Initiate());
               }
             }
             if (state.msg != null) {
@@ -191,6 +203,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
           child: Container(
             child: BlocBuilder<InsertstockBloc, InsertstockState>(
               builder: (context, state) {
+                // print(state);
                 if (state.isLoading) {
                   if (state.isLoaded == false) {
                     return Center(
@@ -217,6 +230,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                   ? MediaQuery.of(context).size.width * 0.05
                                   : 4),
                           child: ListView.builder(
+                            padding: EdgeInsets.only(bottom: 120),
                             itemCount: state.data.length,
                             controller: scrollc,
                             itemBuilder: (context, i) => Row(children: [
@@ -245,7 +259,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                                     state.data[i],
                                     Key(state.data[i].cardId.toString()),
                                     scrollc),
-                              )
+                              ),
                             ]),
                           ),
                         ),

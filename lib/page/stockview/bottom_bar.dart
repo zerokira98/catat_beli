@@ -106,7 +106,7 @@ class BottomBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius:
                           BorderRadius.all(Radius.elliptical(18.0, 4.0)),
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     child: Center(

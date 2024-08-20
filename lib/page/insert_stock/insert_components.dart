@@ -43,9 +43,9 @@ class BarcodeField extends StatelessWidget {
 
 class HargaBeliField extends StatelessWidget {
   final TextEditingController hargaBeli;
+  // final FocusNode fsn = FocusNode();
   final ItemCards data;
-  const HargaBeliField(
-      {super.key, required this.hargaBeli, required this.data});
+  HargaBeliField({super.key, required this.hargaBeli, required this.data});
   String? hargabeliError() {
     // return widget.data.hargaBeli.invalid ? 'invalid' : null;
     switch (data.hargaBeli.error) {
@@ -63,6 +63,7 @@ class HargaBeliField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      // focusNode: fsn,
       onEditingComplete: () => FocusScope.of(context).unfocus(),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       onChanged: (v) {
@@ -80,6 +81,7 @@ class HargaBeliField extends StatelessWidget {
               maxLines: 1),
           suffixIcon: InkWell(
               onTap: () {
+                // fsn.requestFocus();
                 BlocProvider.of<InsertstockBloc>(context)
                     .add(DataChange(data.copywith(
                   hargaBeli: Hargabeli.dirty(0),
@@ -91,11 +93,15 @@ class HargaBeliField extends StatelessWidget {
 }
 
 class NamaBarangField extends StatelessWidget {
-  final SuggestionsController<StockItem> sbc;
+  // final SuggestionsController<StockItem> sbc;
   final TextEditingController namec;
   final ItemCards data;
-  const NamaBarangField(
-      {required this.sbc, required this.namec, required this.data, super.key});
+  const NamaBarangField({
+    // required this.sbc,
+    required this.namec,
+    required this.data,
+    super.key,
+  });
   String? namabarangError() {
     switch (data.namaBarang.error) {
       case NamaBarangValidationError.empty:
@@ -114,34 +120,17 @@ class NamaBarangField extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: TypeAheadField<StockItem>(
-              onSelected: (StockItem suggestion) async {
-                var res1 = await RepositoryProvider.of<MyDatabase>(context)
-                    .showInsideStock(idBarang: (suggestion.id));
-                var tempat = await RepositoryProvider.of<MyDatabase>(context)
-                    .tempatwithid(res1.last.idSupplier!);
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                    data.copywith(
-                        namaBarang: NamaBarang.dirty(suggestion.nama),
-                        productId: () => suggestion.id,
-                        hargaBeli: Hargabeli.dirty(
-                            res1.isNotEmpty ? res1.last.price : 0),
-                        tempatBeli: Tempatbeli.dirty(tempat.single.nama),
-                        barcode: Barcode.dirty(suggestion.barcode ?? 0),
-                        discount: Discount.pure()
-                        // hargaJual: suggestion,
-                        )));
-              },
+            child: TypeAheadField(
               // autovalidateMode: AutovalidateMode.onUserInteraction,
-              controller: namec,
-              suggestionsController: sbc,
-              builder: (context, controller, focusNode) => TextField(
+              // controller: namec,
+              // suggestionsController: sbc,
+              textFieldConfiguration: TextFieldConfiguration(
                   maxLines: 2,
-                  focusNode: focusNode,
+                  // focusNode: focusNode,
                   enableSuggestions: false,
                   minLines: 1,
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
-                  controller: controller,
+                  controller: namec,
                   onChanged: (v) {
                     var nv = v;
                     if (namec.text.isNotEmpty && namec.text.length >= 1) {
@@ -175,9 +164,45 @@ class NamaBarangField extends StatelessWidget {
               itemBuilder: (context, StockItem suggestion) {
                 if (suggestion.nama == '[deleted]') return Container();
                 return ListTile(
-                  leading: Icon(Icons.shopping_cart),
+                  dense: true,
+                  leading: IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ListOfItems(
+                                initQuery: suggestion.nama,
+                              ),
+                            ));
+                      },
+                      icon: Icon(Icons.edit)),
                   title: Text(suggestion.nama),
                 );
+              },
+
+              onSuggestionSelected: (StockItem suggestion) async {
+                // sbc.unfocus();
+                FocusScopeNode().unfocus();
+                FocusNode().unfocus();
+                var res1 = await RepositoryProvider.of<MyDatabase>(context)
+                    .showInsideStock(idBarang: (suggestion.id));
+                var tempat = await RepositoryProvider.of<MyDatabase>(context)
+                    .tempatwithid(res1.last.idSupplier!);
+                print(data.open);
+                print(data.created);
+                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                    data.copywith(
+                        open: () => true,
+                        created: () => true,
+                        namaBarang: NamaBarang.dirty(suggestion.nama),
+                        productId: () => suggestion.id,
+                        hargaBeli: Hargabeli.dirty(
+                            res1.isNotEmpty ? res1.last.price : 0),
+                        tempatBeli: Tempatbeli.dirty(tempat.single.nama),
+                        barcode: Barcode.dirty(suggestion.barcode ?? 0),
+                        discount: Discount.pure()
+                        // hargaJual: suggestion,
+                        )));
               },
               // onSuggestionSelected: (StockItem suggestion) async {
               //   var res1 = await RepositoryProvider.of<MyDatabase>(context)
@@ -251,10 +276,7 @@ class QtyField extends StatelessWidget {
       decoration: InputDecoration(
         errorText: pcsError(),
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        label: AutoSizeText(
-          'jumlah unit',
-          maxLines: 1,
-        ),
+        label: Text('jumlah ${data.modeHarga == 0 ? 'total' : 'pcs'}'),
         // labelText: 'jumlah unit',
       ),
     );
@@ -320,7 +342,8 @@ class TempatBeliField extends StatelessWidget {
   final TextEditingController placec;
   final FocusNode fsn2;
   final ItemCards data;
-  const TempatBeliField(
+  // final SuggestionsController<TempatBeli> sbc = SuggestionsController();
+  TempatBeliField(
       {super.key,
       required this.placec,
       required this.fsn2,
@@ -329,44 +352,54 @@ class TempatBeliField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TypeAheadField(
-        controller: placec,
-        focusNode: fsn2,
-        builder: (context, controller, focusNode) => TextField(
-              focusNode: focusNode,
-              onEditingComplete: () => FocusScope.of(context).unfocus(),
-              controller: controller,
-              onChanged: (v) {
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                    data.copywith(tempatBeli: Tempatbeli.dirty(placec.text))));
-              },
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                suffixIcon: InkWell(
-                    onTap: () {
-                      BlocProvider.of<InsertstockBloc>(context)
-                          .add(DataChange(data.copywith(
-                        tempatBeli: Tempatbeli.pure(),
-                      )));
-                    },
-                    child: Icon(Icons.close_rounded)),
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                labelStyle: TextStyle(overflow: TextOverflow.clip),
-                labelText: 'Tempat Beli',
-              ),
-            ),
-        onSelected: (TempatBeli val) {
-          BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-              data.copywith(tempatBeli: Tempatbeli.dirty(val.nama))));
+        // suggestionsController: sbc,
+        // focusNode: fsn2,
+        textFieldConfiguration: TextFieldConfiguration(
+          controller: placec,
+          focusNode: fsn2,
+          onEditingComplete: () => FocusScope.of(context).unfocus(),
+          // controller: controller,
+          onChanged: (v) {
+            BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                data.copywith(tempatBeli: Tempatbeli.dirty(placec.text))));
+          },
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            suffixIcon: InkWell(
+                onTap: () {
+                  fsn2.requestFocus();
+                  BlocProvider.of<InsertstockBloc>(context)
+                      .add(DataChange(data.copywith(
+                    tempatBeli: Tempatbeli.pure(),
+                  )));
+                },
+                child: Icon(Icons.close_rounded)),
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            labelStyle: TextStyle(overflow: TextOverflow.clip),
+            labelText: 'Tempat Beli',
+          ),
+        ),
+        onSuggestionSelected: (TempatBeli val) {
+          // sbc.unfocus();
+          BlocProvider.of<InsertstockBloc>(context)
+              .add(DataChange(data.copywith(
+            tempatBeli: Tempatbeli.dirty(val.nama),
+            created: () => true,
+            open: () => true,
+          )));
         },
         itemBuilder: (context, TempatBeli datas) {
           return ListTile(
+            dense: true,
             title: Text(datas.nama),
+            subtitle: Text(datas.alamat ?? ''),
           );
         },
         suggestionsCallback: (data) async {
           var vals =
               await RepositoryProvider.of<MyDatabase>(context).datatempat(data);
           List<TempatBeli> newvals = [];
+          print(vals);
           if (vals.isNotEmpty) {
             vals.forEach((element) {
               newvals.add(element);
@@ -624,6 +657,10 @@ class _FloatingOptionsState extends State<FloatingOptions> {
                 onTap: () {
                   FocusScope.of(context).unfocus();
                   widget.noteToggle();
+
+                  setState(() {
+                    openOption = false;
+                  });
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -689,7 +726,7 @@ class _DiscountFieldState extends State<DiscountField> {
         },
         keyboardType: TextInputType.number,
         decoration: InputDecoration(
-            label: widget.data.discountMode.index % 2 == 0
+            label: widget.data.discountMode.index == 0
                 ? Text('Total Discount')
                 : Text('Discount per pcs'),
             suffixIcon: IconButton(

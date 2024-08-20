@@ -56,7 +56,7 @@ class _SideDrawerState extends State<SideDrawer> {
       Expanded(
         child: ListView(children: [
           // ListTile(
-          //   trailing: Icon(Icons.android),
+          //   leading: Icon(Icons.android),
           //   subtitle: Text('Dev deug'),
           //   onTap: () async {
           //     var now = DateTime.now();
@@ -76,7 +76,7 @@ class _SideDrawerState extends State<SideDrawer> {
           //   title: Text('dev debug '),
           // ),
           ListTile(
-            trailing: Icon(Icons.history),
+            leading: Icon(Icons.history),
             subtitle: Text('Data Masuk Barang'),
             onTap: () {
               BlocProvider.of<StockviewBloc>(context).add(InitiateView());
@@ -86,7 +86,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Riwayat Stock'),
           ),
           ListTile(
-            trailing: Icon(Icons.edit),
+            leading: Icon(Icons.edit),
             subtitle: Text('Nama, barcode, dsb.'),
             onTap: () {
               Navigator.push(context,
@@ -95,7 +95,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Edit Barang'),
           ),
           ListTile(
-            trailing: Icon(Icons.edit),
+            leading: Icon(Icons.location_on),
             onTap: () {
               Navigator.push(context,
                   CupertinoPageRoute(builder: (context) => TempatEdit()));
@@ -103,7 +103,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Ganti Nama Tempat'),
           ),
           ListTile(
-            trailing: Icon(Icons.print),
+            leading: Icon(Icons.print),
             onTap: () {
               showDialog(
                   context: context,
@@ -114,7 +114,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Print to Excel'),
           ),
           ListTile(
-            trailing: Icon(Icons.auto_graph),
+            leading: Icon(Icons.auto_graph),
             onTap: () {
               Navigator.push(
                   context,
@@ -127,7 +127,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Statistik'),
           ),
           ListTile(
-            trailing: Icon(Icons.ac_unit),
+            leading: Icon(Icons.ac_unit),
             onTap: () async {
               final dbFolder = await getApplicationDocumentsDirectory();
               final file = File(p.join(dbFolder.path, 'db.sqlite'));
@@ -159,7 +159,7 @@ class _SideDrawerState extends State<SideDrawer> {
             title: Text('Backup .db'),
           ),
           ListTile(
-            trailing: Icon(Icons.ac_unit),
+            leading: Icon(Icons.ac_unit),
             onTap: () async {
               List sqliteHead = [
                 '53',

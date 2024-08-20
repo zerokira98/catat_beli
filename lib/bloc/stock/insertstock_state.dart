@@ -44,6 +44,11 @@ class InsertstockState extends Equatable {
 
   @override
   List<Object?> get props => [msg, isLoaded, isLoading, isSuccess] + data;
+
+  @override
+  String toString() {
+    return 'InsertstockState{isSuccess=$isSuccess, isLoaded=$isLoaded, isLoading=$isLoading, data=$data, msg=$msg, beforeState=$beforeState}';
+  }
 }
 
 // class InsertstockInitial extends InsertstockState {

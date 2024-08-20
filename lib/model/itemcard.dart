@@ -51,8 +51,8 @@ class ItemCards extends Equatable with FormzMixin {
       DiscountMode? discountMode,
       Tempatbeli? tempatBeli,
       int? Function()? productId,
-      bool? open,
-      bool? created,
+      bool? Function()? open,
+      bool? Function()? created,
       String? note,
       // GlobalKey<FormState>? formkey,
       Barcode? barcode,
@@ -63,8 +63,8 @@ class ItemCards extends Equatable with FormzMixin {
         barcode: barcode ?? this.barcode,
         modeHarga: modeHarga ?? this.modeHarga,
         discountMode: discountMode ?? this.discountMode,
-        open: open ?? this.open,
-        created: created ?? this.created,
+        open: open != null ? open() : this.open,
+        created: created != null ? created() : this.created,
         namaBarang: namaBarang ?? this.namaBarang,
         productId: productId != null ? productId() : this.productId,
         ditambahkan: ditambahkan ?? this.ditambahkan,
@@ -95,37 +95,14 @@ class ItemCards extends Equatable with FormzMixin {
         ditambahkan,
       ];
 
-  @override
-  String toString() {
-    return [
-      namaBarang,
-      hargaBeli,
-      hargaJual,
-      note,
-      pcs,
-      tempatBeli,
-      cardId,
-      open,
-      modeHarga,
-      created,
-      barcode,
-      productId,
-      ditambahkan,
-      discount,
-    ].toString();
-    // return 'open : $open';
-    // return '''{id: $id,nama: $name,open:$open,$hargaBeli, $hargaJual,
-    // $pcs, $tempatBeli, $id, $expdate, $barcode,$productId}''';
-  }
-
   ItemCards fromJson(Map<String, dynamic> json) {
     // print('ditambah' + json['ditambahkan'].toString());
     return ItemCards(
         barcode: Barcode.dirty(json['barcode']),
-        open: json['open'],
+        open: json['open'] ?? true,
         discount: Discount.dirty(json['discount']),
         namaBarang: NamaBarang.dirty(json['namaBarang']),
-        created: true,
+        created: json['namaBarang'],
         modeHarga: ModeHarga.values[json['modeHarga']],
         discountMode: DiscountMode.values[json['discountMode']],
         // formkey: formkey ?? this.formkey,
@@ -145,8 +122,8 @@ class ItemCards extends Equatable with FormzMixin {
     return {
       'barcode': this.barcode.value,
       'discount': this.discount.value,
-      'open': this.open,
-      'created': true,
+      'open': this.open ?? true,
+      'created': this.created ?? true,
       'modeHarga': this.modeHarga.index,
       'discountMode': this.discountMode.index,
       'namaBarang': this.namaBarang.value,

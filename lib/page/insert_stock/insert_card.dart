@@ -13,7 +13,7 @@ class InsertProductCard extends StatefulWidget {
 
 class _InsertProductCardState extends State<InsertProductCard>
     with TickerProviderStateMixin {
-  SuggestionsController<StockItem> sbc = SuggestionsController();
+  // SuggestionsController<StockItem> sbc = SuggestionsController();
   TextEditingController hargaBeli = TextEditingController();
   TextEditingController namec = TextEditingController(),
       datec = TextEditingController(),
@@ -37,21 +37,24 @@ class _InsertProductCardState extends State<InsertProductCard>
   @override
   void initState() {
     // hargaBeli = ;
+
+    super.initState();
     if (mounted) {
       fsn1.addListener(fsn1Listener);
       fsn2.addListener(fsn2Listener);
-      if (widget.data.created == false) {
-        print(widget.data.created);
-        print('huh');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted)
-            BlocProvider.of<InsertstockBloc>(context).add(
-                DataChange(widget.data.copywith(open: true, created: true)));
-        });
-      }
+      // if (widget.data.created == false) {
+      print(widget.data.created);
+      print('huh');
+      WidgetsBinding.instance.addPostFrameCallback((dur) {
+        if (mounted)
+          Future.delayed(
+            Durations.short1,
+            () => BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                widget.data.copywith(open: () => true, created: () => true))),
+          );
+      });
+      // }
     }
-
-    super.initState();
   }
 
   fsn1Listener() {
@@ -156,7 +159,11 @@ class _InsertProductCardState extends State<InsertProductCard>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  NamaBarangField(sbc: sbc, namec: namec, data: widget.data),
+                  NamaBarangField(
+                    // sbc: sbc,
+                    namec: namec,
+                    data: widget.data,
+                  ),
                   Padding(
                     padding: EdgeInsets.all(2),
                   ),

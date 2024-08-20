@@ -201,7 +201,7 @@ class StockviewBloc extends Bloc<StockviewEvent, StockviewState> {
       print(a);
       // yield StockviewInitial();
       add(InitiateView(
-          message: '[${event.data.namaBarang}] Deleted Sucsessfully'));
+          message: '[${event.data.namaBarang.value}] Deleted Sucsessfully'));
     }
   }
 }

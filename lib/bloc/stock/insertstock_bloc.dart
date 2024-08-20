@@ -3,6 +3,7 @@ import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
+import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'insertstock_event.dart';
@@ -49,6 +50,8 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     // if (!event.refresh) {
     List<ItemCards> data = [];
     if (event.fromstate != null) {
+      emit(InsertstockState(data: [], isLoaded: true, isLoading: true));
+      await Future.delayed(Durations.long2);
       emit(event.fromstate!);
     } else {
       emit(InsertstockState(
@@ -73,6 +76,7 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
   }
 
   void _dataChange(DataChange event, Emitter<InsertstockState> emit) async {
+    print('isloaded' + state.isLoaded.toString());
     if (state.isLoaded) {
       emit(InsertstockState(
         data: (state)
@@ -176,7 +180,8 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
     emit(InsertstockState(
       data: (state)
           .data
-          .map((e) => e.cardId == event.cardId ? e.copywith(open: false) : e)
+          .map((e) =>
+              e.cardId == event.cardId ? e.copywith(open: () => false) : e)
           .toList(),
       isLoaded: true,
       isLoading: false,
@@ -200,19 +205,13 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
   @override
   InsertstockState? fromJson(Map<String, dynamic> json) {
     // print('you here?');
-    // print('${json['state']['data']}');
     var prevData = (json['state']['data'] as List).map((e) {
-      print('a');
+      print('fromjson');
       return ItemCards().fromJson(e);
     }).toList();
-    // print(prevData);
     if (prevData.isEmpty) {
-      //   List<ItemCards> data = [];
-      // print('telo');
       return (InsertstockState(
           data: [], isLoaded: false, isLoading: true, isSuccess: false));
-      // data.add();
-      // add(Initiate());
     } else {
       if (prevData.length == 1 &&
           ItemCards()

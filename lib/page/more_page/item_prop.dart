@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 // import 'package:kasir/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:intl/intl.dart';
@@ -321,7 +320,7 @@ class EditItemPage extends StatefulWidget {
 
 class _EditItemPageState extends State<EditItemPage>
     with TickerProviderStateMixin {
-  SuggestionsController sbc = SuggestionsController();
+  // SuggestionsController sbc = SuggestionsController();
 
   TextEditingController namec = TextEditingController(),
       hargaJual = TextEditingController(),
@@ -413,6 +412,8 @@ class _EditItemPageState extends State<EditItemPage>
       ),
       appBar: AppBar(title: Text('Edit'), actions: [
         ElevatedButton(
+            style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(Colors.green)),
             onPressed: () async {
               if (_formkey.currentState!.validate()) {
                 // print('succ here');
@@ -426,7 +427,10 @@ class _EditItemPageState extends State<EditItemPage>
                         (value) => Navigator.pop(context, 'halo minnasan XD'));
               }
             },
-            child: Text('Save'))
+            child: Text(
+              'Save',
+              textScaler: TextScaler.linear(1.15),
+            ))
       ]),
       body: Column(
         children: [
