@@ -1,4 +1,4 @@
-package com.example.kasir
+package com.example.catat_beli
 
 import io.flutter.embedding.android.FlutterActivity
 

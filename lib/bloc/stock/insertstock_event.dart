@@ -24,8 +24,9 @@ class SendtoDB extends InsertstockEvent {
 }
 
 class AddCard extends InsertstockEvent {
+  final Map? item;
   // final int cardId;
-  // AddCard(this.cardId);
+  AddCard([this.item]);
 }
 
 class RemoveCard extends InsertstockEvent {

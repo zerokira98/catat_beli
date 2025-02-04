@@ -60,6 +60,8 @@ class HargaBeliField extends StatelessWidget {
     }
   }
 
+  final currencyFormatter = CurrencyTextInputFormatter.currency(
+      locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -69,8 +71,11 @@ class HargaBeliField extends StatelessWidget {
       onChanged: (v) {
         BlocProvider.of<InsertstockBloc>(context).add(DataChange(data.copywith(
           hargaBeli: Hargabeli.dirty(int.tryParse(hargaBeli.text) ?? 0),
+          // hargaBeli:
+          //     Hargabeli.dirty(currencyFormatter.getUnformattedValue().toInt()),
         )));
       },
+      // inputFormatters: [currencyFormatter],
       controller: hargaBeli,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
@@ -96,11 +101,13 @@ class NamaBarangField extends StatelessWidget {
   // final SuggestionsController<StockItem> sbc;
   final TextEditingController namec;
   final ItemCards data;
-  const NamaBarangField({
+  final FocusNode fn;
+  NamaBarangField({
     // required this.sbc,
     required this.namec,
     required this.data,
     super.key,
+    required this.fn,
   });
   String? namabarangError() {
     switch (data.namaBarang.error) {
@@ -126,31 +133,44 @@ class NamaBarangField extends StatelessWidget {
               // suggestionsController: sbc,
               textFieldConfiguration: TextFieldConfiguration(
                   maxLines: 2,
-                  // focusNode: focusNode,
+                  focusNode: fn,
                   enableSuggestions: false,
                   minLines: 1,
                   onEditingComplete: () => FocusScope.of(context).unfocus(),
                   controller: namec,
                   onChanged: (v) {
                     var nv = v;
-                    if (namec.text.isNotEmpty && namec.text.length >= 1) {
+                    if (namec.text.isNotEmpty && namec.text.length >= 2) {
                       if (namec.text[0] != namec.text[0].toUpperCase()) {
-                        print('here');
                         nv = namec.text[0].toUpperCase() +
                             namec.text.substring(1);
                       }
+                      BlocProvider.of<InsertstockBloc>(context)
+                          .add(DataChange(data.copywith(
+                        namaBarang: NamaBarang.dirty(nv),
+                        productId: () => null,
+                      )));
                     }
-                    BlocProvider.of<InsertstockBloc>(context)
-                        .add(DataChange(data.copywith(
-                      namaBarang: NamaBarang.dirty(nv),
-                      productId: () => null,
-                    )));
                   },
                   style: DefaultTextStyle.of(context)
                       .style
                       .copyWith(fontStyle: FontStyle.italic),
                   decoration: InputDecoration(
+                      hintText: data.fromOCR != null && data.fromOCR!
+                          ? data.namaBarang.value
+                          : '',
                       errorText: namabarangError(),
+                      suffixIcon: IconButton(
+                          onPressed: () {
+                            fn.requestFocus();
+                            // namec.clear();
+                            BlocProvider.of<InsertstockBloc>(context)
+                                .add(DataChange(data.copywith(
+                              namaBarang: NamaBarang.pure(),
+                              productId: () => null,
+                            )));
+                          },
+                          icon: Icon(Icons.clear)),
                       border: OutlineInputBorder(),
                       labelText: 'Nama item')),
               suggestionsCallback: (pattern) async {
@@ -188,21 +208,32 @@ class NamaBarangField extends StatelessWidget {
                     .showInsideStock(idBarang: (suggestion.id));
                 var tempat = await RepositoryProvider.of<MyDatabase>(context)
                     .tempatwithid(res1.last.idSupplier!);
-                print(data.open);
-                print(data.created);
-                BlocProvider.of<InsertstockBloc>(context).add(DataChange(
-                    data.copywith(
-                        open: () => true,
-                        created: () => true,
-                        namaBarang: NamaBarang.dirty(suggestion.nama),
-                        productId: () => suggestion.id,
-                        hargaBeli: Hargabeli.dirty(
-                            res1.isNotEmpty ? res1.last.price : 0),
-                        tempatBeli: Tempatbeli.dirty(tempat.single.nama),
-                        barcode: Barcode.dirty(suggestion.barcode ?? 0),
-                        discount: Discount.pure()
-                        // hargaJual: suggestion,
-                        )));
+                if (data.fromOCR != null && data.fromOCR!) {
+                  BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                      data.copywith(
+                          open: () => true,
+                          created: () => true,
+                          namaBarang: NamaBarang.dirty(suggestion.nama),
+                          productId: () => suggestion.id,
+                          barcode: Barcode.dirty(suggestion.barcode ?? 0),
+                          discount: Discount.pure()
+                          // hargaJual: suggestion,
+                          )));
+                } else {
+                  BlocProvider.of<InsertstockBloc>(context).add(DataChange(
+                      data.copywith(
+                          open: () => true,
+                          created: () => true,
+                          namaBarang: NamaBarang.dirty(suggestion.nama),
+                          productId: () => suggestion.id,
+                          hargaBeli: Hargabeli.dirty(
+                              res1.isNotEmpty ? res1.last.price : 0),
+                          tempatBeli: Tempatbeli.dirty(tempat.single.nama),
+                          barcode: Barcode.dirty(suggestion.barcode ?? 0),
+                          discount: Discount.pure()
+                          // hargaJual: suggestion,
+                          )));
+                }
               },
               // onSuggestionSelected: (StockItem suggestion) async {
               //   var res1 = await RepositoryProvider.of<MyDatabase>(context)

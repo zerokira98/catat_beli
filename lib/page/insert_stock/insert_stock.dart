@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -8,17 +9,23 @@ import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:catatbeli/page/more_page/item_prop.dart';
 import 'package:catatbeli/page/sidebar/sidebar.dart';
 import 'package:catatbeli/page/stockview/stockview.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 // import 'package:drift/drift.dart' as d;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
 import 'package:catatbeli/msc/db_moor.dart';
-import 'package:intl/intl.dart'; 
+import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:mime/mime.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 part 'insert_card.dart';
 part 'insert_components.dart';
@@ -45,6 +52,76 @@ class _InsertProductPageState extends State<InsertProductPage> {
               : Colors.transparent,
           title: Text('Masuk Barang'),
           actions: [
+            IconButton(
+                onPressed: () async {
+                  var capture = await ImagePicker()
+                      .pickImage(source: ImageSource.gallery);
+                  if (capture == null) return;
+                  // final inputImage = InputImage.fromFilePath(capture.path);
+                  // print();
+                  // final recognizedText =
+                  //     await TextRecognizer(script: TextRecognitionScript.latin)
+                  //         .processImage(inputImage);
+                  ///generative ai
+                  final model = GenerativeModel(
+                    model: 'gemini-1.5-flash-latest',
+                    apiKey: "AIzaSyC3H34M3VXfd9CBUoKD1TWxWEcoTBtK7L0",
+                  );
+
+                  String prompt = """
+                  Extract the invoice. If the invoice number, payment method, date, can't be extracted please put the string "UNKNOWN"
+
+                  Please return the response in the following JSON format:
+                   
+                  {
+                    "invoice_number": "Invoice Number",
+                    "store_name":"Store Name",
+                    "date": "Date",
+                    "payment_method":"PAYMENT METHOD",
+                    "items": [
+                      {
+                        "name": "Item Name",
+                        "quantity": Quantity,
+                        "price_per_unit": Price per unit,
+                        "total_price":"Total Price"
+                      },
+                      ...
+                    ],
+                    "subtotal": Subtotal,
+                    "tax": Tax,
+                    "total": Total
+                  }
+                  """;
+                  try {
+                    var contentdata = Content.data(
+                        lookupMimeType(capture.path) ?? '',
+                        await capture.readAsBytes());
+                    var contenttext = Content.text(prompt);
+                    final response =
+                        await model.generateContent([contentdata, contenttext]);
+
+                    // Extract the generated text which contains the JSON wrapped in ```json ```
+                    String generatedText = response.text
+                            ?.replaceFirst('```json', '')
+                            .replaceAll('```', '') ??
+                        '';
+                    print(generatedText);
+                    // Extract the JSON part from the wrapped ```json ``` text
+                    // String jsonString = extractJsonFromText(generatedText);
+
+                    // Convert the response into a JSON structure
+                    Map<String, dynamic> extractedData =
+                        jsonDecode(generatedText);
+                    print(extractedData);
+                    for (var e in extractedData['items']) {
+                      BlocProvider.of<InsertstockBloc>(context).add(AddCard(e));
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.maybeOf(context)
+                        ?.showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                },
+                icon: Icon(Icons.image_search)),
             Container(
               padding: EdgeInsets.all(8.0),
               child: MouseRegion(
@@ -146,7 +223,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   icon: Icon(Icons.delete_sweep),
                   // tooltip: 'Hapus Semua',
                 ),
-                Padding(padding: EdgeInsets.all(4)),
+                // Padding(padding: EdgeInsets.all(4)),
               ],
             ),
           ),
@@ -221,6 +298,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Padding(
@@ -262,6 +340,19 @@ class _InsertProductPageState extends State<InsertProductPage> {
                               ),
                             ]),
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Text(
+                          'Total : ${CurrencyTextInputFormatter.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).formatDouble(state.data.map(
+                                (e) => e.hargaBeli.value * e.pcs.value,
+                              ).toList().fold<double>(
+                                0,
+                                (previousValue, element) =>
+                                    previousValue + element,
+                              ))}',
+                          // textScaler: TextScaler.linear(0.55),
                         ),
                       ),
                     ],

@@ -23,6 +23,7 @@ class ItemCards extends Equatable with FormzMixin {
   final Barcode barcode;
   final bool? open;
   final bool? created;
+  final bool? fromOCR;
   final DateTime? ditambahkan;
 
   const ItemCards(
@@ -40,7 +41,8 @@ class ItemCards extends Equatable with FormzMixin {
       this.tempatBeli = const Tempatbeli.pure(),
       this.open,
       this.ditambahkan,
-      this.cardId});
+      this.cardId,
+      this.fromOCR});
   ItemCards copywith(
       {NamaBarang? namaBarang,
       Discount? discount,
@@ -52,6 +54,7 @@ class ItemCards extends Equatable with FormzMixin {
       Tempatbeli? tempatBeli,
       int? Function()? productId,
       bool? Function()? open,
+      bool? Function()? fromOCR,
       bool? Function()? created,
       String? note,
       // GlobalKey<FormState>? formkey,
@@ -64,6 +67,7 @@ class ItemCards extends Equatable with FormzMixin {
         modeHarga: modeHarga ?? this.modeHarga,
         discountMode: discountMode ?? this.discountMode,
         open: open != null ? open() : this.open,
+        fromOCR: fromOCR != null ? fromOCR() : this.fromOCR,
         created: created != null ? created() : this.created,
         namaBarang: namaBarang ?? this.namaBarang,
         productId: productId != null ? productId() : this.productId,

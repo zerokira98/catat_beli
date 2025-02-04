@@ -25,6 +25,7 @@ class _InsertProductCardState extends State<InsertProductCard>
   // final _formkey = GlobalKey<FormState>();
   bool noteVisible = false;
   bool discountVisible = false;
+  FocusNode fn = FocusNode();
   FocusNode fsn1 = FocusNode();
   FocusNode fsn2 = FocusNode();
   DateFormat dateFormat = DateFormat('d/MM/y');
@@ -161,6 +162,7 @@ class _InsertProductCardState extends State<InsertProductCard>
                 children: [
                   NamaBarangField(
                     // sbc: sbc,
+                    fn: fn,
                     namec: namec,
                     data: widget.data,
                   ),

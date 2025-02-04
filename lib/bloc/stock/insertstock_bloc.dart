@@ -139,14 +139,29 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         });
       }
     } else {
-      var whereErr = data.indexWhere((element) => element.isNotValid);
-
+      // var whereErr = data.indexWhere((element) => element.isNotValid);
+      List indexes = [];
+      var whereErr = data
+          .asMap()
+          .map(
+            (key, value) =>
+                value.isNotValid ? MapEntry(key, value) : MapEntry(null, null),
+          )
+          .keys
+          .toList()
+          .nonNulls
+          .map(
+            (e) => e + 1,
+          )
+          .toList();
+      print(whereErr);
+      for (var e in whereErr) {}
       emit(InsertstockState(
           data: data,
           isLoaded: true,
           isLoading: false,
           isSuccess: false,
-          msg: 'There is invalid data. \nNomor: ${whereErr + 1}'));
+          msg: 'There is invalid data. \nNomor: ${whereErr}'));
       await Future.delayed(Duration(seconds: 10), () {
         if (state.isLoaded) {
           emit((state).clearMsg());
@@ -164,11 +179,16 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
         data: prev +
             [
               ItemCards(
+                  fromOCR: event.item != null,
+                  namaBarang: NamaBarang.dirty(event.item?['name'] ?? ''),
+                  hargaBeli:
+                      Hargabeli.dirty(event.item?['price_per_unit'] ?? 0),
                   cardId: prev.isNotEmpty ? prev.last.cardId! + 1 : 1,
                   ditambahkan: tambahDate,
                   created: false,
                   tempatBeli: Tempatbeli.dirty(tempatBeli),
-                  pcs: Pcs.dirty(1),
+                  pcs: Pcs.dirty(
+                      (event.item?['quantity'] as num?)?.toDouble() ?? 1.0),
                   open: false)
             ],
         isLoaded: true,
