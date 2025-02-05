@@ -18,6 +18,7 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/model/itemcard.dart';
@@ -63,10 +64,11 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   //     await TextRecognizer(script: TextRecognitionScript.latin)
                   //         .processImage(inputImage);
                   ///generative ai
+                  await dotenv.load();
+                  print(dotenv.env['TELO']);
                   final model = GenerativeModel(
-                    model: 'gemini-1.5-flash-latest',
-                    apiKey: "AIzaSyC3H34M3VXfd9CBUoKD1TWxWEcoTBtK7L0",
-                  );
+                      model: 'gemini-1.5-flash-latest',
+                      apiKey: dotenv.env["TELO"] ?? "");
 
                   String prompt = """
                   Extract the invoice. If the invoice number, payment method, date, can't be extracted please put the string "UNKNOWN"

@@ -1,12 +1,14 @@
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
 import 'package:catatbeli/msc/themedatas.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:catatbeli/bloc/stock/insertstock_bloc.dart';
 import 'package:catatbeli/bloc/stockview/stockview_bloc.dart';
 import 'package:catatbeli/page/insert_stock/insert_stock.dart';
 import 'package:catatbeli/msc/db_moor.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,6 +21,10 @@ import 'package:sqlite3/open.dart';
 part 'windows_window.dart';
 
 main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // var str = await rootBundle.loadString('.env');
+  var env = await dotenv.load();
+  print(dotenv.env['TELO']);
   if (Platform.isWindows) {
     open.overrideFor(OperatingSystem.linux, _openOnWindows);
     final db = sql.sqlite3.openInMemory();
@@ -26,7 +32,6 @@ main() async {
   }
 
   Bloc.observer = SimpleBlocObserver();
-  WidgetsFlutterBinding.ensureInitialized();
   HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: await getTemporaryDirectory());
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
