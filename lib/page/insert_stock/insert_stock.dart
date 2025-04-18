@@ -65,10 +65,10 @@ class _InsertProductPageState extends State<InsertProductPage> {
                   //         .processImage(inputImage);
                   ///generative ai
                   await dotenv.load();
-                  print(dotenv.env['TELO']);
+                  // print(dotenv.env['TELO']);
                   final model = GenerativeModel(
                       model: 'gemini-1.5-flash-latest',
-                      apiKey: dotenv.env["TELO"] ?? "");
+                      apiKey: dotenv.env["API_KEY"] ?? "");
 
                   String prompt = """
                   Extract the invoice. If the invoice number, payment method, date, can't be extracted please put the string "UNKNOWN"

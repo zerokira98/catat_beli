@@ -1,4 +1,5 @@
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:catatbeli/msc/backupfile_uploader.dart';
 import 'package:catatbeli/msc/themedatas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,24 +19,45 @@ import 'dart:io';
 import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:sqlite3/open.dart';
 // import 'package:intl/intl.dart';
+import 'package:background_fetch/background_fetch.dart';
 part 'windows_window.dart';
+
+// [Android-only] This "Headless Task" is run when the Android app is terminated with `enableHeadless: true`
+// Be sure to annotate your callback function to avoid issues in release mode on Flutter >= 3.3.0
+@pragma('vm:entry-point')
+void backgroundFetchHeadlessTask(HeadlessTask task) async {
+  String taskId = task.taskId;
+  bool isTimeout = task.timeout;
+  if (isTimeout) {
+    // This task has exceeded its allowed running-time.
+    // You must stop what you're doing and immediately .finish(taskId)
+    print("[BackgroundFetch] Headless task timed-out: $taskId");
+    BackgroundFetch.finish(taskId);
+    return;
+  }
+  print('[BackgroundFetch] Headless event received.');
+  // Do your work here...
+  BackgroundFetch.finish(taskId);
+}
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // var str = await rootBundle.loadString('.env');
   var env = await dotenv.load();
-  print(dotenv.env['TELO']);
-  if (Platform.isWindows) {
-    open.overrideFor(OperatingSystem.linux, _openOnWindows);
-    final db = sql.sqlite3.openInMemory();
-    db.dispose();
-  }
+  // print(dotenv.env['TELO']);
 
   Bloc.observer = SimpleBlocObserver();
   HydratedBloc.storage = await HydratedStorage.build(
       storageDirectory: await getTemporaryDirectory());
   await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
+
+  // Register to receive BackgroundFetch events after app is terminated.
+  // Requires {stopOnTerminate: false, enableHeadless: true}
+  BackgroundFetch.registerHeadlessTask(backgroundFetchHeadlessTask);
   if (Platform.isWindows) {
+    open.overrideFor(OperatingSystem.linux, _openOnWindows);
+    final db = sql.sqlite3.openInMemory();
+    db.dispose();
     doWhenWindowReady(() {
       appWindow.size = Size(480, 720);
       appWindow.minSize = Size(420, 720);
@@ -52,12 +74,91 @@ ffi.DynamicLibrary _openOnWindows() {
   return ffi.DynamicLibrary.open(libraryNextToScript.path);
 }
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   App({
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
   final pageC = PageController();
+  bool _enabled = true;
+  int _status = 0;
+  List<DateTime> _events = [];
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initPlatformState() async {
+    // Configure BackgroundFetch.
+    int status = await BackgroundFetch.configure(
+        BackgroundFetchConfig(
+            minimumFetchInterval: 15,
+            stopOnTerminate: false,
+            enableHeadless: true,
+            requiresBatteryNotLow: false,
+            requiresCharging: false,
+            requiresStorageNotLow: false,
+            requiresDeviceIdle: false,
+            requiredNetworkType: NetworkType.NONE), (String taskId) async {
+      // <-- Event handler
+      // This is the fetch-event callback.
+      print("[BackgroundFetch] Event received $taskId");
+      setState(() {
+        _events.insert(0, new DateTime.now());
+      });
+      // IMPORTANT:  You must signal completion of your task or the OS can punish your app
+      // for taking too long in the background.
+      BackgroundFetch.finish(taskId);
+    }, (String taskId) async {
+      // <-- Task timeout handler.
+      // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
+      print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
+      BackgroundFetch.finish(taskId);
+    });
+    print('[BackgroundFetch] configure success: $status');
+    setState(() {
+      _status = status;
+    });
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+  }
+
+  void _onClickEnable(enabled) {
+    setState(() {
+      _enabled = enabled;
+    });
+    if (enabled) {
+      BackgroundFetch.start().then((int status) {
+        print('[BackgroundFetch] start success: $status');
+      }).catchError((e) {
+        print('[BackgroundFetch] start FAILURE: $e');
+      });
+    } else {
+      BackgroundFetch.stop().then((int status) {
+        print('[BackgroundFetch] stop success: $status');
+      });
+    }
+  }
+
+  void _onClickStatus() async {
+    int status = await BackgroundFetch.status;
+    print(_events);
+    print('[BackgroundFetch] status: $status');
+    setState(() {
+      _status = status;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

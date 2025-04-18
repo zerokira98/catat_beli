@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:catatbeli/bloc/cubit/theme_cubit.dart';
+import 'package:catatbeli/msc/backupfile_uploader.dart';
 import 'package:flutter/foundation.dart';
 // import 'package:catatbeli/msc/db_moor.dart';
 import 'package:catatbeli/page/statistic_page/statistic_page.dart';
@@ -128,6 +129,7 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.ac_unit),
+            onLongPress: () => BackupfileUploader().backup(),
             onTap: () async {
               final dbFolder = await getApplicationDocumentsDirectory();
               final file = File(p.join(dbFolder.path, 'db.sqlite'));
@@ -160,6 +162,7 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.ac_unit),
+            onLongPress: () => BackupfileUploader().restore(),
             onTap: () async {
               List sqliteHead = [
                 '53',
