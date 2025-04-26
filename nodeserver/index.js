@@ -57,7 +57,7 @@ app.post("/checkfile", upload.single(), (request, response, next) => {
   let uploadedfiledate = new Date(request.body.last_modified)
   let storagefiledate = new Date(dbdata.last_modified)
   if (request.body.hash == dbdata.hash) {
-    if (uploadedfiledate > storagefiledate) {
+    if (uploadedfiledate < storagefiledate) {
       response.send('same data,old data');
       return;
     }
@@ -74,7 +74,7 @@ app.post("/backupapi", upload.single('file'), async (request, response, next) =>
   dbdata.last_modified = request.body.last_modified;
   dbdata.hash = request.body.hash;
   jsondbfilewrite(dbdata);
-  fs.writeFileSync('/telo.db', request.file.buffer);
+  fs.writeFileSync('./telo.db', request.file.buffer);
   console.log(jsondbfileread);
   response.send('data updated')
 });
@@ -82,5 +82,11 @@ app.post("/backupapi", upload.single('file'), async (request, response, next) =>
 app.get("/restoreapi", upload.single('file'), async (request, response, next) => {
   let dbdata = JSON.parse(jsondbfileread);
   console.log((dbdata.filename));
-  response.sendFile(dbdata.filename, { root: __dirname })
+  response.send(JSON.stringify({ last_modified: dbdata.last_modified, download_url: "/restoreapifile" + "/" + dbdata.filename }));
+});
+app.get("/restoreapifile/:filename", upload.single('file'), async (request, response, next) => {
+  // let dbdata = JSON.parse(jsondbfileread);
+  console.log((request.body));
+  console.log((request.params.filename));
+  response.sendFile(request.params.filename, { root: __dirname })
 }); 

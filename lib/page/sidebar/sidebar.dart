@@ -56,26 +56,6 @@ class _SideDrawerState extends State<SideDrawer> {
       ),
       Expanded(
         child: ListView(children: [
-          // ListTile(
-          //   leading: Icon(Icons.android),
-          //   subtitle: Text('Dev deug'),
-          //   onTap: () async {
-          //     var now = DateTime.now();
-          //     var a = await RepositoryProvider.of<MyDatabase>(context)
-          //         .maxdataStock(
-          //             startDate: DateTime(2023, 2, 0),
-          //             endDate: DateTime(2023, 3, 0)
-          //                 .add(Duration(hours: 23, minutes: 59)));
-          //     print(a);
-          //     // for (var element in a) {
-          //     //   print(element);
-          //     // }
-          //     // BlocProvider.of<StockviewBloc>(context).add(InitiateView());
-          //     // Navigator.push(context,
-          //     //     CupertinoPageRoute(builder: (context) => ListOfStockItems()));
-          //   },
-          //   title: Text('dev debug '),
-          // ),
           ListTile(
             leading: Icon(Icons.history),
             subtitle: Text('Data Masuk Barang'),
@@ -129,7 +109,14 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.ac_unit),
-            onLongPress: () => BackupfileUploader().backup(),
+            onLongPress: () {
+              BackupfileUploader()
+                  .backup()
+                  .onError<Exception>((Exception e, d) {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(e.toString())));
+              });
+            },
             onTap: () async {
               final dbFolder = await getApplicationDocumentsDirectory();
               final file = File(p.join(dbFolder.path, 'db.sqlite'));
@@ -162,7 +149,48 @@ class _SideDrawerState extends State<SideDrawer> {
           ),
           ListTile(
             leading: Icon(Icons.ac_unit),
-            onLongPress: () => BackupfileUploader().restore(),
+            onLongPress: () {
+              showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Alert!'),
+                  content: Text('it will replace/remove all datas'),
+                  actions: [
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: Text('Sure')),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: Text('Cancel')),
+                  ],
+                ),
+              ).then(
+                (value) => value!
+                    ? BackupfileUploader().restore().onError<Exception>((e, s) {
+                        if (e.toString().contains('newer')) {
+                          ScaffoldMessenger.of(context)
+                            ..clearSnackBars()
+                            ..showSnackBar(SnackBar(
+                              content: Text(e.toString()),
+                              action: SnackBarAction(
+                                  label: 'replace',
+                                  onPressed: () =>
+                                      BackupfileUploader().restore(true)),
+                            ));
+                          return;
+                        }
+                        ScaffoldMessenger.of(context)
+                          ..clearSnackBars()
+                          ..showSnackBar(SnackBar(content: Text(e.toString())));
+                      })
+                    : ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('cancelled'))),
+              );
+            },
             onTap: () async {
               List sqliteHead = [
                 '53',
