@@ -15,8 +15,6 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -53,24 +51,25 @@ class _InsertProductPageState extends State<InsertProductPage> {
               : Colors.transparent,
           title: Text('Masuk Barang'),
           actions: [
-            IconButton(
-                onPressed: () async {
-                  var capture = await ImagePicker()
-                      .pickImage(source: ImageSource.gallery);
-                  if (capture == null) return;
-                  // final inputImage = InputImage.fromFilePath(capture.path);
-                  // print();
-                  // final recognizedText =
-                  //     await TextRecognizer(script: TextRecognitionScript.latin)
-                  //         .processImage(inputImage);
-                  ///generative ai
-                  await dotenv.load();
-                  // print(dotenv.env['TELO']);
-                  final model = GenerativeModel(
-                      model: 'gemini-1.5-flash-latest',
-                      apiKey: dotenv.env["API_KEY"] ?? "");
+            if (dotenv.env["GEMINI_API_KEY"] != null)
+              IconButton(
+                  onPressed: () async {
+                    var capture = await ImagePicker()
+                        .pickImage(source: ImageSource.gallery);
+                    if (capture == null) return;
+                    // final inputImage = InputImage.fromFilePath(capture.path);
+                    // print();
+                    // final recognizedText =
+                    //     await TextRecognizer(script: TextRecognitionScript.latin)
+                    //         .processImage(inputImage);
+                    ///generative ai
+                    await dotenv.load();
+                    // print(dotenv.env['TELO']);
+                    final model = GenerativeModel(
+                        model: 'gemini-1.5-flash-latest',
+                        apiKey: dotenv.env["GEMINI_API_KEY"] ?? "");
 
-                  String prompt = """
+                    String prompt = """
                   Extract the invoice. If the invoice number, payment method, date, can't be extracted please put the string "UNKNOWN"
 
                   Please return the response in the following JSON format:
@@ -94,36 +93,37 @@ class _InsertProductPageState extends State<InsertProductPage> {
                     "total": Total
                   }
                   """;
-                  try {
-                    var contentdata = Content.data(
-                        lookupMimeType(capture.path) ?? '',
-                        await capture.readAsBytes());
-                    var contenttext = Content.text(prompt);
-                    final response =
-                        await model.generateContent([contentdata, contenttext]);
+                    try {
+                      var contentdata = Content.data(
+                          lookupMimeType(capture.path) ?? '',
+                          await capture.readAsBytes());
+                      var contenttext = Content.text(prompt);
+                      final response = await model
+                          .generateContent([contentdata, contenttext]);
 
-                    // Extract the generated text which contains the JSON wrapped in ```json ```
-                    String generatedText = response.text
-                            ?.replaceFirst('```json', '')
-                            .replaceAll('```', '') ??
-                        '';
-                    print(generatedText);
-                    // Extract the JSON part from the wrapped ```json ``` text
-                    // String jsonString = extractJsonFromText(generatedText);
+                      // Extract the generated text which contains the JSON wrapped in ```json ```
+                      String generatedText = response.text
+                              ?.replaceFirst('```json', '')
+                              .replaceAll('```', '') ??
+                          '';
+                      print(generatedText);
+                      // Extract the JSON part from the wrapped ```json ``` text
+                      // String jsonString = extractJsonFromText(generatedText);
 
-                    // Convert the response into a JSON structure
-                    Map<String, dynamic> extractedData =
-                        jsonDecode(generatedText);
-                    print(extractedData);
-                    for (var e in extractedData['items']) {
-                      BlocProvider.of<InsertstockBloc>(context).add(AddCard(e));
+                      // Convert the response into a JSON structure
+                      Map<String, dynamic> extractedData =
+                          jsonDecode(generatedText);
+                      print(extractedData);
+                      for (var e in extractedData['items']) {
+                        BlocProvider.of<InsertstockBloc>(context)
+                            .add(AddCard(e));
+                      }
+                    } catch (e) {
+                      ScaffoldMessenger.maybeOf(context)
+                          ?.showSnackBar(SnackBar(content: Text(e.toString())));
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.maybeOf(context)
-                        ?.showSnackBar(SnackBar(content: Text(e.toString())));
-                  }
-                },
-                icon: Icon(Icons.image_search)),
+                  },
+                  icon: Icon(Icons.image_search)),
             Container(
               padding: EdgeInsets.all(8.0),
               child: MouseRegion(
@@ -235,6 +235,7 @@ class _InsertProductPageState extends State<InsertProductPage> {
             if (state.isLoaded) {
               if (state.data.isEmpty) {
                 BlocProvider.of<InsertstockBloc>(context).add(Initiate());
+                return;
               }
               if (state.isSuccess != null) {
                 if (state.isSuccess!) {

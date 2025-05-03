@@ -23,7 +23,23 @@ const multer = require('multer') // v1.0.5
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+/// db.json file init
+try {
+  let jsondbfileread = fs.readFileSync('./db.json', { encoding: 'utf-8' });
+
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    console.error('File not found!,creating...');
+
+    const stringdata = JSON.stringify({ "filename": "telo.db", "hash": "2736aa9969bc0710fabeecafaa05090f62758d9415ac07b2a26b02b97dce65ee", "last_modified": "2020-04-26T13:07:44.000" });
+    return fs.writeFileSync('./db.json', stringdata);
+  } else {
+    console.error('An error occurred:', err);
+  }
+}
+
 let jsondbfileread = fs.readFileSync('./db.json', { encoding: 'utf-8' });
+
 
 function jsondbfilewrite(map) {
   const stringdata = JSON.stringify(map);
@@ -42,15 +58,6 @@ app.listen(PORT, () => {
   console.log("Server Listening on PORT:", PORT);
 
 });
-app.get("/checkfile", (request, response) => {
-  const status = {
-    'Status': ' Running'
-  };
-  console.log(status);
-  console.log(fs.existsSync('db.json'));
-  response.send(status);
-});
-
 app.post("/checkfile", upload.single(), (request, response, next) => {
   console.log(fs.existsSync('db.json'));
   let dbdata = JSON.parse(jsondbfileread);
@@ -73,8 +80,11 @@ app.post("/backupapi", upload.single('file'), async (request, response, next) =>
   let dbdata = JSON.parse(jsondbfileread);
   dbdata.last_modified = request.body.last_modified;
   dbdata.hash = request.body.hash;
+  var newnameupdate = 'telo' + new Date(request.body.last_modified).toJSON().slice(0, 10) + '.db';
+  dbdata.filename = newnameupdate;
   jsondbfilewrite(dbdata);
-  fs.writeFileSync('./telo.db', request.file.buffer);
+  console.log('here');
+  fs.writeFileSync(__dirname + '/dbs/' + newnameupdate, request.file.buffer);
   console.log(jsondbfileread);
   response.send('data updated')
 });
@@ -88,5 +98,5 @@ app.get("/restoreapifile/:filename", upload.single('file'), async (request, resp
   // let dbdata = JSON.parse(jsondbfileread);
   console.log((request.body));
   console.log((request.params.filename));
-  response.sendFile(request.params.filename, { root: __dirname })
+  response.sendFile('/dbs/' + request.params.filename, { root: __dirname })
 }); 

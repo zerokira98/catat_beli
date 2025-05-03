@@ -256,7 +256,7 @@ Total : ${numFormat.format(harga * pcs)}''';
                   BoxShadow(blurRadius: 8, color: Colors.black26),
                 ],
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[700]
+                    ? Colors.grey[800]
                     : Colors.white,
               ),
               child: ListTile(

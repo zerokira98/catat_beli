@@ -9,7 +9,8 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 part 'insertstock_event.dart';
 part 'insertstock_state.dart';
 
-class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
+class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
+    with HydratedMixin {
   final MyDatabase db;
   InsertstockBloc(this.db)
       : super(InsertstockState(
@@ -17,6 +18,7 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
           isLoaded: false,
           isLoading: true,
         )) {
+    hydrate();
     on<Initiate>(_initiate);
     on<ClearAll>(_clearDatas);
     on<DataChange>(_dataChange);
@@ -224,31 +226,35 @@ class InsertstockBloc extends HydratedBloc<InsertstockEvent, InsertstockState> {
 
   @override
   InsertstockState? fromJson(Map<String, dynamic> json) {
-    // print('you here?');
+    print('you here?');
     var prevData = (json['state']['data'] as List).map((e) {
       print('fromjson');
-      return ItemCards().fromJson(e);
+      return ItemCards.fromJson(e);
     }).toList();
     if (prevData.isEmpty) {
-      return (InsertstockState(
-          data: [], isLoaded: false, isLoading: true, isSuccess: false));
+      print('empty prev');
+      return null;
+      // return (InsertstockState(
+      //     data: [], isLoaded: false, isLoading: true, isSuccess: false));
     } else {
       if (prevData.length == 1 &&
-          ItemCards()
-              .fromJson(json['state']['data'][0])
+          ItemCards.fromJson(json['state']['data'][0])
               .namaBarang
               .value
               .trim()
               .isEmpty) {
+        print('single prev, empty name');
         return InsertstockState(data: [
-          ItemCards()
-              .fromJson(json['state']['data'][0])
+          ItemCards.fromJson(json['state']['data'][0])
               .copywith(ditambahkan: DateTime.now())
         ], isLoaded: true, isLoading: false, isSuccess: false);
       }
+      print((json['state']['data'] as List)
+          .map((e) => ItemCards.fromJson(e))
+          .toList());
       return InsertstockState(
           data: (json['state']['data'] as List)
-              .map((e) => ItemCards().fromJson(e))
+              .map((e) => ItemCards.fromJson(e))
               .toList(),
           isLoaded: true,
           isLoading: false,
