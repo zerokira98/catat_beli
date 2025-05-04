@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:catatbeli/main.dart';
 import 'package:catatbeli/model/itemcard_formz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:catatbeli/model/itemcard.dart';
@@ -12,13 +13,14 @@ part 'insertstock_state.dart';
 class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
     with HydratedMixin {
   final MyDatabase db;
-  InsertstockBloc(this.db)
+  final HydratedStorage storage;
+  InsertstockBloc(this.db, this.storage)
       : super(InsertstockState(
           data: [],
           isLoaded: false,
           isLoading: true,
         )) {
-    hydrate();
+    hydrate(storage: storage);
     on<Initiate>(_initiate);
     on<ClearAll>(_clearDatas);
     on<DataChange>(_dataChange);
@@ -142,7 +144,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
       }
     } else {
       // var whereErr = data.indexWhere((element) => element.isNotValid);
-      List indexes = [];
+      // List indexes = [];
       var whereErr = data
           .asMap()
           .map(
@@ -157,7 +159,7 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
           )
           .toList();
       print(whereErr);
-      for (var e in whereErr) {}
+      // for (var e in whereErr) {}
       emit(InsertstockState(
           data: data,
           isLoaded: true,
@@ -226,36 +228,27 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
 
   @override
   InsertstockState? fromJson(Map<String, dynamic> json) {
-    print('you here?');
-    var prevData = (json['state']['data'] as List).map((e) {
-      print('fromjson');
+    print('you here, from json');
+    var prevData = (json['data'] as List<dynamic>).map((e) {
       return ItemCards.fromJson(e);
     }).toList();
     if (prevData.isEmpty) {
       print('empty prev');
-      return null;
-      // return (InsertstockState(
-      //     data: [], isLoaded: false, isLoading: true, isSuccess: false));
+      // return null;
+      return (InsertstockState(
+          data: [], isLoaded: false, isLoading: true, isSuccess: false));
     } else {
       if (prevData.length == 1 &&
-          ItemCards.fromJson(json['state']['data'][0])
-              .namaBarang
-              .value
-              .trim()
-              .isEmpty) {
+          ItemCards.fromJson(json['data'][0]).namaBarang.value.trim().isEmpty) {
         print('single prev, empty name');
         return InsertstockState(data: [
-          ItemCards.fromJson(json['state']['data'][0])
+          ItemCards.fromJson(json['data'][0])
               .copywith(ditambahkan: DateTime.now())
         ], isLoaded: true, isLoading: false, isSuccess: false);
       }
-      print((json['state']['data'] as List)
-          .map((e) => ItemCards.fromJson(e))
-          .toList());
       return InsertstockState(
-          data: (json['state']['data'] as List)
-              .map((e) => ItemCards.fromJson(e))
-              .toList(),
+          data:
+              (json['data'] as List).map((e) => ItemCards.fromJson(e)).toList(),
           isLoaded: true,
           isLoading: false,
           isSuccess: false);
@@ -269,12 +262,11 @@ class InsertstockBloc extends Bloc<InsertstockEvent, InsertstockState>
     print(state.data.map((ItemCards e) {
       return e.toJson();
     }).toList());
-    return {
-      'state': {
-        'data': state.data.map((ItemCards e) {
-          return e.toJson();
-        }).toList(),
-      }
+    Map<String, dynamic> theJson = {
+      'data': state.data.map((ItemCards e) {
+        return e.toJson();
+      }).toList(),
     };
+    return theJson;
   }
 }

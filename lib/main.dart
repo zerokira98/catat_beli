@@ -20,33 +20,19 @@ import 'package:sqlite3/open.dart';
 // import 'package:intl/intl.dart';
 part 'windows_window.dart';
 
-// [Android-only] This "Headless Task" is run when the Android app is terminated with `enableHeadless: true`
-// Be sure to annotate your callback function to avoid issues in release mode on Flutter >= 3.3.0
-// @pragma('vm:entry-point')
-// void backgroundFetchHeadlessTask(HeadlessTask task) async {
-//   String taskId = task.taskId;
-//   bool isTimeout = task.timeout;
-//   if (isTimeout) {
-//     // This task has exceeded its allowed running-time.
-//     // You must stop what you're doing and immediately .finish(taskId)
-//     print("[BackgroundFetch] Headless task timed-out: $taskId");
-//     BackgroundFetch.finish(taskId);
-//     return;
-//   }
-//   print('[BackgroundFetch] Headless event received.');
-//   // Do your work here...
-//   BackgroundFetch.finish(taskId);
-// }
-
 main() async {
   // var str = await rootBundle.loadString('.env');
   await dotenv.load();
-  Bloc.observer = SimpleBlocObserver();
-  HydratedBloc.storage = await HydratedStorage.build(
+  WidgetsFlutterBinding.ensureInitialized();
+  // Bloc.observer = SimpleBlocObserver();
+  var thestorage = await HydratedStorage.build(
       storageDirectory: HydratedStorageDirectory(
           (await getApplicationDocumentsDirectory()).path));
-  WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('id_ID', null).then((_) => runApp(App()));
+  HydratedBloc.storage = thestorage;
+  print(HydratedStorageDirectory((await getApplicationCacheDirectory()).path)
+      .path);
+  await initializeDateFormatting('id_ID', null)
+      .then((_) => runApp(App(thestorage)));
 
   // Register to receive BackgroundFetch events after app is terminated.
   // Requires {stopOnTerminate: false, enableHeadless: true}
@@ -73,103 +59,11 @@ ffi.DynamicLibrary _openOnWindows() {
 
 class App extends StatelessWidget {
   final pageC = PageController();
+  final HydratedStorage thestorage;
+  App(this.thestorage);
   // bool _enabled = true;
   // int _status = 0;
   // List<DateTime> _events = [];
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   Future.delayed(
-  //     Durations.extralong4,
-  //     () {
-  //       WidgetsBinding.instance.addPostFrameCallback((_) {
-  //         // BackupfileUploader().backup().onError(
-  //         //   (error, stackTrace) {
-  //         //     print(error);
-  //         //   },
-  //         // );
-  //         var env = dotenv.load().then(
-  //           (value) {
-  //             if (dotenv.env['GEMINI_API_KEY'] == null) {
-  //               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-  //                   content:
-  //                       Text('api variable not found, unable to use gemini.')));
-  //               print(dotenv.env['GEMINI_API_KEY'] ??
-  //                   'api variable not found, unable to use gemini.');
-  //             }
-  //           },
-  //         );
-  //       });
-  //     },
-  //   );
-  //   // initPlatformState();
-  // }
-
-  // // Platform messages are asynchronous, so we initialize in an async method.
-  // Future<void> initPlatformState() async {
-  //   // Configure BackgroundFetch.
-  //   int status = await BackgroundFetch.configure(
-  //       BackgroundFetchConfig(
-  //           minimumFetchInterval: 15,
-  //           stopOnTerminate: false,
-  //           enableHeadless: true,
-  //           requiresBatteryNotLow: false,
-  //           requiresCharging: false,
-  //           requiresStorageNotLow: false,
-  //           requiresDeviceIdle: false,
-  //           requiredNetworkType: NetworkType.NONE), (String taskId) async {
-  //     // <-- Event handler
-  //     // This is the fetch-event callback.
-  //     print("[BackgroundFetch] Event received $taskId");
-  //     setState(() {
-  //       _events.insert(0, new DateTime.now());
-  //     });
-  //     // IMPORTANT:  You must signal completion of your task or the OS can punish your app
-  //     // for taking too long in the background.
-  //     BackgroundFetch.finish(taskId);
-  //   }, (String taskId) async {
-  //     // <-- Task timeout handler.
-  //     // This task has exceeded its allowed running-time.  You must stop what you're doing and immediately .finish(taskId)
-  //     print("[BackgroundFetch] TASK TIMEOUT taskId: $taskId");
-  //     BackgroundFetch.finish(taskId);
-  //   });
-  //   print('[BackgroundFetch] configure success: $status');
-  //   setState(() {
-  //     _status = status;
-  //   });
-
-  //   // If the widget was removed from the tree while the asynchronous platform
-  //   // message was in flight, we want to discard the reply rather than calling
-  //   // setState to update our non-existent appearance.
-  //   if (!mounted) return;
-  // }
-
-  // void _onClickEnable(enabled) {
-  //   setState(() {
-  //     _enabled = enabled;
-  //   });
-  //   if (enabled) {
-  //     BackgroundFetch.start().then((int status) {
-  //       print('[BackgroundFetch] start success: $status');
-  //     }).catchError((e) {
-  //       print('[BackgroundFetch] start FAILURE: $e');
-  //     });
-  //   } else {
-  //     BackgroundFetch.stop().then((int status) {
-  //       print('[BackgroundFetch] stop success: $status');
-  //     });
-  //   }
-  // }
-
-  // void _onClickStatus() async {
-  //   int status = await BackgroundFetch.status;
-  //   print(_events);
-  //   print('[BackgroundFetch] status: $status');
-  //   setState(() {
-  //     _status = status;
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -182,8 +76,8 @@ class App extends StatelessWidget {
                 ThemeCubit(themeDatas: ThemeDatas())..getThemeData(),
           ),
           BlocProvider(
-            create: (context) =>
-                InsertstockBloc(RepositoryProvider.of<MyDatabase>(context)),
+            create: (context) => InsertstockBloc(
+                RepositoryProvider.of<MyDatabase>(context), thestorage),
             // ..add(Initiate(refresh: false)),
           ),
           BlocProvider(
@@ -234,13 +128,5 @@ class App extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class SimpleBlocObserver extends BlocObserver {
-  @override
-  void onChange(BlocBase bloc, Change change) {
-    super.onChange(bloc, change);
-    print('${bloc.runtimeType}');
   }
 }
